@@ -1,0 +1,3 @@
+[submodule "regesten-schemas"]
+	path = regesten-schemas
+	url = https://github.com/itsjeyd/regesten-schemas.git
