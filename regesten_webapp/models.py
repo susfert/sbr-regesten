@@ -80,7 +80,7 @@ class SealInfo(RegestInfo):
         return self
 
 
-class ArchiveInfo(models.Model):
+class ArchiveInfo(RegestInfo):
     """
     The RegestArchive model represents an archive associated with a
     regest.
@@ -92,7 +92,7 @@ class ArchiveInfo(models.Model):
         return self
 
 
-class PrintInfo(models.Model):
+class PrintInfo(RegestInfo):
     """
     The PrintInfo model represents print information about a regest.
 
@@ -103,7 +103,7 @@ class PrintInfo(models.Model):
         return self
 
 
-class TranslationInfo(models.Model):
+class TranslationInfo(RegestInfo):
     """
     The TranslationInfo model represents translation information about
     a regest.
@@ -115,7 +115,7 @@ class TranslationInfo(models.Model):
         return self
 
 
-class OriginalInfo(models.Model):
+class OriginalInfo(RegestInfo):
     """
     The OriginalInfo model represents information about the original
     version of a specific regest.
