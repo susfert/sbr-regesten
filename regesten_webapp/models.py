@@ -56,7 +56,31 @@ class RegestType(RegestInfo):
         return self
 
 
-class RegestArchive(models.Model):
+class OriginalDateInfo(RegestInfo):
+    """
+    The OriginalDateInfo represents information about the date of a
+    single regest as originally provided.
+
+    TODO: Add examples
+    """
+
+    def __unicode__(self):
+        return self
+
+
+class SealInfo(RegestInfo):
+    """
+    The SealInfo model represents information about the seal of a
+    single regest (such as the sealer).
+
+    TODO: Add examples
+    """
+
+    def __unicode__(self):
+        return self
+
+
+class ArchiveInfo(models.Model):
     """
     The RegestArchive model represents an archive associated with a
     regest.
@@ -68,9 +92,9 @@ class RegestArchive(models.Model):
         return self
 
 
-class RegestPrint(models.Model):
+class PrintInfo(models.Model):
     """
-    The RegestPrint model represents print information about a regest.
+    The PrintInfo model represents print information about a regest.
 
     TODO: Add examples
     """
@@ -79,10 +103,10 @@ class RegestPrint(models.Model):
         return self
 
 
-class RegestTranslation(models.Model):
+class TranslationInfo(models.Model):
     """
-    The RegestTranslation model represents translation information
-    about a regest.
+    The TranslationInfo model represents translation information about
+    a regest.
 
     TODO: Add examples
     """
@@ -91,10 +115,10 @@ class RegestTranslation(models.Model):
         return self
 
 
-class RegestOriginal(models.Model):
+class OriginalInfo(models.Model):
     """
-    The RegestOriginal model represents information about the origin
-    of a specific regest.
+    The OriginalInfo model represents information about the original
+    version of a specific regest.
 
     TODO: Add examples
     """
