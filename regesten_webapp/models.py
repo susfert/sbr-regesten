@@ -7,14 +7,14 @@ class Regest(models.Model):
 
     title = models.OneToOneField("RegestTitle")
     date = models.OneToOneField("RegestDate")
-    location = models.OneToOneField("RegestLocation")
-    regest_type = models.OneToOneField("RegestType")
+    location = models.OneToOneField("RegestLocation", null=True)
+    regest_type = models.OneToOneField("RegestType", null=True)
     content = models.OneToOneField("RegestContent")
     original_date = models.OneToOneField("OriginalDateInfo")
     seal = models.OneToOneField("SealInfo")
     archives = models.OneToOneField("ArchiveInfo")
     regest_print = models.OneToOneField("PrintInfo")
-    translation = models.OneToOneField("TranslationInfo")
+    translation = models.OneToOneField("TranslationInfo", null=True)
     original = models.OneToOneField("OriginalInfo")
 
     def __unicode__(self):
