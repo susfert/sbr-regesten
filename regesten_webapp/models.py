@@ -5,17 +5,17 @@ class Regest(models.Model):
     The Regest model represents a single regest.
     """
 
-    title = models.OneToOneField("RegestTitle")
+    title = models.OneToOneField("ShortInfo")
     date = models.OneToOneField("RegestDate")
-    location = models.OneToOneField("RegestLocation", null=True)
-    regest_type = models.OneToOneField("RegestType", null=True)
+    location = models.OneToOneField("ShortInfo", null=True)
+    regest_type = models.OneToOneField("ShortInfo", null=True)
     content = models.OneToOneField("RegestContent")
-    original_date = models.OneToOneField("OriginalDateInfo")
+    original_date = models.OneToOneField("ContentInfo")
     seal = models.OneToOneField("SealInfo")
-    archives = models.OneToOneField("ArchiveInfo")
-    regest_print = models.OneToOneField("PrintInfo")
-    translation = models.OneToOneField("TranslationInfo", null=True)
-    original = models.OneToOneField("OriginalInfo")
+    archives = models.OneToOneField("ContentInfo")
+    regest_print = models.OneToOneField("ContentInfo")
+    translation = models.OneToOneField("ContentInfo", null=True)
+    original = models.OneToOneField("ContentInfo")
 
     def __unicode__(self):
         return self
@@ -23,8 +23,7 @@ class Regest(models.Model):
 
 class RegestInfo(models.Model):
     """
-    Abstract superclass for models representing different types of
-    information about a regest.
+    Superclass for content type models.
     """
 
     class Meta:
@@ -34,52 +33,21 @@ class RegestInfo(models.Model):
         return self
 
 
-class RegestTitle(RegestInfo):
+class ShortInfo(RegestInfo):
     """
-    The RegestTitle model represents the title of a single regest.
-
-    TODO: Add examples
+    Superclass for content types that contain plain text and footnotes
+    only.
     """
 
-    name = models.CharField(max_length=70)
+    content = models.CharField(max_length=70)
 
     def __unicode__(self):
         return self
 
 
-class RegestLocation(RegestInfo):
+class ContentInfo(RegestInfo):
     """
-    The RegestLocation models represents the location of a single
-    regest.
-
-    TODO: Add examples
-    """
-
-    name = models.CharField(max_length=70)
-
-    def __unicode__(self):
-        return self
-
-
-class RegestType(RegestInfo):
-    """
-    The RegestType model represents the type of a single regest.
-
-    TODO: Add examples
-    """
-
-    name = models.CharField(max_length=70)
-
-    def __unicode__(self):
-        return self
-
-
-class OriginalDateInfo(RegestInfo):
-    """
-    The OriginalDateInfo represents information about the date of a
-    single regest as originally provided.
-
-    TODO: Add examples
+    Superclass for content types that can contain Quotes.
     """
 
     content = models.OneToOneField("Content")
@@ -88,7 +56,7 @@ class OriginalDateInfo(RegestInfo):
         return self
 
 
-class SealInfo(RegestInfo):
+class SealInfo(ContentInfo):
     """
     The SealInfo model represents information about the seal of a
     single regest (such as the sealer).
@@ -96,63 +64,7 @@ class SealInfo(RegestInfo):
     TODO: Add examples
     """
 
-    content = models.OneToOneField("Content")
     sealers = models.ManyToManyField("Person", null=True)
-
-    def __unicode__(self):
-        return self
-
-
-class ArchiveInfo(RegestInfo):
-    """
-    The RegestArchive model represents an archive associated with a
-    regest.
-
-    TODO: Add examples
-    """
-
-    content = models.OneToOneField("Content")
-
-    def __unicode__(self):
-        return self
-
-
-class PrintInfo(RegestInfo):
-    """
-    The PrintInfo model represents print information about a regest.
-
-    TODO: Add examples
-    """
-
-    content = models.OneToOneField("Content")
-
-    def __unicode__(self):
-        return self
-
-
-class TranslationInfo(RegestInfo):
-    """
-    The TranslationInfo model represents translation information about
-    a regest.
-
-    TODO: Add examples
-    """
-
-    content = models.OneToOneField("Content")
-
-    def __unicode__(self):
-        return self
-
-
-class OriginalInfo(RegestInfo):
-    """
-    The OriginalInfo model represents information about the original
-    version of a specific regest.
-
-    TODO: Add examples
-    """
-
-    content = models.OneToOneField("Content")
 
     def __unicode__(self):
         return self
@@ -214,7 +126,7 @@ class Content(models.Model):
         return self
 
 
-class RegestContent(Content):
+class RegestContent(RegestInfo, Content):
     """
     The RegestContent model represents the content of a single regest.
     """
@@ -223,7 +135,7 @@ class RegestContent(Content):
         return self
 
 
-class Footnote(models.Model):
+class Footnote(RegestInfo):
     """
     The footnote model represents footnotes referenced e.g. in the
     content of a regest.
@@ -233,7 +145,7 @@ class Footnote(models.Model):
         return self
 
 
-class Quote(models.Model):
+class Quote(RegestInfo):
     """
     The Quote model represents quotes embedded in e.g. the content of
     a regest.
