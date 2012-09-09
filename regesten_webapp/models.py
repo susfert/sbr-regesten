@@ -28,9 +28,6 @@ class RegestInfo(models.Model):
     Superclass for content type models.
     """
 
-    class Meta:
-        abstract = True
-
     def __unicode__(self):
         return self
 
