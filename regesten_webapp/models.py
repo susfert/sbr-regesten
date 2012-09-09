@@ -5,17 +5,19 @@ class Regest(models.Model):
     The Regest model represents a single regest.
     """
 
-    title = models.OneToOneField("ShortInfo")
+    title = models.OneToOneField("ShortInfo", related_name="+")
     date = models.OneToOneField("RegestDate")
-    location = models.OneToOneField("ShortInfo", null=True)
-    regest_type = models.OneToOneField("ShortInfo", null=True)
+    location = models.OneToOneField("ShortInfo", null=True, related_name="+")
+    regest_type = models.OneToOneField("ShortInfo", null=True, related_name="+")
     content = models.OneToOneField("RegestContent")
-    original_date = models.OneToOneField("ContentInfo")
+    original_date = models.OneToOneField(
+        "ContentInfo", related_name="+")
     seal = models.OneToOneField("SealInfo")
-    archives = models.OneToOneField("ContentInfo")
-    regest_print = models.OneToOneField("ContentInfo")
-    translation = models.OneToOneField("ContentInfo", null=True)
-    original = models.OneToOneField("ContentInfo")
+    archives = models.OneToOneField("ContentInfo", related_name="+")
+    regest_print = models.OneToOneField("ContentInfo", related_name="+")
+    translation = models.OneToOneField(
+        "ContentInfo", null=True, related_name="+")
+    original = models.OneToOneField("ContentInfo", related_name="+")
 
     def __unicode__(self):
         return self
@@ -140,6 +142,9 @@ class Footnote(RegestInfo):
     The footnote model represents footnotes referenced e.g. in the
     content of a regest.
     """
+
+    referenced_in = models.ForeignKey("RegestInfo", related_name="footnotes")
+    content = models.OneToOneField("Content")
 
     def __unicode__(self):
         return self
