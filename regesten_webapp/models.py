@@ -41,6 +41,8 @@ class RegestTitle(RegestInfo):
     TODO: Add examples
     """
 
+    name = models.CharField(max_length=70)
+
     def __unicode__(self):
         return self
 
@@ -53,6 +55,8 @@ class RegestLocation(RegestInfo):
     TODO: Add examples
     """
 
+    name = models.CharField(max_length=70)
+
     def __unicode__(self):
         return self
 
@@ -63,6 +67,8 @@ class RegestType(RegestInfo):
 
     TODO: Add examples
     """
+
+    name = models.CharField(max_length=70)
 
     def __unicode__(self):
         return self
@@ -76,6 +82,8 @@ class OriginalDateInfo(RegestInfo):
     TODO: Add examples
     """
 
+    content = models.OneToOneField("Content")
+
     def __unicode__(self):
         return self
 
@@ -87,6 +95,9 @@ class SealInfo(RegestInfo):
 
     TODO: Add examples
     """
+
+    content = models.OneToOneField("Content")
+    sealers = models.ManyToManyField("Person", null=True)
 
     def __unicode__(self):
         return self
@@ -100,6 +111,8 @@ class ArchiveInfo(RegestInfo):
     TODO: Add examples
     """
 
+    content = models.OneToOneField("Content")
+
     def __unicode__(self):
         return self
 
@@ -110,6 +123,8 @@ class PrintInfo(RegestInfo):
 
     TODO: Add examples
     """
+
+    content = models.OneToOneField("Content")
 
     def __unicode__(self):
         return self
@@ -123,6 +138,8 @@ class TranslationInfo(RegestInfo):
     TODO: Add examples
     """
 
+    content = models.OneToOneField("Content")
+
     def __unicode__(self):
         return self
 
@@ -135,6 +152,8 @@ class OriginalInfo(RegestInfo):
     TODO: Add examples
     """
 
+    content = models.OneToOneField("Content")
+
     def __unicode__(self):
         return self
 
@@ -145,6 +164,11 @@ class RegestDate(models.Model):
 
     TODO: Add examples
     """
+
+    start = models.OneToOneField("StartDate")
+    end = models.OneToOneField("EndDate")
+    alt_date = models.DateField(null=True)
+    exact = models.BooleanField()
 
     def __unicode__(self):
         return self
@@ -158,6 +182,9 @@ class StartDate(models.Model):
     TODO: Add examples
     """
 
+    date = models.DateField()
+    offset = models.CharField(max_length=30, null=True)
+
     def __unicode__(self):
         return self
 
@@ -169,6 +196,9 @@ class EndDate(models.Model):
 
     TODO: Add examples
     """
+
+    date = models.DateField()
+    offset = models.CharField(max_length=30, null=True)
 
     def __unicode__(self):
         return self
