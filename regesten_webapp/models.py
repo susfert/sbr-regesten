@@ -5,6 +5,18 @@ class Regest(models.Model):
     The Regest model represents a single regest.
     """
 
+    title = models.OneToOneField("RegestTitle")
+    date = models.OneToOneField("RegestDate")
+    location = models.OneToOneField("RegestLocation")
+    regest_type = models.OneToOneField("RegestType")
+    content = models.OneToOneField("RegestContent")
+    original_date = models.OneToOneField("OriginalDateInfo")
+    seal = models.OneToOneField("SealInfo")
+    archives = models.OneToOneField("ArchiveInfo")
+    regest_print = models.OneToOneField("PrintInfo")
+    translation = models.OneToOneField("TranslationInfo")
+    original = models.OneToOneField("OriginalInfo")
+
     def __unicode__(self):
         return self
 
