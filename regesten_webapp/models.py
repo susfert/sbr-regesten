@@ -46,7 +46,8 @@ class ShortInfo(RegestInfo):
 
 class ContentInfo(RegestInfo):
     """
-    Superclass for content types that can contain Quotes.
+    Superclass for content types that contain plain text, footnotes,
+    and quotes.
     """
 
     content = models.OneToOneField("Content")
