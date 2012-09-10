@@ -1,0 +1,25 @@
+from regesten_webapp.models import *
+from django.contrib import admin
+
+admin.site.register(Regest)
+admin.site.register(ShortInfo)
+admin.site.register(ContentInfo)
+admin.site.register(SealInfo)
+admin.site.register(RegestDate)
+admin.site.register(StartDate)
+admin.site.register(EndDate)
+admin.site.register(Content)
+admin.site.register(RegestContent)
+admin.site.register(Footnote)
+admin.site.register(Quote)
+admin.site.register(Concept)
+admin.site.register(SpecificConcept)
+admin.site.register(Landmark)
+admin.site.register(Location)
+admin.site.register(Person)
+admin.site.register(PersonGroup)
+admin.site.register(Family)
+admin.site.register(IndexEntry)
+admin.site.register(Region)
+admin.site.register(Country)
+
