@@ -38,6 +38,8 @@ class ShortInfo(RegestInfo):
     """
     Superclass for content types that contain plain text and footnotes
     only.
+
+    TODO: Add examples
     """
 
     content = models.CharField(max_length=70)
@@ -50,6 +52,8 @@ class ContentInfo(RegestInfo):
     """
     Superclass for content types that contain plain text, footnotes,
     and quotes.
+
+    TODO: Add examples
     """
 
     content = models.OneToOneField("Content")
