@@ -1,3 +1,5 @@
+""" This module defines the data model of the Sbr Regesten webapp. """
+
 from django.db import models
 
 class Regest(models.Model):
