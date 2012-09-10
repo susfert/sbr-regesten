@@ -122,6 +122,8 @@ class Content(models.Model):
     containing one or more quotes.
     """
 
+    content = models.TextField()
+
     def __unicode__(self):
         return self
 
@@ -130,6 +132,9 @@ class RegestContent(RegestInfo, Content):
     """
     The RegestContent model represents the content of a single regest.
     """
+
+    issuer = models.OneToOneField("Person")
+    mentions = models.ManyToManyField("Concept", null=True)
 
     def __unicode__(self):
         return self
@@ -154,6 +159,10 @@ class Quote(RegestInfo):
     a regest.
     """
 
+    cited_in = models.ForeignKey("Content")
+    content = models.TextField()
+    mentions = models.ManyToManyField("Concept", null=True)
+
     def __unicode__(self):
         return self
 
@@ -163,6 +172,9 @@ class Concept(models.Model):
     The Concept model represents any type of (underspecified) concept
     introduced in the index of the Sbr Regesten.
     """
+
+    name = models.OneToOneField("Content")
+    related_concepts = models.ManyToManyField("self", null=True)
 
     def __unicode__(self):
         return self
@@ -174,6 +186,8 @@ class SpecificConcept(Concept):
     concepts introduced in the index of the Sbr Regesten.
     """
 
+    add_names = models.TextField(null=True)
+
     def __unicode__(self):
         return self
 
@@ -183,6 +197,8 @@ class Landmark(SpecificConcept):
     The landmark model represents a single landmark listed or
     mentioned in the index of the Sbr Regesten.
     """
+
+    landmark_type = models.CharField(max_length=30, null=True)
 
     def __unicode__(self):
         return self
@@ -194,6 +210,14 @@ class Location(SpecificConcept):
     mentioned in the index of the Sbr Regesten.
     """
 
+    location_type = models.CharField(max_length=30, null=True)
+    w = models.NullBooleanField()
+    w_ref = models.CharField(max_length=100, null=True)
+    reference_point = models.CharField(max_length=100, null=True)
+    district = models.CharField(max_length=70, null=True)
+    region = models.ForeignKey("Region", null=True)
+    country = models.ForeignKey("Country", null=True)
+
     def __unicode__(self):
         return self
 
@@ -203,6 +227,14 @@ class Person(SpecificConcept):
     The Person model represents a single individual listed or
     mentioned in the index of the Sbr Regesten.
     """
+
+    forename = models.CharField(max_length=70, null=True)
+    surname = models.CharField(max_length=70, null=True)
+    genname = models.CharField(max_length=30, null=True)
+    maidenname = models.CharField(max_length=70, null=True)
+    info = models.OneToOneField("Content", null=True)
+    profession = models.CharField(max_length=30, null=True)
+    resident_of = models.ForeignKey("Location", null=True)
 
     def __unicode__(self):
         return self
@@ -214,6 +246,8 @@ class PersonGroup(SpecificConcept):
     e.g. by their profession.
     """
 
+    members = models.ManyToManyField("Person")
+
     def __unicode__(self):
         return self
 
@@ -222,6 +256,8 @@ class Family(PersonGroup):
     """
     The family model represents a single family.
     """
+
+    location = models.ForeignKey("Location", null=True)
 
     def __unicode__(self):
         return self
@@ -233,5 +269,39 @@ class IndexEntry(models.Model):
     Sbr Regesten.
     """
 
+    defines = models.OneToOneField("SpecificConcept")
+    related_entries = models.OneToOneField("self", null=True)
+
     def __unicode__(self):
         return self
+
+
+class Region(models.Model):
+    """
+    The Region model represents regions mentioned in the (index of
+    the) Sbr Regesten.
+    """
+
+    REGION_TYPES = (
+        ('Bundesland', 'A state / province of Germany'),
+        ('Departement', 'A state / province of France'),
+        ('Provinz', 'A state / province of Belgium'))
+
+    name = models.CharField(max_length=70)
+    region_type = models.CharField(max_length=30, choices=REGION_TYPES)
+
+    def __unicode__(self):
+        return self
+
+
+class Country(models.Model):
+    """
+    The Country model represents countries mentioned in the (index of
+    the) Sbr Regesten.
+    """
+
+    name = models.CharField(max_length=30)
+
+    def __unicode__(self):
+        return self
+
