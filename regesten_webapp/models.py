@@ -22,7 +22,7 @@ class Regest(models.Model):
     original = models.OneToOneField("ContentInfo", related_name="+")
 
     def __unicode__(self):
-        return self
+        return u'Regest {0}: {1}'.format(self.id, self.title)
 
 
 class RegestInfo(models.Model):
@@ -43,7 +43,7 @@ class ShortInfo(RegestInfo):
     content = models.CharField(max_length=70)
 
     def __unicode__(self):
-        return self
+        return u'ShortInfo {0}: {1}'.format(self.id, self.content)
 
 
 class ContentInfo(RegestInfo):
@@ -55,7 +55,7 @@ class ContentInfo(RegestInfo):
     content = models.OneToOneField("Content")
 
     def __unicode__(self):
-        return self
+        return u'ContentInfo {0}: {1}'.format(self.id, self.content)
 
 
 class SealInfo(ContentInfo):
@@ -69,7 +69,7 @@ class SealInfo(ContentInfo):
     sealers = models.ManyToManyField("Person", null=True)
 
     def __unicode__(self):
-        return self
+        return u'SealInfo {0}: {1}'.format(self.id, self.content)
 
 
 class RegestDate(models.Model):
@@ -88,7 +88,9 @@ class RegestDate(models.Model):
         return not self.start.offset and not self.end.offset
 
     def __unicode__(self):
-        return self
+        return u'RegestDate {0} ({1}):\n\nStarts on {2}\nEnds on {3}\n'.format(
+            self.id, 'exact' if self.exact else 'not exact',
+            self.start, self.end)
 
 
 class StartDate(models.Model):
@@ -103,7 +105,10 @@ class StartDate(models.Model):
     offset = models.CharField(max_length=30, null=True)
 
     def __unicode__(self):
-        return self
+        startdate = u'StartDate {0}: {1}'.format(self.id, self.date)
+        if self.offset:
+            startdate += u' [{0}]'.format(self.offset)
+        return startdate
 
 
 class EndDate(models.Model):
@@ -118,7 +123,10 @@ class EndDate(models.Model):
     offset = models.CharField(max_length=30, null=True)
 
     def __unicode__(self):
-        return self
+        enddate = u'EndDate {0}: {1}'.format(self.id, self.date)
+        if self.offset:
+            enddate += u' [{0}]'.format(self.offset)
+        return enddate
 
 
 class Content(models.Model):
@@ -130,7 +138,7 @@ class Content(models.Model):
     content = models.TextField()
 
     def __unicode__(self):
-        return self
+        return u'Content {0}: {1}'.format(self.id, self.content)
 
 
 class RegestContent(RegestInfo, Content):
@@ -142,7 +150,7 @@ class RegestContent(RegestInfo, Content):
     mentions = models.ManyToManyField("Concept", null=True)
 
     def __unicode__(self):
-        return self
+        return u'RegestContent {0}: {1}'.format(self.id, self.content)
 
 
 class Footnote(RegestInfo):
@@ -155,7 +163,8 @@ class Footnote(RegestInfo):
     content = models.OneToOneField("Content")
 
     def __unicode__(self):
-        return self
+        return u'Footnote {0}:\n{1}\n\nReferenced in:\n{2}'.format(
+            self.id, self.content, self.referenced_in)
 
 
 class Quote(RegestInfo):
@@ -169,7 +178,7 @@ class Quote(RegestInfo):
     mentions = models.ManyToManyField("Concept", null=True)
 
     def __unicode__(self):
-        return self
+        return u'Quote {0}: {1}'.format(self.id, self.content)
 
 
 class Concept(models.Model):
@@ -182,7 +191,7 @@ class Concept(models.Model):
     related_concepts = models.ManyToManyField("self", null=True)
 
     def __unicode__(self):
-        return self
+        return u'Concept {0}: {1}'.format(self.id, self.name)
 
 
 class SpecificConcept(Concept):
@@ -194,7 +203,7 @@ class SpecificConcept(Concept):
     add_names = models.TextField(null=True)
 
     def __unicode__(self):
-        return self
+        return u'SpecificConcept {0}: {1}'.format(self.id, self.name)
 
 
 class Landmark(SpecificConcept):
@@ -206,7 +215,10 @@ class Landmark(SpecificConcept):
     landmark_type = models.CharField(max_length=30, null=True)
 
     def __unicode__(self):
-        return self
+        landmark =  u'Landmark {0}: {1}'.format(self.id, self.name)
+        if self.landmark_type:
+            landmark += u' [{0}]'.format(self.landmark_type)
+        return landmark
 
 
 class Location(SpecificConcept):
@@ -224,7 +236,10 @@ class Location(SpecificConcept):
     country = models.ForeignKey("Country", null=True)
 
     def __unicode__(self):
-        return self
+        location = u'Location {0}: {1}'.format(self.id, self.name)
+        if self.location_type:
+            location += u' [{0}]'.format(self.landmark_type)
+        return location
 
 
 class Person(SpecificConcept):
@@ -242,7 +257,7 @@ class Person(SpecificConcept):
     resident_of = models.ForeignKey("Location", null=True)
 
     def __unicode__(self):
-        return self
+        return u'Person {0}: {1}'.format(self.id, self.name)
 
 
 class PersonGroup(SpecificConcept):
@@ -254,7 +269,7 @@ class PersonGroup(SpecificConcept):
     members = models.ManyToManyField("Person")
 
     def __unicode__(self):
-        return self
+        return u'PersonGroup {0}: {1}'.format(self.id, self.name)
 
 
 class Family(PersonGroup):
@@ -265,7 +280,7 @@ class Family(PersonGroup):
     location = models.ForeignKey("Location", null=True)
 
     def __unicode__(self):
-        return self
+        return u'Family {0}: {1}'.format(self.id, self.name)
 
 
 class IndexEntry(models.Model):
@@ -278,7 +293,7 @@ class IndexEntry(models.Model):
     related_entries = models.OneToOneField("self", null=True)
 
     def __unicode__(self):
-        return self
+        return u'IndexEntry {0}\n\n{1}'.format(self.id, self.defines)
 
 
 class Region(models.Model):
@@ -296,7 +311,8 @@ class Region(models.Model):
     region_type = models.CharField(max_length=30, choices=REGION_TYPES)
 
     def __unicode__(self):
-        return self
+        return u'Region {0}: {1} ({2})'.format(
+            self.id, self.name, self.region_type)
 
 
 class Country(models.Model):
@@ -308,5 +324,5 @@ class Country(models.Model):
     name = models.CharField(max_length=30)
 
     def __unicode__(self):
-        return self
+        return u'Country {0}: {1}'.format(self.id, self.name)
 
