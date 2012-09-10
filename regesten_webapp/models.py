@@ -82,7 +82,10 @@ class RegestDate(models.Model):
     start = models.OneToOneField("StartDate")
     end = models.OneToOneField("EndDate")
     alt_date = models.DateField(null=True)
-    exact = models.BooleanField()
+
+    @property
+    def exact(self):
+        return not self.start.offset and not self.end.offset
 
     def __unicode__(self):
         return self
