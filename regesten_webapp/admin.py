@@ -2,9 +2,15 @@ from regesten_webapp.models import *
 from django.contrib import admin
 
 admin.site.register(Regest)
-admin.site.register(ShortInfo)
-admin.site.register(ContentInfo)
+admin.site.register(RegestTitle)
+admin.site.register(RegestLocation)
+admin.site.register(RegestType)
+admin.site.register(OriginalDateInfo)
 admin.site.register(SealInfo)
+admin.site.register(ArchiveInfo)
+admin.site.register(PrintInfo)
+admin.site.register(TranslationInfo)
+admin.site.register(OriginalInfo)
 admin.site.register(RegestDate)
 admin.site.register(StartDate)
 admin.site.register(EndDate)

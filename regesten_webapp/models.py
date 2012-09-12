@@ -1,40 +1,32 @@
 """ This module defines the data model of the Sbr Regesten webapp. """
 
 from django.db import models
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
+
 
 class Regest(models.Model):
     """
     The Regest model represents a single regest.
     """
 
-    title = models.OneToOneField("ShortInfo", related_name="+")
+    title = models.OneToOneField("RegestTitle")
     date = models.OneToOneField("RegestDate")
-    location = models.OneToOneField("ShortInfo", null=True, related_name="+")
-    regest_type = models.OneToOneField("ShortInfo", null=True, related_name="+")
+    location = models.OneToOneField("RegestLocation", null=True)
+    regest_type = models.OneToOneField("RegestType", null=True)
     content = models.OneToOneField("RegestContent")
-    original_date = models.OneToOneField(
-        "ContentInfo", related_name="+")
+    original_date = models.OneToOneField("OriginalDateInfo")
     seal = models.OneToOneField("SealInfo")
-    archives = models.OneToOneField("ContentInfo", related_name="+")
-    regest_print = models.OneToOneField("ContentInfo", related_name="+")
-    translation = models.OneToOneField(
-        "ContentInfo", null=True, related_name="+")
-    original = models.OneToOneField("ContentInfo", related_name="+")
+    archives = models.OneToOneField("ArchiveInfo")
+    regest_print = models.OneToOneField("PrintInfo")
+    translation = models.OneToOneField("TranslationInfo", null=True)
+    original = models.OneToOneField("OriginalInfo")
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
 
 
-class RegestInfo(models.Model):
-    """
-    Superclass for content type models.
-    """
-
-    def __unicode__(self):
-        return self
-
-
-class ShortInfo(RegestInfo):
+class GenericInfo(models.Model):
     """
     Superclass for content types that contain plain text and footnotes
     only.
@@ -42,13 +34,57 @@ class ShortInfo(RegestInfo):
     TODO: Add examples
     """
 
-    content = models.CharField(max_length=70)
+    footnotes = generic.GenericRelation("Footnote")
+
+    class Meta:
+        """
+        Specifies metadata and options for the GenericInfo model.
+        """
+
+        abstract = True
+
+
+class RegestTitle(GenericInfo):
+    """
+    The RegestTitle model represents regest titles.
+
+    TODO: Add examples
+    """
+
+    title = models.CharField(max_length=70)
 
     def __unicode__(self):
-        return u'ShortInfo {0}: {1}'.format(self.id, self.content)
+        return self
 
 
-class ContentInfo(RegestInfo):
+class RegestLocation(GenericInfo):
+    """
+    The RegestLocation model represents locations associated with
+    regests.
+
+    TODO: Add examples
+    """
+
+    name = models.CharField(max_length=70)
+
+    def __unicode__(self):
+        return self
+
+
+class RegestType(GenericInfo):
+    """
+    The RegestType model represents regest types.
+
+    TODO: Add examples
+    """
+
+    name = models.CharField(max_length=70)
+
+    def __unicode__(self):
+        return self
+
+
+class ContentInfo(GenericInfo):
     """
     Superclass for content types that contain plain text, footnotes,
     and quotes.
@@ -58,14 +94,30 @@ class ContentInfo(RegestInfo):
 
     content = models.OneToOneField("Content")
 
+    class Meta:
+        """
+        Specifies metadata and options for the ContentInfo model.
+        """
+
+        abstract = True
+
+
+class OriginalDateInfo(ContentInfo):
+    """
+    The OriginalDateInfo model represents information about regest
+    dates as originally provided.
+
+    TODO: Add examples
+    """
+
     def __unicode__(self):
-        return u'ContentInfo {0}: {1}'.format(self.id, self.content)
+        return self
 
 
 class SealInfo(ContentInfo):
     """
-    The SealInfo model represents information about the seal of a
-    single regest (such as the sealer).
+    The SealInfo model represents information about regest seals (such
+    as the sealer).
 
     TODO: Add examples
     """
@@ -74,6 +126,53 @@ class SealInfo(ContentInfo):
 
     def __unicode__(self):
         return u'SealInfo {0}: {1}'.format(self.id, self.content)
+
+
+class ArchiveInfo(ContentInfo):
+    """
+    The ArchiveInfo model represents information about archives
+    associated with regests.
+
+    TODO: Add examples
+    """
+
+    def __unicode__(self):
+        return self
+
+
+class PrintInfo(ContentInfo):
+    """
+    The PrintInfo model represents print information for regests.
+
+    TODO: Add examples
+    """
+
+    def __unicode__(self):
+        return self
+
+
+class TranslationInfo(ContentInfo):
+    """
+    The TranslationInfo model represents translation information for
+    regests.
+
+    TODO: Add examples
+    """
+
+    def __unicode__(self):
+        return self
+
+
+class OriginalInfo(ContentInfo):
+    """
+    The OriginalInfo model represents information about original
+    regests.
+
+    TODO: Add examples
+    """
+
+    def __unicode__(self):
+        return self
 
 
 class RegestDate(models.Model):
@@ -145,7 +244,7 @@ class Content(models.Model):
         return u'Content {0}: {1}'.format(self.id, self.content)
 
 
-class RegestContent(RegestInfo, Content):
+class RegestContent(GenericInfo, Content):
     """
     The RegestContent model represents the content of a single regest.
     """
@@ -157,21 +256,23 @@ class RegestContent(RegestInfo, Content):
         return u'RegestContent {0}: {1}'.format(self.id, self.content)
 
 
-class Footnote(RegestInfo):
+class Footnote(models.Model):
     """
     The footnote model represents footnotes referenced e.g. in the
     content of a regest.
     """
 
-    referenced_in = models.ForeignKey("RegestInfo", related_name="footnotes")
     content = models.OneToOneField("Content")
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
         return u'Footnote {0}:\n{1}\n\nReferenced in:\n{2}'.format(
             self.id, self.content, self.referenced_in)
 
 
-class Quote(RegestInfo):
+class Quote(GenericInfo):
     """
     The Quote model represents quotes embedded in e.g. the content of
     a regest.
