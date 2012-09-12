@@ -263,7 +263,18 @@ class Footnote(models.Model):
     """
 
     content = models.OneToOneField("Content")
-    content_type = models.ForeignKey(ContentType)
+    __limit = models.Q(app_label='regesten_webapp', model='regesttitle') | \
+              models.Q(app_label='regesten_webapp', model='regestlocation') | \
+              models.Q(app_label='regesten_webapp', model='regesttype') | \
+              models.Q(app_label='regesten_webapp', model='originaldateinfo') | \
+              models.Q(app_label='regesten_webapp', model='sealinfo') | \
+              models.Q(app_label='regesten_webapp', model='archiveinfo') | \
+              models.Q(app_label='regesten_webapp', model='printinfo') | \
+              models.Q(app_label='regesten_webapp', model='translationinfo') | \
+              models.Q(app_label='regesten_webapp', model='originalinfo') | \
+              models.Q(app_label='regesten_webapp', model='regestcontent') | \
+              models.Q(app_label='regesten_webapp', model='quote')
+    content_type = models.ForeignKey(ContentType, limit_choices_to=__limit)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
