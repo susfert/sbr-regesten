@@ -125,7 +125,7 @@ class SealInfo(ContentInfo):
     sealers = models.ManyToManyField("Person", null=True)
 
     def __unicode__(self):
-        return u'SealInfo {0}: {1}'.format(self.id, self.content)
+        return u'{0}'.format(self.content)
 
 
 class ArchiveInfo(ContentInfo):
@@ -191,9 +191,8 @@ class RegestDate(models.Model):
         return not self.start.offset and not self.end.offset
 
     def __unicode__(self):
-        return u'RegestDate {0} ({1}):\n\nStarts on {2}\nEnds on {3}\n'.format(
-            self.id, 'exact' if self.exact else 'not exact',
-            self.start, self.end)
+        return u'\nStarts on {0}\nEnds on {1}\n\n---> ({2})'.format(
+            self.start, self.end, 'exact' if self.exact else 'not exact')
 
 
 class StartDate(models.Model):
@@ -208,7 +207,7 @@ class StartDate(models.Model):
     offset = models.CharField(max_length=30, null=True)
 
     def __unicode__(self):
-        startdate = u'StartDate {0}: {1}'.format(self.id, self.date)
+        startdate = u'{0}'.format(self.date)
         if self.offset:
             startdate += u' [{0}]'.format(self.offset)
         return startdate
@@ -226,7 +225,7 @@ class EndDate(models.Model):
     offset = models.CharField(max_length=30, null=True)
 
     def __unicode__(self):
-        enddate = u'EndDate {0}: {1}'.format(self.id, self.date)
+        enddate = u'{0}'.format(self.date)
         if self.offset:
             enddate += u' [{0}]'.format(self.offset)
         return enddate
@@ -241,7 +240,7 @@ class Content(models.Model):
     content = models.TextField()
 
     def __unicode__(self):
-        return u'Content {0}: {1}'.format(self.id, self.content)
+        return u'{0}'.format(self.content)
 
 
 class RegestContent(GenericInfo, Content):
@@ -253,7 +252,7 @@ class RegestContent(GenericInfo, Content):
     mentions = models.ManyToManyField("Concept", null=True)
 
     def __unicode__(self):
-        return u'RegestContent {0}: {1}'.format(self.id, self.content)
+        return u'{0}'.format(self.content)
 
 
 class Footnote(models.Model):
@@ -294,7 +293,7 @@ class Quote(GenericInfo):
     mentions = models.ManyToManyField("Concept", null=True)
 
     def __unicode__(self):
-        return u'Quote {0}: {1}'.format(self.id, self.content)
+        return u'{0}'.format(self.content)
 
 
 class Concept(models.Model):
@@ -427,8 +426,7 @@ class Region(models.Model):
     region_type = models.CharField(max_length=30, choices=REGION_TYPES)
 
     def __unicode__(self):
-        return u'Region {0}: {1} ({2})'.format(
-            self.id, self.name, self.region_type)
+        return u'{0}: ({1})'.format(self.name, self.region_type)
 
 
 class Country(models.Model):
@@ -440,5 +438,5 @@ class Country(models.Model):
     name = models.CharField(max_length=30)
 
     def __unicode__(self):
-        return u'Country {0}: {1}'.format(self.id, self.name)
+        return u'{0}'.format(self.name)
 
