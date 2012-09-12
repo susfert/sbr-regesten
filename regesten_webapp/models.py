@@ -54,7 +54,7 @@ class RegestTitle(GenericInfo):
     title = models.CharField(max_length=70)
 
     def __unicode__(self):
-        return self
+        return u'{0}'.format(self.title)
 
 
 class RegestLocation(GenericInfo):
@@ -68,7 +68,7 @@ class RegestLocation(GenericInfo):
     name = models.CharField(max_length=70)
 
     def __unicode__(self):
-        return self
+        return u'{0}'.format(self.name)
 
 
 class RegestType(GenericInfo):
@@ -81,7 +81,7 @@ class RegestType(GenericInfo):
     name = models.CharField(max_length=70)
 
     def __unicode__(self):
-        return self
+        return u'{0}'.format(self.name)
 
 
 class ContentInfo(GenericInfo):
@@ -111,7 +111,7 @@ class OriginalDateInfo(ContentInfo):
     """
 
     def __unicode__(self):
-        return self
+        return u'{0}'.format(self.content)
 
 
 class SealInfo(ContentInfo):
@@ -137,7 +137,7 @@ class ArchiveInfo(ContentInfo):
     """
 
     def __unicode__(self):
-        return self
+        return u'{0}'.format(self.content)
 
 
 class PrintInfo(ContentInfo):
@@ -148,7 +148,7 @@ class PrintInfo(ContentInfo):
     """
 
     def __unicode__(self):
-        return self
+        return u'{0}'.format(self.content)
 
 
 class TranslationInfo(ContentInfo):
@@ -160,7 +160,7 @@ class TranslationInfo(ContentInfo):
     """
 
     def __unicode__(self):
-        return self
+        return u'{0}'.format(self.content)
 
 
 class OriginalInfo(ContentInfo):
@@ -172,7 +172,7 @@ class OriginalInfo(ContentInfo):
     """
 
     def __unicode__(self):
-        return self
+        return u'{0}'.format(self.content)
 
 
 class RegestDate(models.Model):
