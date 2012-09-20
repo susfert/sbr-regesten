@@ -21,6 +21,7 @@ class Regest(models.Model):
     regest_print = models.OneToOneField("PrintInfo")
     translation = models.OneToOneField("TranslationInfo", null=True)
     original = models.OneToOneField("OriginalInfo")
+    xml_repr = models.TextField()
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
@@ -406,6 +407,7 @@ class IndexEntry(models.Model):
 
     defines = models.OneToOneField("SpecificConcept")
     related_entries = models.OneToOneField("self", null=True)
+    xml_repr = models.TextField()
 
     def __unicode__(self):
         return u'IndexEntry {0}\n\n{1}'.format(self.id, self.defines)
