@@ -15,7 +15,7 @@ class Regest(models.Model):
     location = models.OneToOneField("RegestLocation", null=True)
     regest_type = models.OneToOneField("RegestType", null=True)
     content = models.OneToOneField("RegestContent")
-    original_date = models.OneToOneField("OriginalDateInfo")
+    original_date = models.OneToOneField("OriginalDateInfo", null=True)
     seal = models.OneToOneField("SealInfo")
     archives = models.OneToOneField("ArchiveInfo")
     regest_print = models.OneToOneField("PrintInfo")
