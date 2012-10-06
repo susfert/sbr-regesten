@@ -354,7 +354,7 @@ class Location(SpecificConcept):
     def __unicode__(self):
         location = u'Location {0}: {1}'.format(self.id, self.name)
         if self.location_type:
-            location += u' [{0}]'.format(self.landmark_type)
+            location += u' [{0}]'.format(self.location_type)
         return location
 
 
