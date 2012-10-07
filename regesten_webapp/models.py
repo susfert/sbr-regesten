@@ -406,7 +406,7 @@ class IndexEntry(models.Model):
     """
 
     defines = models.OneToOneField("SpecificConcept")
-    related_entries = models.OneToOneField("self", null=True)
+    related_entries = models.ManyToManyField("self", null=True)
     xml_repr = models.TextField()
 
     def __unicode__(self):
