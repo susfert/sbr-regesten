@@ -398,6 +398,13 @@ class Family(PersonGroup):
     def __unicode__(self):
         return u'Family {0}: {1}'.format(self.id, self.name)
 
+    class Meta:
+        """
+        Specifies metadata and options for the Family model.
+        """
+
+        verbose_name_plural = "families"
+
 
 class IndexEntry(models.Model):
     """
@@ -411,6 +418,13 @@ class IndexEntry(models.Model):
 
     def __unicode__(self):
         return u'IndexEntry {0}\n\n{1}'.format(self.id, self.defines)
+
+    class Meta:
+        """
+        Specifies metadata and options for the IndexEntry model.
+        """
+
+        verbose_name_plural = "index entries"
 
 
 class Region(models.Model):
@@ -442,3 +456,9 @@ class Country(models.Model):
     def __unicode__(self):
         return u'{0}'.format(self.name)
 
+    class Meta:
+        """
+        Specifies metadata and options for the Country model.
+        """
+
+        verbose_name_plural = "countries"
