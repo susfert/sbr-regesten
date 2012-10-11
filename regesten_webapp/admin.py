@@ -1,28 +1,46 @@
-from regesten_webapp.models import *
 from django.contrib import admin
 from django.contrib.sites.models import Site
 
+from regesten_webapp.models import Archive, Concept, Country
+from regesten_webapp.models import Family, Footnote, IndexEntry
+from regesten_webapp.models import Landmark, Location, Person
+from regesten_webapp.models import PersonGroup, Regest, RegestDate
+from regesten_webapp.models import Region
+
+
+class RegestDateInline(admin.StackedInline):
+    model = RegestDate
+
+class ArchiveInline(admin.StackedInline):
+    model = Archive
+
+class FootnoteInline(admin.StackedInline):
+    model = Footnote
+
+class RegestAdmin(admin.ModelAdmin):
+    inlines = [
+        RegestDateInline,
+        ArchiveInline,
+        FootnoteInline,
+        ]
+
+class RegionInline(admin.StackedInline):
+    model = Region
+
+class CountryInline(admin.StackedInline):
+    model = Country
+
+class LocationAdmin(admin.ModelAdmin):
+    inlines = [
+        RegionInline,
+        CountryInline,
+        ]
+
+
 admin.site.unregister(Site)
 
-admin.site.register(Regest)
-admin.site.register(RegestTitle)
-admin.site.register(RegestLocation)
-admin.site.register(RegestType)
-admin.site.register(OriginalDateInfo)
-admin.site.register(SealInfo)
-admin.site.register(ArchiveInfo)
-admin.site.register(PrintInfo)
-admin.site.register(TranslationInfo)
-admin.site.register(OriginalInfo)
-admin.site.register(RegestDate)
-admin.site.register(StartDate)
-admin.site.register(EndDate)
-admin.site.register(Content)
-admin.site.register(RegestContent)
-admin.site.register(Footnote)
-admin.site.register(Quote)
+admin.site.register(Regest, RegestAdmin)
 admin.site.register(Concept)
-admin.site.register(SpecificConcept)
 admin.site.register(Landmark)
 admin.site.register(Location)
 admin.site.register(Person)
@@ -31,4 +49,3 @@ admin.site.register(Family)
 admin.site.register(IndexEntry)
 admin.site.register(Region)
 admin.site.register(Country)
-
