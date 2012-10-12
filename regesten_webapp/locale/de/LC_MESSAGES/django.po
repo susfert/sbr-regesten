@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-11 19:45+0200\n"
+"POT-Creation-Date: 2012-10-12 14:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,90 +18,226 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: models.py:12
+#: models.py:14
 msgid "title"
 msgstr "titel"
 
-#: models.py:13
+#: models.py:15 models.py:245
 msgid "location"
 msgstr "ort"
 
-#: models.py:14
+#: models.py:16
 msgid "type"
 msgstr "typ"
 
-#: models.py:15 models.py:99
+#: models.py:17 models.py:101
 msgid "content"
 msgstr "inhalt"
 
-#: models.py:18
+#: models.py:20
 msgid "issuer"
 msgstr "aussteller"
 
-#: models.py:20
+#: models.py:22
 msgid "mentions"
 msgstr "erwähnt"
 
-#: models.py:22
+#: models.py:24
 msgid "original date"
 msgstr "originaldatum"
 
-#: models.py:23
+#: models.py:25
 msgid "seal"
 msgstr "siegel"
 
-#: models.py:24
+#: models.py:26
 msgid "print info"
 msgstr "Druckinfo"
 
-#: models.py:25
+#: models.py:27
 msgid "translation"
 msgstr "übersetzung"
 
-#: models.py:27
+#: models.py:29 models.py:119
 msgid "XML representation"
 msgstr "XML-Repräsentation"
 
-#: models.py:52
+#: models.py:54
 msgid "archive"
 msgstr "Archiv"
 
-#: models.py:53
+#: models.py:55
 msgid "archives"
 msgstr "Archive"
 
-#: models.py:71
+#: models.py:73
 msgid "from"
 msgstr "von"
 
-#: models.py:73
+#: models.py:75
 msgid "start offset"
 msgstr "zusatz"
 
-#: models.py:74
+#: models.py:76
 msgid "to"
 msgstr "bis"
 
-#: models.py:76
+#: models.py:78
 msgid "end offset"
 msgstr "zusatz"
 
-#: models.py:77
+#: models.py:79
 msgid "alternative date"
 msgstr "bzw."
 
-#: models.py:88
+#: models.py:90
 msgid "regest date"
 msgstr "Regest-Datum"
 
-#: models.py:89
+#: models.py:91
 msgid "regest dates"
 msgstr "Regest-Datum"
 
-#: models.py:105
+#: models.py:107
 msgid "Footnote"
 msgstr "Fußnote"
 
-#: models.py:106
+#: models.py:108
 msgid "Footnotes"
 msgstr "Fußnoten"
+
+#: models.py:118
+msgid "related entries"
+msgstr "Verwandte Einträge"
+
+#: models.py:131 models.py:265
+msgid "name"
+msgstr "name"
+
+#: models.py:133
+msgid "additional names"
+msgstr "alternativnamen"
+
+#: models.py:135
+msgid "related concepts"
+msgstr "Verwandte Konzepte"
+
+#: models.py:141
+msgid "Concept"
+msgstr "Konzept"
+
+#: models.py:142
+msgid "Concepts"
+msgstr "Konzepte"
+
+#: models.py:152
+msgid "landmark type"
+msgstr "wahrzeichentyp"
+
+#: models.py:161
+msgid "Landmark"
+msgstr "Wahrzeichen"
+
+#: models.py:162
+msgid "Landmarks"
+msgstr "Wahrzeichen"
+
+#: models.py:172
+msgid "location type"
+msgstr "ortstyp"
+
+#: models.py:173
+msgid "abandoned village"
+msgstr "wüstung"
+
+#: models.py:175
+msgid "abandoned village reference"
+msgstr "Wüstung (Referenz)"
+
+#: models.py:177
+msgid "reference point"
+msgstr "Bezugspunkt"
+
+#: models.py:178
+msgid "district"
+msgstr "bezirk"
+
+#: models.py:180
+msgid "region"
+msgstr "Region"
+
+#: models.py:182
+msgid "country"
+msgstr "land"
+
+#: models.py:191
+msgid "Location"
+msgstr "Ort"
+
+#: models.py:192
+msgid "Locations"
+msgstr "Orte"
+
+#: models.py:202
+msgid "forename"
+msgstr "vorname"
+
+#: models.py:204
+msgid "surname"
+msgstr "nachname"
+
+#: models.py:206
+msgid "generational name"
+msgstr "generation"
+
+#: models.py:208
+msgid "maiden name"
+msgstr "geburtsname"
+
+#: models.py:211
+msgid "profession"
+msgstr "beruf"
+
+#: models.py:213
+msgid "resident of"
+msgstr "Bürger von"
+
+#: models.py:219
+msgid "Person"
+msgstr "Person"
+
+#: models.py:220
+msgid "Persons"
+msgstr "Personen"
+
+#: models.py:229
+msgid "members"
+msgstr "mitglieder"
+
+#: models.py:235
+msgid "Person group"
+msgstr "Personengruppe"
+
+#: models.py:236
+msgid "Person groups"
+msgstr "Personengruppen"
+
+#: models.py:255
+msgid "Family"
+msgstr "Familie"
+
+#: models.py:256
+msgid "Families"
+msgstr "Familien"
+
+#: models.py:267
+msgid "region type"
+msgstr "regionstyp"
+
+#: models.py:273
+msgid "Region"
+msgstr "Region"
+
+#: models.py:274
+msgid "Regions"
+msgstr "Regionen"

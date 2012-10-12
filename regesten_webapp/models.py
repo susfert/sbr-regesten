@@ -114,18 +114,12 @@ class IndexEntry(models.Model):
     Sbr Regesten.
     """
 
-    related_entries = models.OneToOneField("self", null=True)
-    xml_repr = models.TextField()
+    related_entries = models.OneToOneField(
+        "self", verbose_name=_('related entries'), null=True)
+    xml_repr = models.TextField(_('XML representation'))
 
     def __unicode__(self):
         return u'IndexEntry {0}\n\n{1}'.format(self.id, self.defines)
-
-    class Meta:
-        """
-        Specifies metadata and options for the IndexEntry model.
-        """
-
-        verbose_name_plural = "index entries"
 
 
 class Concept(models.Model):
@@ -134,12 +128,18 @@ class Concept(models.Model):
     concepts listed in the index of the Sbr Regesten.
     """
 
-    name = models.TextField()
-    additional_names = models.TextField(null=True)
-    related_concepts = models.ManyToManyField("self", null=True)
+    name = models.TextField(_('name'))
+    additional_names = models.TextField(
+        _('additional names'), null=True)
+    related_concepts = models.ManyToManyField(
+        "self", verbose_name=_('related concepts'), null=True)
 
     def __unicode__(self):
         return u'Concept {0}: {1}'.format(self.id, self.name)
+
+    class Meta:
+        verbose_name = ugettext_lazy('Concept')
+        verbose_name_plural = ugettext_lazy('Concepts')
 
 
 class Landmark(IndexEntry, Concept):
@@ -148,13 +148,18 @@ class Landmark(IndexEntry, Concept):
     mentioned in the index of the Sbr Regesten.
     """
 
-    landmark_type = models.CharField(max_length=30, null=True)
+    landmark_type = models.CharField(
+        _('landmark type'), max_length=30, null=True)
 
     def __unicode__(self):
         landmark =  u'Landmark {0}: {1}'.format(self.id, self.name)
         if self.landmark_type:
             landmark += u' [{0}]'.format(self.landmark_type)
         return landmark
+
+    class Meta:
+        verbose_name = ugettext_lazy('Landmark')
+        verbose_name_plural = ugettext_lazy('Landmarks')
 
 
 class Location(IndexEntry, Concept):
@@ -163,20 +168,28 @@ class Location(IndexEntry, Concept):
     mentioned in the index of the Sbr Regesten.
     """
 
-    location_type = models.CharField(max_length=30, null=True)
-    abandoned_village = models.NullBooleanField()
-    av_ref = models.CharField(max_length=100, null=True)
-    reference_point = models.CharField(max_length=100, null=True)
-    district = models.CharField(max_length=70, null=True)
-    region = models.ForeignKey("Region", null=True)
+    location_type = models.CharField(
+        _('location type'), max_length=30, null=True)
+    abandoned_village = models.NullBooleanField(_('abandoned village'))
+    av_ref = models.CharField(
+        _('abandoned village reference'), max_length=100, null=True)
+    reference_point = models.CharField(
+        _('reference point'), max_length=100, null=True)
+    district = models.CharField(_('district'), max_length=70, null=True)
+    region = models.ForeignKey(
+        "Region", verbose_name=_('region'), null=True)
     country = models.CharField(
-        "country", max_length=20, choices=COUNTRIES, null=True)
+        _("country"), max_length=20, choices=COUNTRIES, null=True)
 
     def __unicode__(self):
         location = u'Location {0}: {1}'.format(self.id, self.name)
         if self.location_type:
             location += u' [{0}]'.format(self.location_type)
         return location
+
+    class Meta:
+        verbose_name = ugettext_lazy('Location')
+        verbose_name_plural = ugettext_lazy('Locations')
 
 
 class Person(IndexEntry, Concept):
@@ -185,16 +198,26 @@ class Person(IndexEntry, Concept):
     mentioned in the index of the Sbr Regesten.
     """
 
-    forename = models.CharField(max_length=70, null=True)
-    surname = models.CharField(max_length=70, null=True)
-    genname = models.CharField(max_length=30, null=True)
-    maidenname = models.CharField(max_length=70, null=True)
+    forename = models.CharField(
+        _('forename'), max_length=70, null=True)
+    surname = models.CharField(
+        _('surname'), max_length=70, null=True)
+    genname = models.CharField(
+        _('generational name'), max_length=30, null=True)
+    maidenname = models.CharField(
+        _('maiden name'), max_length=70, null=True)
     info = models.TextField(null=True)
-    profession = models.CharField(max_length=30, null=True)
-    resident_of = models.ForeignKey("Location", null=True)
+    profession = models.CharField(
+        _('profession'), max_length=30, null=True)
+    resident_of = models.ForeignKey(
+        "Location", verbose_name=_('resident of'), null=True)
 
     def __unicode__(self):
         return u'Person {0}: {1}'.format(self.id, self.name)
+
+    class Meta:
+        verbose_name = ugettext_lazy('Person')
+        verbose_name_plural = ugettext_lazy('Persons')
 
 
 class PersonGroup(IndexEntry, Concept):
@@ -203,10 +226,14 @@ class PersonGroup(IndexEntry, Concept):
     e.g. by their profession.
     """
 
-    members = models.ManyToManyField("Person")
+    members = models.ManyToManyField("Person", verbose_name=_('members'))
 
     def __unicode__(self):
         return u'PersonGroup {0}: {1}'.format(self.id, self.name)
+
+    class Meta:
+        verbose_name = ugettext_lazy('Person group')
+        verbose_name_plural = ugettext_lazy('Person groups')
 
 
 class Family(PersonGroup):
@@ -214,7 +241,8 @@ class Family(PersonGroup):
     The family model represents a single family.
     """
 
-    location = models.ForeignKey("Location", null=True)
+    location = models.ForeignKey(
+        "Location", verbose_name=_('location'), null=True)
 
     def __unicode__(self):
         return u'Family {0}: {1}'.format(self.id, self.name)
@@ -224,7 +252,8 @@ class Family(PersonGroup):
         Specifies metadata and options for the Family model.
         """
 
-        verbose_name_plural = "families"
+        verbose_name = ugettext_lazy('Family')
+        verbose_name_plural = ugettext_lazy('Families')
 
 
 class Region(models.Model):
@@ -233,8 +262,13 @@ class Region(models.Model):
     the) Sbr Regesten.
     """
 
-    name = models.CharField(max_length=70)
-    region_type = models.CharField(max_length=30, choices=REGION_TYPES)
+    name = models.CharField(_('name'), max_length=70)
+    region_type = models.CharField(
+        _('region type'), max_length=30, choices=REGION_TYPES)
 
     def __unicode__(self):
         return u'{0}: ({1})'.format(self.name, self.region_type)
+
+    class Meta:
+        verbose_name = ugettext_lazy('Region')
+        verbose_name_plural = ugettext_lazy('Regions')
