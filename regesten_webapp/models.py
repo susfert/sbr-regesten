@@ -1,30 +1,37 @@
 """ This module defines the data model of the Sbr Regesten webapp. """
 
 from django.db import models
-
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 
 class Regest(models.Model):
     """
     The Regest model represents a single regest.
     """
 
-    title = models.CharField(max_length=70)
-    location = models.CharField(max_length=70, null=True)
-    regest_type = models.CharField(max_length=70, null=True)
-    content = models.TextField()
+    title = models.CharField(_('title'), max_length=70)
+    location = models.CharField(_('location'), max_length=70, null=True)
+    regest_type = models.CharField(_('type'), max_length=70, null=True)
+    content = models.TextField(_('content'))
 
-    issuer = models.OneToOneField("Person", null=True)
-    mentions = models.ManyToManyField("Concept", null=True)
+    issuer = models.OneToOneField(
+        "Person", null=True, verbose_name=_('issuer'))
+    mentions = models.ManyToManyField(
+        "Concept", null=True, verbose_name=_('mentions'))
 
-    original_date = models.TextField(null=True)
-    seal_info = models.TextField()
-    print_info = models.TextField()
-    translation_info = models.TextField(null=True)
-    original_info = models.TextField()
-    xml_repr = models.TextField()
+    original_date = models.TextField(_('original date'), null=True)
+    seal = models.TextField(_('seal'))
+    print_info = models.TextField(_('print info'))
+    translation = models.TextField(_('translation'), null=True)
+    original = models.TextField()
+    xml_repr = models.TextField(_('XML representation'))
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
+
+    class Meta:
+        verbose_name = "Regest"
+        verbose_name_plural = "regesten"
 
 
 class Archive(models.Model):
@@ -40,6 +47,10 @@ class Archive(models.Model):
 
     def __unicode__(self):
         return u'{0}'.format(self.content)
+
+    class Meta:
+        verbose_name = ugettext_lazy("archive")
+        verbose_name_plural = ugettext_lazy("archives")
 
 
 class RegestDate(models.Model):
@@ -57,13 +68,13 @@ class RegestDate(models.Model):
         ('kurz nach', 'kurz nach'),)
 
     regest = models.OneToOneField("Regest")
-    start = models.DateField()
+    start = models.DateField(_('from'))
     start_offset = models.CharField(
-        max_length=20, choices=OFFSET_TYPES, null=True)
-    end = models.DateField()
+        _('start offset'), max_length=20, choices=OFFSET_TYPES, null=True)
+    end = models.DateField(_('to'))
     end_offset = models.CharField(
-        max_length=20, choices=OFFSET_TYPES, null=True)
-    alt_date = models.DateField(null=True)
+        _('end offset'), max_length=20, choices=OFFSET_TYPES, null=True)
+    alt_date = models.DateField(_('alternative date'), null=True)
 
     @property
     def exact(self):
@@ -73,6 +84,10 @@ class RegestDate(models.Model):
         return u'\nStarts on {0}\nEnds on {1}\n\n---> ({2})'.format(
             self.start, self.end, 'exact' if self.exact else 'not exact')
 
+    class Meta:
+        verbose_name = ugettext_lazy("regest date")
+        verbose_name_plural = ugettext_lazy("regest dates")
+
 
 class Footnote(models.Model):
     """
@@ -81,10 +96,14 @@ class Footnote(models.Model):
     """
 
     regest = models.ForeignKey("Regest")
-    content = models.TextField()
+    content = models.TextField(_('content'))
 
     def __unicode__(self):
         return u'Footnote {0}:\n{1}'.format(self.id, self.content)
+
+    class Meta:
+        verbose_name = ugettext_lazy("Footnote")
+        verbose_name_plural = ugettext_lazy("Footnotes")
 
 
 class Concept(models.Model):

@@ -1,0 +1,107 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-11 19:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: models.py:12
+msgid "title"
+msgstr "titel"
+
+#: models.py:13
+msgid "location"
+msgstr "ort"
+
+#: models.py:14
+msgid "type"
+msgstr "typ"
+
+#: models.py:15 models.py:99
+msgid "content"
+msgstr "inhalt"
+
+#: models.py:18
+msgid "issuer"
+msgstr "aussteller"
+
+#: models.py:20
+msgid "mentions"
+msgstr "erwähnt"
+
+#: models.py:22
+msgid "original date"
+msgstr "originaldatum"
+
+#: models.py:23
+msgid "seal"
+msgstr "siegel"
+
+#: models.py:24
+msgid "print info"
+msgstr "Druckinfo"
+
+#: models.py:25
+msgid "translation"
+msgstr "übersetzung"
+
+#: models.py:27
+msgid "XML representation"
+msgstr "XML-Repräsentation"
+
+#: models.py:52
+msgid "archive"
+msgstr "Archiv"
+
+#: models.py:53
+msgid "archives"
+msgstr "Archive"
+
+#: models.py:71
+msgid "from"
+msgstr "von"
+
+#: models.py:73
+msgid "start offset"
+msgstr "zusatz"
+
+#: models.py:74
+msgid "to"
+msgstr "bis"
+
+#: models.py:76
+msgid "end offset"
+msgstr "zusatz"
+
+#: models.py:77
+msgid "alternative date"
+msgstr "bzw."
+
+#: models.py:88
+msgid "regest date"
+msgstr "Regest-Datum"
+
+#: models.py:89
+msgid "regest dates"
+msgstr "Regest-Datum"
+
+#: models.py:105
+msgid "Footnote"
+msgstr "Fußnote"
+
+#: models.py:106
+msgid "Footnotes"
+msgstr "Fußnoten"
