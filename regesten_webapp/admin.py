@@ -1,11 +1,10 @@
 from django.contrib import admin
 from django.contrib.sites.models import Site
 
-from regesten_webapp.models import Archive, Concept, Country
-from regesten_webapp.models import Family, Footnote, IndexEntry
-from regesten_webapp.models import Landmark, Location, Person
-from regesten_webapp.models import PersonGroup, Regest, RegestDate
-from regesten_webapp.models import Region
+from regesten_webapp.models import Archive, Concept, Family
+from regesten_webapp.models import Footnote, Landmark, Location
+from regesten_webapp.models import Person, PersonGroup, Regest
+from regesten_webapp.models import RegestDate, Region
 
 
 class RegestDateInline(admin.StackedInline):
@@ -24,18 +23,6 @@ class RegestAdmin(admin.ModelAdmin):
         FootnoteInline,
         ]
 
-class RegionInline(admin.StackedInline):
-    model = Region
-
-class CountryInline(admin.StackedInline):
-    model = Country
-
-class LocationAdmin(admin.ModelAdmin):
-    inlines = [
-        RegionInline,
-        CountryInline,
-        ]
-
 
 admin.site.unregister(Site)
 
@@ -46,6 +33,4 @@ admin.site.register(Location)
 admin.site.register(Person)
 admin.site.register(PersonGroup)
 admin.site.register(Family)
-admin.site.register(IndexEntry)
 admin.site.register(Region)
-admin.site.register(Country)

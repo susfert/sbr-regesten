@@ -4,6 +4,8 @@ from django.db import models
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
+from regesten_webapp import COUNTRIES, REGION_TYPES
+
 class Regest(models.Model):
     """
     The Regest model represents a single regest.
@@ -106,10 +108,30 @@ class Footnote(models.Model):
         verbose_name_plural = ugettext_lazy("Footnotes")
 
 
+class IndexEntry(models.Model):
+    """
+    The IndexEntry model represents a single entry in the index of the
+    Sbr Regesten.
+    """
+
+    related_entries = models.OneToOneField("self", null=True)
+    xml_repr = models.TextField()
+
+    def __unicode__(self):
+        return u'IndexEntry {0}\n\n{1}'.format(self.id, self.defines)
+
+    class Meta:
+        """
+        Specifies metadata and options for the IndexEntry model.
+        """
+
+        verbose_name_plural = "index entries"
+
+
 class Concept(models.Model):
     """
     The Concept model groups attributes common to all types of
-    IndexEntries.
+    concepts listed in the index of the Sbr Regesten.
     """
 
     name = models.TextField()
@@ -120,7 +142,7 @@ class Concept(models.Model):
         return u'Concept {0}: {1}'.format(self.id, self.name)
 
 
-class Landmark(Concept):
+class Landmark(IndexEntry, Concept):
     """
     The landmark model represents a single landmark listed or
     mentioned in the index of the Sbr Regesten.
@@ -135,19 +157,20 @@ class Landmark(Concept):
         return landmark
 
 
-class Location(Concept):
+class Location(IndexEntry, Concept):
     """
     The Location model represents a single location listed or
     mentioned in the index of the Sbr Regesten.
     """
 
     location_type = models.CharField(max_length=30, null=True)
-    w = models.NullBooleanField()
-    w_ref = models.CharField(max_length=100, null=True)
+    abandoned_village = models.NullBooleanField()
+    av_ref = models.CharField(max_length=100, null=True)
     reference_point = models.CharField(max_length=100, null=True)
     district = models.CharField(max_length=70, null=True)
     region = models.ForeignKey("Region", null=True)
-    country = models.ForeignKey("Country", null=True)
+    country = models.CharField(
+        "country", max_length=20, choices=COUNTRIES, null=True)
 
     def __unicode__(self):
         location = u'Location {0}: {1}'.format(self.id, self.name)
@@ -156,7 +179,7 @@ class Location(Concept):
         return location
 
 
-class Person(Concept):
+class Person(IndexEntry, Concept):
     """
     The Person model represents a single individual listed or
     mentioned in the index of the Sbr Regesten.
@@ -174,7 +197,7 @@ class Person(Concept):
         return u'Person {0}: {1}'.format(self.id, self.name)
 
 
-class PersonGroup(Concept):
+class PersonGroup(IndexEntry, Concept):
     """
     The PersonGroup model represents a single group of people related
     e.g. by their profession.
@@ -204,59 +227,14 @@ class Family(PersonGroup):
         verbose_name_plural = "families"
 
 
-class IndexEntry(models.Model):
-    """
-    The IndexEntry model represents a single entry in the index of the
-    Sbr Regesten.
-    """
-
-    defines = models.OneToOneField("Concept")
-    related_entries = models.OneToOneField("self", null=True)
-    xml_repr = models.TextField()
-
-    def __unicode__(self):
-        return u'IndexEntry {0}\n\n{1}'.format(self.id, self.defines)
-
-    class Meta:
-        """
-        Specifies metadata and options for the IndexEntry model.
-        """
-
-        verbose_name_plural = "index entries"
-
-
 class Region(models.Model):
     """
     The Region model represents regions mentioned in the (index of
     the) Sbr Regesten.
     """
 
-    REGION_TYPES = (
-        ('Bundesland', 'Bundesland'),
-        ('Departement', 'Departement'),
-        ('Provinz', 'Provinz'))
-
     name = models.CharField(max_length=70)
     region_type = models.CharField(max_length=30, choices=REGION_TYPES)
 
     def __unicode__(self):
         return u'{0}: ({1})'.format(self.name, self.region_type)
-
-
-class Country(models.Model):
-    """
-    The Country model represents countries mentioned in the (index of
-    the) Sbr Regesten.
-    """
-
-    name = models.CharField(max_length=30)
-
-    def __unicode__(self):
-        return u'{0}'.format(self.name)
-
-    class Meta:
-        """
-        Specifies metadata and options for the Country model.
-        """
-
-        verbose_name_plural = "countries"
