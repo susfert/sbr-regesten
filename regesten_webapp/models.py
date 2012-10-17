@@ -17,9 +17,9 @@ class Regest(models.Model):
     content = models.TextField(_('content'))
 
     issuer = models.OneToOneField(
-        "Person", null=True, verbose_name=_('issuer'))
+        "Person", verbose_name=_('issuer'), null=True)
     mentions = models.ManyToManyField(
-        "Concept", null=True, verbose_name=_('mentions'))
+        "Concept", verbose_name=_('mentions'), null=True)
 
     original_date = models.TextField(_('original date'), null=True)
     seal = models.TextField(_('seal'))
