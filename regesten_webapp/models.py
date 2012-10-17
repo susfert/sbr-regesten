@@ -29,6 +29,9 @@ class Regest(models.Model):
 
     author = models.CharField(_('author'), max_length=3, choices=AUTHORS)
 
+    comments = models.TextField(_('comments'))
+    tags = models.TextField(_('tags'))
+
     xml_repr = models.TextField(_('XML representation'))
 
     def __unicode__(self):
