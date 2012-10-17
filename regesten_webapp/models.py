@@ -17,9 +17,9 @@ class Regest(models.Model):
     content = models.TextField(_('content'))
 
     issuer = models.OneToOneField(
-        "Person", verbose_name=_('issuer'), null=True)
+        'Person', verbose_name=_('issuer'), null=True)
     mentions = models.ManyToManyField(
-        "Concept", verbose_name=_('mentions'), null=True)
+        'Concept', verbose_name=_('mentions'), null=True)
 
     original_date = models.TextField(_('original date'), null=True)
     seal = models.TextField(_('seal'))
@@ -32,8 +32,8 @@ class Regest(models.Model):
         return u'Regest {0}: {1}'.format(self.id, self.title)
 
     class Meta:
-        verbose_name = "Regest"
-        verbose_name_plural = "Regesten"
+        verbose_name = 'Regest'
+        verbose_name_plural = 'Regesten'
 
 
 class Archive(models.Model):
@@ -44,15 +44,15 @@ class Archive(models.Model):
     TODO: Add examples
     """
 
-    regest = models.ForeignKey("Regest")
+    regest = models.ForeignKey('Regest')
     info = models.TextField()
 
     def __unicode__(self):
         return u'{0}'.format(self.content)
 
     class Meta:
-        verbose_name = ugettext_lazy("archive")
-        verbose_name_plural = ugettext_lazy("archives")
+        verbose_name = ugettext_lazy('archive')
+        verbose_name_plural = ugettext_lazy('archives')
 
 
 class RegestDate(models.Model):
@@ -69,7 +69,7 @@ class RegestDate(models.Model):
         ('ca.', 'ca.'),
         ('kurz nach', 'kurz nach'),)
 
-    regest = models.OneToOneField("Regest")
+    regest = models.OneToOneField('Regest')
     start = models.DateField(_('from'))
     start_offset = models.CharField(
         _('start offset'), max_length=20, choices=OFFSET_TYPES, null=True)
@@ -87,8 +87,8 @@ class RegestDate(models.Model):
             self.start, self.end, 'exact' if self.exact else 'not exact')
 
     class Meta:
-        verbose_name = ugettext_lazy("regest date")
-        verbose_name_plural = ugettext_lazy("regest dates")
+        verbose_name = ugettext_lazy('regest date')
+        verbose_name_plural = ugettext_lazy('regest dates')
 
 
 class Footnote(models.Model):
@@ -97,15 +97,15 @@ class Footnote(models.Model):
     content of a regest.
     """
 
-    regest = models.ForeignKey("Regest")
+    regest = models.ForeignKey('Regest')
     content = models.TextField(_('content'))
 
     def __unicode__(self):
         return u'Footnote {0}:\n{1}'.format(self.id, self.content)
 
     class Meta:
-        verbose_name = ugettext_lazy("Footnote")
-        verbose_name_plural = ugettext_lazy("Footnotes")
+        verbose_name = ugettext_lazy('Footnote')
+        verbose_name_plural = ugettext_lazy('Footnotes')
 
 
 class IndexEntry(models.Model):
@@ -115,7 +115,7 @@ class IndexEntry(models.Model):
     """
 
     related_entries = models.OneToOneField(
-        "self", verbose_name=_('related entries'), null=True)
+        'self', verbose_name=_('related entries'), null=True)
     xml_repr = models.TextField(_('XML representation'))
 
     def __unicode__(self):
@@ -132,7 +132,7 @@ class Concept(models.Model):
     additional_names = models.TextField(
         _('additional names'), null=True)
     related_concepts = models.ManyToManyField(
-        "self", verbose_name=_('related concepts'), null=True)
+        'self', verbose_name=_('related concepts'), null=True)
 
     def __unicode__(self):
         return u'Concept {0}: {1}'.format(self.id, self.name)
@@ -177,9 +177,9 @@ class Location(IndexEntry, Concept):
         _('reference point'), max_length=100, null=True)
     district = models.CharField(_('district'), max_length=70, null=True)
     region = models.ForeignKey(
-        "Region", verbose_name=_('region'), null=True)
+        'Region', verbose_name=_('region'), null=True)
     country = models.CharField(
-        _("country"), max_length=20, choices=COUNTRIES, null=True)
+        _('country'), max_length=20, choices=COUNTRIES, null=True)
 
     def __unicode__(self):
         location = u'Location {0}: {1}'.format(self.id, self.name)
@@ -210,7 +210,7 @@ class Person(IndexEntry, Concept):
     profession = models.CharField(
         _('profession'), max_length=30, null=True)
     resident_of = models.ForeignKey(
-        "Location", verbose_name=_('resident of'), null=True)
+        'Location', verbose_name=_('resident of'), null=True)
 
     def __unicode__(self):
         return u'Person {0}: {1}'.format(self.id, self.name)
@@ -226,7 +226,7 @@ class PersonGroup(IndexEntry, Concept):
     e.g. by their profession.
     """
 
-    members = models.ManyToManyField("Person", verbose_name=_('members'))
+    members = models.ManyToManyField('Person', verbose_name=_('members'))
 
     def __unicode__(self):
         return u'PersonGroup {0}: {1}'.format(self.id, self.name)
@@ -242,7 +242,7 @@ class Family(PersonGroup):
     """
 
     location = models.ForeignKey(
-        "Location", verbose_name=_('location'), null=True)
+        'Location', verbose_name=_('location'), null=True)
 
     def __unicode__(self):
         return u'Family {0}: {1}'.format(self.id, self.name)
