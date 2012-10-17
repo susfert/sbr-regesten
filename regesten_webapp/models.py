@@ -206,6 +206,8 @@ class Person(IndexEntry, Concept):
         _('generational name'), max_length=30, null=True)
     maidenname = models.CharField(
         _('maiden name'), max_length=70, null=True)
+    rolename = models.CharField(
+        _('role name'), max_length=70, null=True)
     info = models.TextField(null=True)
     profession = models.CharField(
         _('profession'), max_length=30, null=True)
