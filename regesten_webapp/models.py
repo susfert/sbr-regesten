@@ -33,7 +33,7 @@ class Regest(models.Model):
 
     class Meta:
         verbose_name = "Regest"
-        verbose_name_plural = "regesten"
+        verbose_name_plural = "Regesten"
 
 
 class Archive(models.Model):
