@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
-from regesten_webapp import COUNTRIES, REGION_TYPES
+from regesten_webapp import AUTHORS, COUNTRIES, REGION_TYPES
 
 class Regest(models.Model):
     """
@@ -26,6 +26,9 @@ class Regest(models.Model):
     print_info = models.TextField(_('print info'))
     translation = models.TextField(_('translation'), null=True)
     original = models.TextField()
+
+    author = models.CharField(_('author'), max_length=3, choices=AUTHORS)
+
     xml_repr = models.TextField(_('XML representation'))
 
     def __unicode__(self):
