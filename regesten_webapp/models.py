@@ -1,5 +1,7 @@
 """ This module defines the data model of the Sbr Regesten webapp. """
 
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
@@ -26,6 +28,8 @@ class Regest(models.Model):
     print_info = models.TextField(_('print info'))
     translation = models.TextField(_('translation'), null=True)
     original = models.TextField()
+
+    quotes = generic.GenericRelation('Quote')
 
     author = models.CharField(_('author'), max_length=3, choices=AUTHORS)
 
@@ -114,6 +118,27 @@ class Footnote(models.Model):
         verbose_name_plural = ugettext_lazy('Footnotes')
 
 
+class Quote(models.Model):
+    """
+    The Quote model represents quotes embedded e.g. in the content of
+    a regest.
+    """
+
+    content = models.TextField(_('content'))
+    __limit = models.Q(app_label='regesten_webapp', model='regest') | \
+              models.Q(app_label='regesten_webapp', model='concept')
+    content_type = models.ForeignKey(ContentType, limit_choices_to=__limit)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    def __unicode__(self):
+        return u'{0}'.format(self.content)
+
+    class Meta:
+        verbose_name = ugettext_lazy('quote')
+        verbose_name_plural = ugettext_lazy('quotes')
+
+
 class IndexEntry(models.Model):
     """
     The IndexEntry model represents a single entry in the index of the
@@ -139,6 +164,8 @@ class Concept(models.Model):
         _('additional names'), null=True)
     related_concepts = models.ManyToManyField(
         'self', verbose_name=_('related concepts'), null=True)
+
+    quotes = generic.GenericRelation('Quote')
 
     def __unicode__(self):
         return u'Concept {0}: {1}'.format(self.id, self.name)
