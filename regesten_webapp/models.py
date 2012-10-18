@@ -33,9 +33,6 @@ class Regest(models.Model):
 
     author = models.CharField(_('author'), max_length=3, choices=AUTHORS)
 
-    comments = models.TextField(_('comments'))
-    tags = models.TextField(_('tags'))
-
     xml_repr = models.TextField(_('XML representation'))
 
     def __unicode__(self):
@@ -116,6 +113,23 @@ class Footnote(models.Model):
     class Meta:
         verbose_name = ugettext_lazy('Footnote')
         verbose_name_plural = ugettext_lazy('Footnotes')
+
+
+class MetaInfo(models.Model):
+    """
+    The MetaInfo model holds meta information about regests.
+    """
+
+    regest = models.OneToOneField('Regest')
+    comments = models.TextField(_('comments'))
+    tags = models.TextField(_('tags'))
+
+    def __unicode__(self):
+        return u''
+
+    class Meta:
+        verbose_name = ugettext_lazy('meta information')
+        verbose_name_plural = ugettext_lazy('meta information')
 
 
 class Quote(models.Model):
