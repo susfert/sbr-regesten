@@ -28,10 +28,9 @@ class Regest(models.Model):
     print_info = models.TextField(_('print info'))
     translation = models.TextField(_('translation'), null=True)
     original = models.TextField()
+    author = models.CharField(_('author'), max_length=3, choices=AUTHORS)
 
     quotes = generic.GenericRelation('Quote')
-
-    author = models.CharField(_('author'), max_length=3, choices=AUTHORS)
 
     xml_repr = models.TextField(_('XML representation'))
 
