@@ -4,8 +4,9 @@ from django.contrib.sites.models import Site
 
 from regesten_webapp.models import Archive, Concept, Family
 from regesten_webapp.models import Footnote, Landmark, Location
-from regesten_webapp.models import Person, PersonGroup, Quote
-from regesten_webapp.models import Regest, RegestDate, Region
+from regesten_webapp.models import MetaInfo, Person, PersonGroup
+from regesten_webapp.models import Quote, Regest, RegestDate
+from regesten_webapp.models import Region
 
 
 class RegestDateInline(admin.StackedInline):
@@ -20,12 +21,16 @@ class FootnoteInline(admin.StackedInline):
 class QuoteInline(GenericStackedInline):
     model = Quote
 
+class MetaInfoInline(admin.StackedInline):
+    model = MetaInfo
+
 class RegestAdmin(admin.ModelAdmin):
     inlines = [
         RegestDateInline,
         ArchiveInline,
         FootnoteInline,
-        QuoteInline
+        QuoteInline,
+        MetaInfoInline,
         ]
 
 class ConceptAdmin(admin.ModelAdmin):
