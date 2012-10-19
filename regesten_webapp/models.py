@@ -14,19 +14,19 @@ class Regest(models.Model):
     """
 
     title = models.CharField(_('title'), max_length=70)
-    location = models.CharField(_('location'), max_length=70)
-    regest_type = models.CharField(_('type'), max_length=70)
+    location = models.CharField(_('location'), max_length=70, blank=True)
+    regest_type = models.CharField(_('type'), max_length=70, blank=True)
     content = models.TextField(_('content'))
 
     issuer = models.OneToOneField(
         'Person', verbose_name=_('issuer'), null=True)
     mentions = models.ManyToManyField(
-        'Concept', verbose_name=_('mentions'), null=True)
+        'Concept', verbose_name=_('mentions'), null=True, blank=True)
 
-    original_date = models.TextField(_('original date'))
+    original_date = models.TextField(_('original date'), blank=True)
     seal = models.TextField(_('seal'))
     print_info = models.TextField(_('print info'))
-    translation = models.TextField(_('translation'))
+    translation = models.TextField(_('translation'), blank=True)
     original = models.TextField()
     author = models.CharField(_('author'), max_length=3, choices=AUTHORS)
 
@@ -78,11 +78,11 @@ class RegestDate(models.Model):
     regest = models.OneToOneField('Regest')
     start = models.DateField(_('from'))
     start_offset = models.CharField(
-        _('start offset'), max_length=20, choices=OFFSET_TYPES)
+        _('start offset'), max_length=20, choices=OFFSET_TYPES, blank=True)
     end = models.DateField(_('to'))
     end_offset = models.CharField(
-        _('end offset'), max_length=20, choices=OFFSET_TYPES)
-    alt_date = models.DateField(_('alternative date'), null=True)
+        _('end offset'), max_length=20, choices=OFFSET_TYPES, blank=True)
+    alt_date = models.DateField(_('alternative date'), null=True, blank=True)
 
     @property
     def exact(self):
