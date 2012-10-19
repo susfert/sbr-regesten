@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-19 09:31+0200\n"
+"POT-Creation-Date: 2012-10-19 12:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,13 +18,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: admin.py:34
+#: admin.py:37
 msgid "Content"
 msgstr "Inhalt"
 
-#: admin.py:38
+#: admin.py:41 admin.py:64 admin.py:81 admin.py:103 admin.py:126 admin.py:143
+#: admin.py:160
 msgid "Additional information"
 msgstr "Zusätzliche Informationen"
+
+#: admin.py:86 admin.py:108 admin.py:131 admin.py:148 admin.py:165
+msgid "Index entry"
+msgstr "Indexeintrag"
+
+#: admin.py:98 admin.py:120
+msgid "Details"
+msgstr "Details"
 
 #: models.py:16
 msgid "title"
@@ -146,87 +155,91 @@ msgstr "Verwandte Einträge"
 msgid "name"
 msgstr "name"
 
-#: models.py:177
+#: models.py:176
+msgid "description"
+msgstr "beschreibung"
+
+#: models.py:178
 msgid "additional names"
 msgstr "alternativnamen"
 
-#: models.py:179
+#: models.py:180
 msgid "related concepts"
 msgstr "Verwandte Konzepte"
 
-#: models.py:187
+#: models.py:188
 msgid "Concept"
 msgstr "Konzept"
 
-#: models.py:188
+#: models.py:189
 msgid "Concepts"
 msgstr "Konzepte"
 
-#: models.py:198
+#: models.py:199
 msgid "landmark type"
 msgstr "wahrzeichentyp"
 
-#: models.py:207
+#: models.py:208
 msgid "Landmark"
 msgstr "Wahrzeichen"
 
-#: models.py:208
+#: models.py:209
 msgid "Landmarks"
 msgstr "Wahrzeichen"
 
-#: models.py:218
+#: models.py:219
 msgid "location type"
 msgstr "ortstyp"
 
-#: models.py:219
+#: models.py:220
 msgid "abandoned village"
 msgstr "wüstung"
 
-#: models.py:221
+#: models.py:222
 msgid "abandoned village reference"
 msgstr "Wüstung (Referenz)"
 
-#: models.py:223
+#: models.py:224
 msgid "reference point"
 msgstr "Bezugspunkt"
 
-#: models.py:224
+#: models.py:225
 msgid "district"
 msgstr "bezirk"
 
-#: models.py:226
+#: models.py:227
 msgid "region"
 msgstr "Region"
 
-#: models.py:228
+#: models.py:229
 msgid "country"
 msgstr "land"
 
-#: models.py:237
+#: models.py:238
 msgid "Location"
 msgstr "Ort"
 
-#: models.py:238
+#: models.py:239
 msgid "Locations"
 msgstr "Orte"
 
-#: models.py:248
+#: models.py:249
 msgid "forename"
 msgstr "vorname"
 
-#: models.py:250
+#: models.py:251
 msgid "surname"
 msgstr "nachname"
 
-#: models.py:252
+#: models.py:253
 msgid "generational name"
 msgstr "generation"
 
-#: models.py:254
+#: models.py:255
 msgid "maiden name"
 msgstr "geburtsname"
 
-#: models.py:256
+#: models.py:257
 msgid "role name"
 msgstr "adelstitel"
 
