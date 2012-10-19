@@ -251,7 +251,7 @@ class Person(IndexEntry, Concept):
     profession = models.CharField(
         _('profession'), max_length=30, blank=True)
     resident_of = models.ForeignKey(
-        'Location', verbose_name=_('resident of'), null=True)
+        'Location', verbose_name=_('resident of'), null=True, blank=True)
 
     def __unicode__(self):
         return u'Person {0}: {1}'.format(self.id, self.name)
