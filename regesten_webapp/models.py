@@ -152,7 +152,7 @@ class IndexEntry(models.Model):
     """
 
     related_entries = models.OneToOneField(
-        'self', verbose_name=_('related entries'), null=True)
+        'self', verbose_name=_('related entries'), null=True, blank=True)
     xml_repr = models.TextField(_('XML representation'))
 
     def __unicode__(self):
@@ -170,7 +170,7 @@ class Concept(models.Model):
     additional_names = models.TextField(
         _('additional names'), blank=True)
     related_concepts = models.ManyToManyField(
-        'self', verbose_name=_('related concepts'), null=True)
+        'self', verbose_name=_('related concepts'), null=True, blank=True)
 
     quotes = generic.GenericRelation('Quote')
 
