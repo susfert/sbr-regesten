@@ -172,7 +172,8 @@ class Concept(models.Model):
     concepts listed in the index of the Sbr Regesten.
     """
 
-    name = models.TextField(_('name'))
+    name = models.CharField(_('name'), max_length=70)
+    description = models.TextField(_('description'))
     additional_names = models.TextField(
         _('additional names'))
     related_concepts = models.ManyToManyField(
@@ -254,7 +255,6 @@ class Person(IndexEntry, Concept):
         _('maiden name'), max_length=70)
     rolename = models.CharField(
         _('role name'), max_length=70)
-    info = models.TextField()
     profession = models.CharField(
         _('profession'), max_length=30)
     resident_of = models.ForeignKey(
