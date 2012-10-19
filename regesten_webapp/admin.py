@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.contenttypes.generic import GenericStackedInline
 from django.contrib.sites.models import Site
+from django.utils.translation import ugettext as _
 
 from regesten_webapp.models import Archive, Concept, Family
 from regesten_webapp.models import Footnote, Landmark, Location
@@ -14,17 +15,36 @@ class RegestDateInline(admin.StackedInline):
 
 class ArchiveInline(admin.StackedInline):
     model = Archive
+    extra = 2
 
 class FootnoteInline(admin.StackedInline):
     model = Footnote
+    extra = 2
 
 class QuoteInline(GenericStackedInline):
     model = Quote
+    extra = 2
 
 class MetaInfoInline(admin.StackedInline):
     model = MetaInfo
 
 class RegestAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'fields': (('title', 'location', 'regest_type'),)
+            }
+         ),
+        (_('Content'), {
+            'fields': ('issuer', 'content', 'mentions')
+            },
+         ),
+        (_('Additional information'), {
+            'fields': (
+                'original_date', 'seal', 'print_info',
+                'translation', 'original', 'author')
+            })
+        )
+
     inlines = [
         RegestDateInline,
         ArchiveInline,
