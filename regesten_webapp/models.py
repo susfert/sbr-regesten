@@ -173,9 +173,9 @@ class Concept(models.Model):
     """
 
     name = models.CharField(_('name'), max_length=70)
-    description = models.TextField(_('description'))
+    description = models.TextField(_('description'), blank=True)
     additional_names = models.TextField(
-        _('additional names'))
+        _('additional names'), blank=True)
     related_concepts = models.ManyToManyField(
         'self', verbose_name=_('related concepts'), null=True)
 
@@ -219,14 +219,14 @@ class Location(IndexEntry, Concept):
         _('location type'), max_length=30)
     abandoned_village = models.NullBooleanField(_('abandoned village'))
     av_ref = models.CharField(
-        _('abandoned village reference'), max_length=100)
+        _('abandoned village reference'), max_length=100, blank=True)
     reference_point = models.CharField(
-        _('reference point'), max_length=100)
-    district = models.CharField(_('district'), max_length=70)
+        _('reference point'), max_length=100, blank=True)
+    district = models.CharField(_('district'), max_length=70, blank=True)
     region = models.ForeignKey(
-        'Region', verbose_name=_('region'), null=True)
+        'Region', verbose_name=_('region'), null=True, blank=True)
     country = models.CharField(
-        _('country'), max_length=20, choices=COUNTRIES)
+        _('country'), max_length=20, choices=COUNTRIES, blank=True)
 
     def __unicode__(self):
         location = u'Location {0}: {1}'.format(self.id, self.name)
@@ -250,13 +250,13 @@ class Person(IndexEntry, Concept):
     surname = models.CharField(
         _('surname'), max_length=70)
     genname = models.CharField(
-        _('generational name'), max_length=30)
+        _('generational name'), max_length=30, blank=True)
     maidenname = models.CharField(
-        _('maiden name'), max_length=70)
+        _('maiden name'), max_length=70, blank=True)
     rolename = models.CharField(
-        _('role name'), max_length=70)
+        _('role name'), max_length=70, blank=True)
     profession = models.CharField(
-        _('profession'), max_length=30)
+        _('profession'), max_length=30, blank=True)
     resident_of = models.ForeignKey(
         'Location', verbose_name=_('resident of'), null=True)
 
