@@ -14,8 +14,8 @@ class Regest(models.Model):
     """
 
     title = models.CharField(_('title'), max_length=70)
-    location = models.CharField(_('location'), max_length=70, null=True)
-    regest_type = models.CharField(_('type'), max_length=70, null=True)
+    location = models.CharField(_('location'), max_length=70)
+    regest_type = models.CharField(_('type'), max_length=70)
     content = models.TextField(_('content'))
 
     issuer = models.OneToOneField(
@@ -23,10 +23,10 @@ class Regest(models.Model):
     mentions = models.ManyToManyField(
         'Concept', verbose_name=_('mentions'), null=True)
 
-    original_date = models.TextField(_('original date'), null=True)
+    original_date = models.TextField(_('original date'))
     seal = models.TextField(_('seal'))
     print_info = models.TextField(_('print info'))
-    translation = models.TextField(_('translation'), null=True)
+    translation = models.TextField(_('translation'))
     original = models.TextField()
     author = models.CharField(_('author'), max_length=3, choices=AUTHORS)
 
@@ -78,10 +78,10 @@ class RegestDate(models.Model):
     regest = models.OneToOneField('Regest')
     start = models.DateField(_('from'))
     start_offset = models.CharField(
-        _('start offset'), max_length=20, choices=OFFSET_TYPES, null=True)
+        _('start offset'), max_length=20, choices=OFFSET_TYPES)
     end = models.DateField(_('to'))
     end_offset = models.CharField(
-        _('end offset'), max_length=20, choices=OFFSET_TYPES, null=True)
+        _('end offset'), max_length=20, choices=OFFSET_TYPES)
     alt_date = models.DateField(_('alternative date'), null=True)
 
     @property
@@ -174,7 +174,7 @@ class Concept(models.Model):
 
     name = models.TextField(_('name'))
     additional_names = models.TextField(
-        _('additional names'), null=True)
+        _('additional names'))
     related_concepts = models.ManyToManyField(
         'self', verbose_name=_('related concepts'), null=True)
 
@@ -195,7 +195,7 @@ class Landmark(IndexEntry, Concept):
     """
 
     landmark_type = models.CharField(
-        _('landmark type'), max_length=30, null=True)
+        _('landmark type'), max_length=30)
 
     def __unicode__(self):
         landmark =  u'Landmark {0}: {1}'.format(self.id, self.name)
@@ -215,17 +215,17 @@ class Location(IndexEntry, Concept):
     """
 
     location_type = models.CharField(
-        _('location type'), max_length=30, null=True)
+        _('location type'), max_length=30)
     abandoned_village = models.NullBooleanField(_('abandoned village'))
     av_ref = models.CharField(
-        _('abandoned village reference'), max_length=100, null=True)
+        _('abandoned village reference'), max_length=100)
     reference_point = models.CharField(
-        _('reference point'), max_length=100, null=True)
-    district = models.CharField(_('district'), max_length=70, null=True)
+        _('reference point'), max_length=100)
+    district = models.CharField(_('district'), max_length=70)
     region = models.ForeignKey(
         'Region', verbose_name=_('region'), null=True)
     country = models.CharField(
-        _('country'), max_length=20, choices=COUNTRIES, null=True)
+        _('country'), max_length=20, choices=COUNTRIES)
 
     def __unicode__(self):
         location = u'Location {0}: {1}'.format(self.id, self.name)
@@ -245,18 +245,18 @@ class Person(IndexEntry, Concept):
     """
 
     forename = models.CharField(
-        _('forename'), max_length=70, null=True)
+        _('forename'), max_length=70)
     surname = models.CharField(
-        _('surname'), max_length=70, null=True)
+        _('surname'), max_length=70)
     genname = models.CharField(
-        _('generational name'), max_length=30, null=True)
+        _('generational name'), max_length=30)
     maidenname = models.CharField(
-        _('maiden name'), max_length=70, null=True)
+        _('maiden name'), max_length=70)
     rolename = models.CharField(
-        _('role name'), max_length=70, null=True)
-    info = models.TextField(null=True)
+        _('role name'), max_length=70)
+    info = models.TextField()
     profession = models.CharField(
-        _('profession'), max_length=30, null=True)
+        _('profession'), max_length=30)
     resident_of = models.ForeignKey(
         'Location', verbose_name=_('resident of'), null=True)
 
