@@ -11,6 +11,13 @@ COUNTRIES = (
     ('Deutschland', 'Deutschland'),
     ('Belgien', 'Belgien'))
 
+OFFSET_TYPES = (
+    ('vor', 'vor'),
+    ('nach', 'nach'),
+    ('um', 'um'),
+    ('ca.', 'ca.'),
+    ('kurz nach', 'kurz nach'),)
+
 REGION_TYPES = (
     ('Bundesland', 'Bundesland'),
     ('Departement', 'Departement'),

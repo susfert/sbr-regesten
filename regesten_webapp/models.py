@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
-from regesten_webapp import AUTHORS, COUNTRIES, REGION_TYPES
+from regesten_webapp import AUTHORS, COUNTRIES, OFFSET_TYPES, REGION_TYPES
 
 class Regest(models.Model):
     """
@@ -67,13 +67,6 @@ class RegestDate(models.Model):
 
     TODO: Add examples
     """
-
-    OFFSET_TYPES = (
-        ('vor', 'vor'),
-        ('nach', 'nach'),
-        ('um', 'um'),
-        ('ca.', 'ca.'),
-        ('kurz nach', 'kurz nach'),)
 
     regest = models.OneToOneField('Regest')
     start = models.DateField(_('from'))
