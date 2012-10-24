@@ -56,7 +56,7 @@ class Archive(models.Model):
     info = models.TextField()
 
     def __unicode__(self):
-        return u'{0}'.format(self.content)
+        return u'{0}'.format(self.info)
 
     class Meta:
         verbose_name = ugettext_lazy('archive')
