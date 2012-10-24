@@ -73,7 +73,8 @@ class ConceptAdmin(admin.ModelAdmin):
 class LandmarkAdmin(ConceptAdmin):
     fieldsets = (
         (None, {
-            'fields': ('name', 'landmark_type')
+            'fields': ('name', 'landmark_type'),
+            'classes': ['wide']
             }
          ),
         (_('Additional information'), {
@@ -82,7 +83,8 @@ class LandmarkAdmin(ConceptAdmin):
             }
          ),
         (_('Index entry'), {
-            'fields': ('related_entries', 'xml_repr')
+            'fields': ('related_entries', 'xml_repr'),
+            'classes': ['wide']
             }
          ),
         )
@@ -104,7 +106,8 @@ class LocationAdmin(ConceptAdmin):
             }
          ),
         (_('Index entry'), {
-            'fields': ('related_entries', 'xml_repr')
+            'fields': ('related_entries', 'xml_repr'),
+            'classes': ['wide']
             }
          ),
         )
@@ -127,7 +130,8 @@ class PersonAdmin(ConceptAdmin):
             }
          ),
         (_('Index entry'), {
-            'fields': ('related_entries', 'xml_repr')
+            'fields': ('related_entries', 'xml_repr'),
+            'classes': ['wide']
             }
          ),
         )
@@ -144,7 +148,8 @@ class PersonGroupAdmin(ConceptAdmin):
             }
          ),
         (_('Index entry'), {
-            'fields': ('related_entries', 'xml_repr')
+            'fields': ('related_entries', 'xml_repr'),
+            'classes': ['wide']
             }
          ),
         )
@@ -161,7 +166,8 @@ class FamilyAdmin(ConceptAdmin):
             }
          ),
         (_('Index entry'), {
-            'fields': ('related_entries', 'xml_repr')
+            'fields': ('related_entries', 'xml_repr'),
+            'classes': ['wide']
             }
          ),
         )
