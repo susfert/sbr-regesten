@@ -159,7 +159,7 @@ class IndexEntry(models.Model):
     xml_repr = models.TextField(_('XML representation'))
 
     def __unicode__(self):
-        return u'IndexEntry {0}'.format(self.id)
+        return ugettext_lazy('Index entry') + ' {0}'.format(self.id)
 
 
 class Concept(models.Model):
@@ -178,7 +178,8 @@ class Concept(models.Model):
     quotes = generic.GenericRelation('Quote')
 
     def __unicode__(self):
-        return u'Concept {0}: {1}'.format(self.id, self.name)
+        return ugettext_lazy('Concept') + u' {0}: {1}'.format(
+            self.id, self.name)
 
     class Meta:
         verbose_name = ugettext_lazy('Concept')
