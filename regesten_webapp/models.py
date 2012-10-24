@@ -19,10 +19,10 @@ class Regest(models.Model):
     content = models.TextField(_('content'))
 
     issuer = models.ForeignKey(
-        'Person', related_name=_('regests_issued'), verbose_name=_('issuer'),
+        'Person', related_name='regests_issued', verbose_name=_('issuer'),
         null=True)
     mentions = models.ManyToManyField(
-        'Concept', related_name=_('mentioned_in'), verbose_name=_('mentions'),
+        'Concept', related_name='mentioned_in', verbose_name=_('mentions'),
         null=True, blank=True)
 
     original_date = models.TextField(_('original date'), blank=True)
