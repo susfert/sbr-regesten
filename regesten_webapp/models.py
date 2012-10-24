@@ -117,7 +117,10 @@ class MetaInfo(models.Model):
     tags = models.TextField(_('tags'))
 
     def __unicode__(self):
-        return u''
+        return u'Meta information for regest {0}\n\n' \
+               'Tags: {1}\n\n' \
+               'Comments: {2}\n'.format(
+            self.regest.id, self.tags, self.comments)
 
     class Meta:
         verbose_name = ugettext_lazy('meta information')
