@@ -18,10 +18,12 @@ class Regest(models.Model):
     regest_type = models.CharField(_('type'), max_length=70, blank=True)
     content = models.TextField(_('content'))
 
-    issuer = models.OneToOneField(
-        'Person', verbose_name=_('issuer'), null=True)
+    issuer = models.ForeignKey(
+        'Person', related_name=_('regests_issued'), verbose_name=_('issuer'),
+        null=True)
     mentions = models.ManyToManyField(
-        'Concept', verbose_name=_('mentions'), null=True, blank=True)
+        'Concept', related_name=_('mentioned_in'), verbose_name=_('mentions'),
+        null=True, blank=True)
 
     original_date = models.TextField(_('original date'), blank=True)
     seal = models.TextField(_('seal'))
