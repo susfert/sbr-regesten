@@ -156,7 +156,7 @@ class IndexEntry(models.Model):
     xml_repr = models.TextField(_('XML representation'))
 
     def __unicode__(self):
-        return u'IndexEntry {0}\n\n{1}'.format(self.id, self.defines)
+        return u'IndexEntry {0}'.format(self.id)
 
 
 class Concept(models.Model):
