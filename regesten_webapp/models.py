@@ -156,7 +156,7 @@ class IndexEntry(models.Model):
     Sbr Regesten.
     """
 
-    related_entries = models.OneToOneField(
+    related_entries = models.ManyToManyField(
         'self', verbose_name=_('related entries'), null=True, blank=True)
     xml_repr = models.TextField(_('XML representation'))
 
