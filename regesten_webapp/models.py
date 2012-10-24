@@ -84,8 +84,8 @@ class RegestDate(models.Model):
         return not self.start_offset and not self.end_offset
 
     def __unicode__(self):
-        return u'\nStarts on {0}\nEnds on {1}\n\n---> ({2})'.format(
-            self.start, self.end, 'exact' if self.exact else 'not exact')
+        return ugettext_lazy('Starts on') + u' {0}, '.format(self.start) + \
+               (ugettext_lazy('ends on') + u' {0}'.format(self.end))
 
     class Meta:
         verbose_name = ugettext_lazy('regest date')
