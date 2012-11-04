@@ -6,13 +6,14 @@ def extract_index():
 from bs4 import BeautifulSoup, Tag, NavigableString
 import codecs, string, re, sys
 from regesten_webapp import models
-from regesten_webapp.models import Location, Family, Person, Country, Region, PersonGroup, Landmark, Content, Concept, IndexEntry, Regest, RegestTitle, RegestDate, RegestContent #*
+from regesten_webapp.models import Location, Family, Person, Region, PersonGroup, Landmark, Concept, IndexEntry, Regest, RegestDate #*
 
 countConc=2000
 
 # Writes the mentionings (related regests) into the DB.
 def mentToDB(xmlNode, concept):
-  if hasattr(xmlNode, 'mentioned-in') and xmlNode.find('mentioned-in'):
+  pass
+  '''if hasattr(xmlNode, 'mentioned-in') and xmlNode.find('mentioned-in'):
     for reg_ref in xmlNode.find('mentioned-in'):
       if isinstance(reg_ref, NavigableString):
         continue
@@ -26,7 +27,7 @@ def mentToDB(xmlNode, concept):
           regestList=Regest.objects.filter(title=titleList[0])
           regest=regestList[0]
           con=regest.content
-          concept.regestcontent_set.add(con)
+          concept.regestcontent_set.add(con)'''
 
 
 def addAll(obj, li):
@@ -35,13 +36,12 @@ def addAll(obj, li):
 
 def createPerson(xmlNode):
   p= Person()
-  content = Content.objects.create(content=xmlNode.find('name').get_text())
-  p.name = content
+  p.name = xmlNode.find('name').get_text()
   return p
   
 def createConcept(xmlNode):
   c=Concept()
-  c.name = Content.objects.create(content=xmlNode.find('name').get_text())
+  c.name = xmlNode.find('name').get_text()
   return c
 
 # writes related_concepts (list of concepts) into the database
@@ -71,27 +71,29 @@ def locToDB(soup):
      
     # Name & Additional names
     l.add_Names=placeName.addNames
-    content = Content.objects.create(content=soup.indexitem['value'])
-    l.name=content
+    l.name=soup.indexitem['value']
         
     # Wuestungen
     if 'type' in attrs:
       l.location_type = placeName.settlement['type']
-    l.w = placeName.settlement['w']
-    if l.w==True:
-      l.w_ref = placeName.settlement['w-ref']
+    l.abandoned_village = placeName.settlement['w']
+    if l.abandoned_village==True:
+      l.av_ref = placeName.settlement['w-ref']
       
     # Reference point & District
-    l.reference_point = placeName.find('reference_point')
-    l.district = placeName.district
+    point=placeName.find('reference_point')
+    if point:
+     l.reference_point = point
+    else:
+     l.reference_point = ''
+    l.district = str(placeName.district.get_text())
       
     # Region & Country
     if placeName.region: # funktioniert noch nicht, da Typ obligatorisch
-      region = Region.objects.create(name=placeName.region)
-      l.region
+      region = Region.objects.create(name=placeName.region.get_text(), region_type='Bundesland') # TODO region_type!!!
+      l.region = region
     if placeName.country:
-      country = Country.objects.create(name=placeName.country)
-      l.country = country
+      l.country = placeName.country
         
     # ID
     #l.id=soup.indexitem['id'].split('_')[1]
@@ -114,12 +116,11 @@ def landToDB(soup):
     header=soup.indexitem.find('landmark-header')
      
     # Name & Additional names
-    content = Content.objects.create(content=soup.indexitem['value'])
-    land.name=content
+    land.name=soup.indexitem['value']
     if header.geogname:
       land.add_Names= header.geogname
       
-      land.landmark_type=header.geogname['type']
+      land.landmark_type=str(header.geogname['type'])
    
     # ID
     #land.id=soup.indexitem['id'].split('_')[1]
@@ -144,12 +145,10 @@ def persToDB(soup):
   if hasattr(soup.indexitem, 'person-header'):
     header=soup.indexitem.find('person-header')
     # Name & Additional names
-    content = Content.objects.create(content=soup.indexitem['value'])
-    p.name=content
+    p.name=soup.indexitem['value']
 
     #p.add_Names= TODO
-    content = Content.objects.create(content=header.person.find('person-info'))
-    p.info=content
+    p.info=header.person.find('person-info')
    
     # ID
     #p.id=soup.indexitem['id'].split('_')[1]
@@ -172,8 +171,7 @@ def persGrToDB(soup):
     header=soup.indexitem.find('persongroup-header')
      
     # Name
-    content = Content.objects.create(content=header.find('group-name').get_text())
-    pg.name=content
+    pg.name=header.find('group-name').get_text()
     
     # ID
     #pg.id=soup.indexitem['id'].split('_')[1]
@@ -197,8 +195,7 @@ def famToDB(soup):
     header=soup.indexitem.find('family-header')
      
     # Name & Additional names
-    content = Content.objects.create(content=soup.indexitem['value'])
-    f.name=content
+    f.name=soup.indexitem['value']
     #land.add_Names= TODO
     
     # ID
@@ -261,10 +258,10 @@ def extract_index():
       i=IndexEntry()
       i.defines=entry
       i.xml_repr=item
-      i.id=countIndex
+      #i.id=countIndex
       countIndex+=1
       i.save()
       #print(i)
   
-  # Länder-Objekte nur einmal anlegen und evtl auflösen (F -> Frankreich)
+  # Laender-Objekte nur einmal anlegen und evtl aufloesen (F -> Frankreich)
   # XML-Tags entfernen (country, region)
