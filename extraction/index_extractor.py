@@ -55,7 +55,7 @@ def relConcToDB(relConc, createElement=createConcept):
       if conc.name=='concept' or conc.name=='person':
         c=createElement(conc)
         countConc+=1
-        c.save()    
+        c.save()
         mentToDB(conc, c)
         if hasattr(conc, 'related_concepts'):
           addAll(c.related_concepts, relConcToDB(conc.related_concepts))
@@ -76,24 +76,50 @@ def locToDB(soup):
     # Wuestungen
     if 'type' in attrs:
       l.location_type = placeName.settlement['type']
-    l.abandoned_village = placeName.settlement['w']
+    #print(placeName.settlement['w'])
+    vill=placeName.settlement['w']
+    if vill=='True':
+     l.abandoned_village = True
+    else:
+     l.abandoned_village = False    
+    
+    #print(type(l.abandoned_village))
     if l.abandoned_village==True:
       l.av_ref = placeName.settlement['w-ref']
+    #print(l.abandoned_village)
       
     # Reference point & District
     point=placeName.find('reference_point')
     if point:
+      point=point.get_text().strip(' ,;.')
+    if point:
      l.reference_point = point
     else:
      l.reference_point = ''
-    l.district = str(placeName.district.get_text())
+    if placeName.district:
+      l.district = placeName.district.get_text().strip(' ,;.')
       
     # Region & Country
-    if placeName.region: # funktioniert noch nicht, da Typ obligatorisch
-      region = Region.objects.create(name=placeName.region.get_text(), region_type='Bundesland') # TODO region_type!!!
+    if placeName.region:
+      regs=Region.objects.filter(name=placeName.region.get_text().strip(' ,;.'))
+      if regs:
+        region = regs[0]
+      else:
+        region = Region.objects.create(name=placeName.region.get_text().strip(' ,;.'), region_type=placeName.region['type'])
       l.region = region
     if placeName.country:
-      l.country = placeName.country
+      if placeName.country.get_text() == "F":
+        l.country = "Frankreich"
+      if placeName.country.get_text() == "B":
+        l.country = "Belgien"
+      if placeName.country.get_text() == "CH":
+        l.country = "Schweiz"
+      if placeName.country.get_text() == "Lux":
+        l.country = "Luxemburg"
+    # all Bundeslaender are in Deutschland by definition, although this information is not included in the original Regesten
+    elif l.region and l.region.region_type == 'Bundesland':
+      l.country = "Deutschland"
+        
         
     # ID
     #l.id=soup.indexitem['id'].split('_')[1]
@@ -182,7 +208,9 @@ def persGrToDB(soup):
     
     # related-concepts
     if soup.indexitem.find('listing-body'):
-      addAll(pg.related_concepts, relConcToDB(soup.indexitem.find('listing-body').members, createElement=createPerson))
+      addAll(pg.members, relConcToDB(soup.indexitem.find('listing-body').members, createElement=createPerson))
+    
+    #print('members'+ str(pg.members))
        
     print(pg)
     #pg.save()
@@ -195,7 +223,7 @@ def famToDB(soup):
     header=soup.indexitem.find('family-header')
      
     # Name & Additional names
-    f.name=soup.indexitem['value']
+    f.name=soup.indexitem['value'].strip(' ,;.')
     #land.add_Names= TODO
     
     # ID
@@ -207,15 +235,15 @@ def famToDB(soup):
     
     # related concepts
     if soup.indexitem.find('listing-body'):
-      addAll(f.related_concepts, relConcToDB(soup.indexitem.find('listing-body').members, createElement=createPerson))
-       
-    print(f)
+      addAll(f.members, relConcToDB(soup.indexitem.find('listing-body').members, createElement=createPerson))
+    
+    print (f)
     return f
  
  
 #  Entry point: writes the XML-index into the database
 def extract_index():
-  ''''for a in [Location, Family, Person, Country, Region, PersonGroup, Landmark, Content, Concept, IndexEntry, Regest, RegestTitle, RegestContent, RegestDate]:
+  '''for a in [Location, Family, Person, Region, PersonGroup, Landmark, Concept, IndexEntry, Regest, RegestDate]:
     a.objects.all().delete()
     
   r=Regest()
@@ -230,7 +258,7 @@ def extract_index():
   
   countIndex=0
   
-  with open ('allXmlItems.xml', 'r') as file:
+  with open ('allXmlItems2.xml', 'r') as file:
     for item in file:
       soup=BeautifulSoup(item)
       type=soup.indexitem['type']
@@ -249,15 +277,19 @@ def extract_index():
       
       elif type=='landmark':
         entry=landToDB(soup)
-        
+  
       else:
         entry=''
         print ('unknown type!!')
         break
       
+      #entry.xml_repr=
+      
+      
       i=IndexEntry()
-      i.defines=entry
+      #i.defines=entry
       i.xml_repr=item
+      i.id =entry.id
       #i.id=countIndex
       countIndex+=1
       i.save()
