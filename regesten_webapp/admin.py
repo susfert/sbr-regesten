@@ -53,6 +53,7 @@ class RegestAdmin(admin.ModelAdmin):
         MetaInfoInline,
         ]
 
+    radio_fields = { 'author': admin.VERTICAL }
 class ConceptAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
