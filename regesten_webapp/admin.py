@@ -53,7 +53,10 @@ class RegestAdmin(admin.ModelAdmin):
         MetaInfoInline,
         ]
 
+    list_display = ['title', 'location', 'regest_type']
     radio_fields = { 'author': admin.VERTICAL }
+    search_fields = ['title', 'content']
+
 class ConceptAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
@@ -70,6 +73,9 @@ class ConceptAdmin(admin.ModelAdmin):
     inlines = [
         QuoteInline,
         ]
+
+    list_display = ['name', 'description']
+    search_fields = ['name', 'description']
 
 class LandmarkAdmin(ConceptAdmin):
     fieldsets = (
@@ -89,6 +95,9 @@ class LandmarkAdmin(ConceptAdmin):
             }
          ),
         )
+
+    list_display = ['name', 'landmark_type']
+    search_fields = ['name', 'landmark_type']
 
 class LocationAdmin(ConceptAdmin):
     fieldsets = (
@@ -112,6 +121,9 @@ class LocationAdmin(ConceptAdmin):
             }
          ),
         )
+
+    list_display = ['name', 'location_type']
+    search_fields = ['name', 'location_type']
 
 class PersonAdmin(ConceptAdmin):
     fieldsets = (
@@ -137,6 +149,9 @@ class PersonAdmin(ConceptAdmin):
          ),
         )
 
+    list_display = ['name', 'profession', 'resident_of']
+    search_fields = ['name', 'profession']
+
 class PersonGroupAdmin(ConceptAdmin):
     fieldsets = (
         (None, {
@@ -155,6 +170,9 @@ class PersonGroupAdmin(ConceptAdmin):
          ),
         )
 
+    list_display = ['name']
+    search_fields = ['name']
+
 class FamilyAdmin(ConceptAdmin):
     fieldsets = (
         (None, {
@@ -172,6 +190,9 @@ class FamilyAdmin(ConceptAdmin):
             }
          ),
         )
+
+    list_display = ['name']
+    search_fields = ['name']
 
 
 admin.site.unregister(Site)
