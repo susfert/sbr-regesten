@@ -194,6 +194,9 @@ class FamilyAdmin(ConceptAdmin):
     list_display = ['name']
     search_fields = ['name']
 
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'region_type']
+    search_fields = ['name', 'region_type']
 
 admin.site.unregister(Site)
 
@@ -204,4 +207,4 @@ admin.site.register(Location, LocationAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(PersonGroup, PersonGroupAdmin)
 admin.site.register(Family, FamilyAdmin)
-admin.site.register(Region)
+admin.site.register(Region, RegionAdmin)
