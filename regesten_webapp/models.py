@@ -1,5 +1,8 @@
 """ This module defines the data model of the Sbr Regesten webapp. """
 
+import re
+from datetime import date
+
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -7,6 +10,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from regesten_webapp import AUTHORS, COUNTRIES, OFFSET_TYPES, REGION_TYPES
+from regesten_webapp import DAY_DEFAULT, MONTH_DEFAULT
 
 class Regest(models.Model):
     """
@@ -35,6 +39,125 @@ class Regest(models.Model):
     quotes = generic.GenericRelation('Quote')
 
     xml_repr = models.TextField(_('XML representation'))
+
+    def save(self, *args, **kwargs):
+        super(Regest, self).save(*args, **kwargs)
+        self._generate_date()
+
+    def _generate_date(self):
+        """
+        # Examples:
+        # - Simple
+        # 1009
+        # 1235-04
+        # 1190-12-20
+        #
+        # - Location
+        # 0977-05-11 Diedenhofen
+        # 1285-03-08 St. Arnual
+        # 1398-01-18 Frankfurt am Main
+        #
+        # - ?
+        # 0857 (?)
+        # 0601-0609 (?)
+        # 1426-12-29 (?)
+        # 1507-12-27 (?) Saarbruecken
+        #
+        # - Offset
+        # 1350 (ca.)
+        # 1267 (um)
+        # 1147-06-22 (um)
+        # 1253 (vor)
+        # 1313-08 (vor)
+        # 1236-06-05 (vor)
+        # 1434 (nach)
+        # 1377-03-08 (nach)
+        # 1503-04-22 (post)
+        #
+        # - Offset + Location
+        # 1509 (ca.) Saarbruecken
+        # 1065-08-28 Saarbruecken (nach)
+        # 1507-12-29 (nach) Saarbruecken
+        # 1477-03-29 (kurz nach) Saarbruecken
+        # 1504 (um) Saarbruecken
+        #
+        # - Alternatives
+        # 1273 (a)
+        # 1273 (b)
+        # 1273 (c)
+        # 1270-07-21 (a)
+        # 1270-07-21 (b)
+        # 1270-07-21 (c)
+        # 1377-03-08 (d)
+        # 1377-03-08 (e)
+        # 1377-03-08 (f)
+        # 1270-04-27/04-28
+        # 1466 [04-28 / 05-01]
+        # 1421-10-05 / 1422-10-04
+        # 1440-11-12/17
+        # 1343-04-12 oder 19
+        # 1424-06-09 (a) und (b)
+        # 1502-11-22 (1503-02-07)259 Saarbruecken
+        # 1506-05-12 bzw. 11-10 bzw. 12-01 Saarbruecken
+        # 1520-02-18 [bzw. 1519-03-06] Saarbruecken
+        #
+        # Alternatives + Location
+        # 1442 (a) Saarbruecken
+        # 1354-04-01 (a) Toul
+        # 1354-04-01 (b) Tull
+        # 1504/1505 (a) Saarbruecken
+        # 1504/1505 (b) Saarbruecken
+        # 1504/1505 (c) Saarbruecken
+        #
+        # - Alternatives + Offset
+        # 1200 (um) (a)
+        # 1200 (um) (b)
+        # 1472 (a) (ca.)
+        # 1472 (b) (ca.)
+        # 1450 (a) (ca. Mitte 15. Jh.)
+        # 1524/1525 (ca.)
+        #
+        # - Range
+        # 1419-05 bis 06 (Mai bis Juli)
+        # 1492-1545 (ohne Datum)
+        #
+        # - Range + Offset
+        # 0935-1000 (ca.)
+        # 1518-1520 (ca.)
+        # 1431 - 1459 (zwischen)
+        # 1482-07-16 (nach) - 1499-01-08 (vor)
+        #
+        # - Range + Offset + Alternatives
+        # 1460-1466 (a) ca.
+        # 1460-1466 (b) ca.
+
+        # - MISC
+        # 1337-12-
+        # 1400 (15. Jh., Anfang)
+        # 1419-10-09 (und oefter)
+        # 1461-04-28 und 06-15 Saarbruecken
+        # 1500 (a) (15. Jh., Ende) Saarbruecken
+        # 1500 (b) (15. Jh., Ende) Saarbruecken
+        # 1500 (c) (15. Jh., Ende)
+        # 1500 (e) (16. Jh., Anfang)
+        """
+        if self.regestdate:
+            regest_date = self.regestdate
+        else:
+            regest_date = RegestDate()
+            regest_date.regest = self
+        year, month, day = re.search(
+            '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
+            self.title).groups()
+        if year and month and day:
+            regest_date.start = date(int(year), int(month), int(day))
+        elif year and month and not day:
+            regest_date.start = date(int(year), int(month), DAY_DEFAULT)
+        elif year and not month and not day:
+            regest_date.start = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
+        regest_date.end = regest_date.start
+        regest_date.save()
+
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)

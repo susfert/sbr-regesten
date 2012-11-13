@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+DAY_DEFAULT = 1
+MONTH_DEFAULT = 1
+
 AUTHORS = (
     ('Ed', 'Irmtraut Eder-Stein, Koblenz'),
     ('He', 'Hans-Walter Herrmann, Saarbrücken'),
