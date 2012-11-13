@@ -141,23 +141,23 @@ class Regest(models.Model):
         # 1500 (c) (15. Jh., Ende)
         # 1500 (e) (16. Jh., Anfang)
         """
-        if self.regestdate:
-            regest_date = self.regestdate
-        else:
-            regest_date = RegestDate()
-            regest_date.regest = self
         year, month, day = re.search(
             '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
             self.title).groups()
         if year and month and day:
-            regest_date.start = date(int(year), int(month), int(day))
+            start = date(int(year), int(month), int(day))
         elif year and month and not day:
-            regest_date.start = date(int(year), int(month), DAY_DEFAULT)
+            start = date(int(year), int(month), DAY_DEFAULT)
         elif year and not month and not day:
-            regest_date.start = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
-        regest_date.end = regest_date.start
-        regest_date.save()
-
+            start = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
+        end = start
+        if RegestDate.objects.filter(regest=self).exists():
+            regest_date = RegestDate.objects.get(regest=self)
+            regest_date.start, regest_date.end = start, end
+            regest_date.save()
+        else:
+            RegestDate.objects.create(
+                regest=self, start=start, end=end)
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
