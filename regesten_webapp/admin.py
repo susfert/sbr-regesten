@@ -6,12 +6,8 @@ from django.utils.translation import ugettext as _
 from regesten_webapp.models import Archive, Concept, Family
 from regesten_webapp.models import Footnote, Landmark, Location
 from regesten_webapp.models import MetaInfo, Person, PersonGroup
-from regesten_webapp.models import Quote, Regest, RegestDate
-from regesten_webapp.models import Region
+from regesten_webapp.models import Quote, Regest, Region
 
-
-class RegestDateInline(admin.StackedInline):
-    model = RegestDate
 
 class ArchiveInline(admin.StackedInline):
     model = Archive
@@ -46,7 +42,6 @@ class RegestAdmin(admin.ModelAdmin):
         )
 
     inlines = [
-        RegestDateInline,
         ArchiveInline,
         FootnoteInline,
         QuoteInline,
