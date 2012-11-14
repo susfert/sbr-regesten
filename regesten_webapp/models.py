@@ -143,7 +143,7 @@ class Regest(models.Model):
         """
         year, month, day, offset = re.search(
             '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?' \
-                ' ?(\([a-z]\)|\w+)? ?' \
+                ' ?(\([a-z]\)|[\w\.]+)? ?' \
                 '\(?(?P<offset>ca\.|nach|kurz nach|um|vor)?\)?',
             self.title).group('year', 'month', 'day', 'offset')
         if year and month and day:
