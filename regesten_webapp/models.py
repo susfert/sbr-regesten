@@ -163,6 +163,9 @@ class Regest(models.Model):
         if offset:
             regest_date.start_offset = offset
             regest_date.save()
+        else:
+            regest_date.start_offset = ''
+            regest_date.save()
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
