@@ -141,9 +141,11 @@ class Regest(models.Model):
         # 1500 (c) (15. Jh., Ende)
         # 1500 (e) (16. Jh., Anfang)
         """
-        year, month, day = re.search(
-            '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
-            self.title).groups()
+        year, month, day, offset = re.search(
+            '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?' \
+                ' ?(\([a-z]\)|\w+)? ?' \
+                '\(?(?P<offset>ca\.|nach|kurz nach|um|vor)?\)?',
+            self.title).group('year', 'month', 'day', 'offset')
         if year and month and day:
             start = date(int(year), int(month), int(day))
         elif year and month and not day:
@@ -156,8 +158,11 @@ class Regest(models.Model):
             regest_date.start, regest_date.end = start, end
             regest_date.save()
         else:
-            RegestDate.objects.create(
+            regest_date = RegestDate.objects.create(
                 regest=self, start=start, end=end)
+        if offset:
+            regest_date.start_offset = offset
+            regest_date.save()
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
