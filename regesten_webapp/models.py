@@ -144,8 +144,8 @@ class Regest(models.Model):
         year, month, day, offset = re.search(
             '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?' \
                 ' ?(\([a-z]\)|[\w\.]+)? ?' \
-                '\(?(?P<offset>ca\.|nach|kurz nach|um|vor)?\)?',
             self.title).group('year', 'month', 'day', 'offset')
+                '\(?(?P<offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
         if year and month and day:
             start = date(int(year), int(month), int(day))
         elif year and month and not day:

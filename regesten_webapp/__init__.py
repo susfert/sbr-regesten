@@ -19,7 +19,8 @@ OFFSET_TYPES = (
     ('nach', 'nach'),
     ('um', 'um'),
     ('ca.', 'ca.'),
-    ('kurz nach', 'kurz nach'),)
+    ('kurz nach', 'kurz nach'),
+    ('post', 'post'))
 
 REGION_TYPES = (
     ('Bundesland', 'Bundesland'),
