@@ -81,7 +81,7 @@ class Regest(models.Model):
         # 1477-03-29 (kurz nach) Saarbruecken
         # 1504 (um) Saarbruecken
         #
-        # - Alternatives
+        # - Duplicates
         # 1273 (a)
         # 1273 (b)
         # 1273 (c)
@@ -91,31 +91,19 @@ class Regest(models.Model):
         # 1377-03-08 (d)
         # 1377-03-08 (e)
         # 1377-03-08 (f)
-        # 1270-04-27/04-28
-        # 1466 [04-28 / 05-01]
-        # 1421-10-05 / 1422-10-04
-        # 1440-11-12/17
-        # 1343-04-12 oder 19
         # 1424-06-09 (a) und (b)
-        # 1502-11-22 (1503-02-07)259 Saarbruecken
-        # 1506-05-12 bzw. 11-10 bzw. 12-01 Saarbruecken
-        # 1520-02-18 [bzw. 1519-03-06] Saarbruecken
         #
-        # Alternatives + Location
+        # Duplicates + Location
         # 1442 (a) Saarbruecken
         # 1354-04-01 (a) Toul
         # 1354-04-01 (b) Tull
-        # 1504/1505 (a) Saarbruecken
-        # 1504/1505 (b) Saarbruecken
-        # 1504/1505 (c) Saarbruecken
         #
-        # - Alternatives + Offset
+        # - Duplicates + Offset
         # 1200 (um) (a)
         # 1200 (um) (b)
         # 1472 (a) (ca.)
         # 1472 (b) (ca.)
         # 1450 (a) (ca. Mitte 15. Jh.)
-        # 1524/1525 (ca.)
         #
         # - Range
         # 1419-05 bis 06 (Mai bis Juli)
@@ -127,9 +115,29 @@ class Regest(models.Model):
         # 1431 - 1459 (zwischen)
         # 1482-07-16 (nach) - 1499-01-08 (vor)
         #
-        # - Range + Offset + Alternatives
+        # - Range + Offset + Duplicates
         # 1460-1466 (a) ca.
         # 1460-1466 (b) ca.
+        #
+        # - Alternatives
+        # 1270-04-27/04-28
+        # 1466 [04-28 / 05-01]
+        # 1421-10-05 / 1422-10-04
+        # 1440-11-12/17
+        # 1343-04-12 oder 19
+        #
+        # - Alternatives + Location
+        # 1502-11-22 (1503-02-07)259 Saarbruecken
+        # 1506-05-12 bzw. 11-10 bzw. 12-01 Saarbruecken
+        # 1520-02-18 [bzw. 1519-03-06] Saarbruecken
+        #
+        # - Alternatives + Offset
+        # 1524/1525 (ca.)
+        #
+        # - Alternatives + Duplicates + Location
+        # 1504/1505 (a) Saarbruecken
+        # 1504/1505 (b) Saarbruecken
+        # 1504/1505 (c) Saarbruecken
 
         # - MISC
         # 1337-12-
