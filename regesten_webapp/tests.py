@@ -304,7 +304,8 @@ class RegestTest(TestCase):
         self.assertEqual(regest.regestdate.end, date(1459, 01, 01))
         self.assertEqual(regest.regestdate.start_offset, 'nach')
         self.assertEqual(regest.regestdate.end_offset, 'vor')
-        regest = Regest.objects.create(title='1484-07-16 - 1499-01-03')
+        regest = Regest.objects.create(
+            title='1484-07-16 (nach) - 1499-01-03 (vor)')
         self.assertEqual(regest.regestdate.start, date(1484, 07, 16))
         self.assertEqual(regest.regestdate.end, date(1499, 01, 03))
         self.assertEqual(regest.regestdate.start_offset, 'nach')
