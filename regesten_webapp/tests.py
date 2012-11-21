@@ -251,4 +251,75 @@ class RegestTest(TestCase):
         self.assertEqual(regest.regestdate.end, date(1200, 03, 12))
         self.assertEqual(regest.regestdate.start_offset, 'ca.')
 
+    def test_date_ranges(self):
+        '''
+        Tests whether or not *date ranges* are extracted correctly
+        from the title of a given regest.
 
+        Examples:
+        - 1024-1030
+        - 1024 - 1030
+        - 1419-05 - 1419-06
+        - 1419-05 bis 06
+        - 1482-07-16 - 1499-01-03
+        '''
+        regest = Regest.objects.create(title='1024-1030')
+        self.assertEqual(regest.regestdate.start, date(1024, 01, 01))
+        self.assertEqual(regest.regestdate.end, date(1030, 01, 01))
+        self.assertEqual(regest.regestdate.start_offset, '')
+        regest = Regest.objects.create(title='1024 - 1030')
+        self.assertEqual(regest.regestdate.start, date(1024, 01, 01))
+        self.assertEqual(regest.regestdate.end, date(1030, 01, 01))
+        self.assertEqual(regest.regestdate.start_offset, '')
+        regest = Regest.objects.create(title='1419-05 - 1419-06')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 01))
+        self.assertEqual(regest.regestdate.end, date(1419, 06, 01))
+        self.assertEqual(regest.regestdate.start_offset, '')
+        regest = Regest.objects.create(title='1419-05 bis 06')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 01))
+        self.assertEqual(regest.regestdate.end, date(1419, 06, 01))
+        self.assertEqual(regest.regestdate.start_offset, '')
+        regest = Regest.objects.create(title='1484-07-16 - 1499-01-03')
+        self.assertEqual(regest.regestdate.start, date(1484, 07, 16))
+        self.assertEqual(regest.regestdate.end, date(1499, 01, 03))
+        self.assertEqual(regest.regestdate.start_offset, '')
+
+    def test_date_ranges_with_offset(self):
+        '''
+        Tests whether or not date ranges and their offsets are
+        extracted correctly from the title of a given regest.
+
+        Examples:
+        - 0935-1000 (ca.)
+        - 1431 - 1459 (zwischen)
+        - 1482-07-16 (nach) - 1499-01-08 (vor)
+        '''
+        regest = Regest.objects.create(title='0935-1000 (ca.)')
+        self.assertEqual(regest.regestdate.start, date(935, 01, 01))
+        self.assertEqual(regest.regestdate.end, date(1000, 01, 01))
+        self.assertEqual(regest.regestdate.start_offset, 'ca.')
+        self.assertEqual(regest.regestdate.end_offset, 'ca.')
+        regest = Regest.objects.create(title='1431 - 1459 (zwischen)')
+        self.assertEqual(regest.regestdate.start, date(1431, 01, 01))
+        self.assertEqual(regest.regestdate.end, date(1459, 01, 01))
+        self.assertEqual(regest.regestdate.start_offset, 'nach')
+        self.assertEqual(regest.regestdate.end_offset, 'vor')
+        regest = Regest.objects.create(title='1484-07-16 - 1499-01-03')
+        self.assertEqual(regest.regestdate.start, date(1484, 07, 16))
+        self.assertEqual(regest.regestdate.end, date(1499, 01, 03))
+        self.assertEqual(regest.regestdate.start_offset, 'nach')
+        self.assertEqual(regest.regestdate.end_offset, 'vor')
+
+    def test_date_ranges_with_offset_and_duplicates(self):
+        '''
+        Tests whether or not date ranges and their offsets are
+        extracted correctly from regest titles containing duplicates.
+
+        Examples:
+        - 1460-1466 (a) ca.
+        '''
+        regest = Regest.objects.create(title='1460-1466 (a) ca.')
+        self.assertEqual(regest.regestdate.start, date(1460, 01, 01))
+        self.assertEqual(regest.regestdate.end, date(1466, 01, 01))
+        self.assertEqual(regest.regestdate.start_offset, 'ca.')
+        self.assertEqual(regest.regestdate.end_offset, 'ca.')
