@@ -149,13 +149,16 @@ class Regest(models.Model):
         # 1500 (c) (15. Jh., Ende)
         # 1500 (e) (16. Jh., Anfang)
         """
-        start, offset, end = re.search(
+        start, start_offset, end, end_offset = re.search(
             '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
                 ' ?(\([a-z]\)|[\w\. ]+)? ?' \
-                '\(?(?P<offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
+                '\(?(?P<start_offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
                 ' ?-? ?' \
-                '(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})?',
-            self.title).group('start', 'offset', 'end')
+                '(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})?' \
+                ' ?(\([a-z]\)|[\w\. ]+)? ?' \
+                '\(?(?P<end_offset>' \
+                'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
+            self.title).group('start', 'start_offset', 'end', 'end_offset')
         # Start
         year, month, day = re.search(
             '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
@@ -188,11 +191,31 @@ class Regest(models.Model):
             regest_date = RegestDate.objects.create(
                 regest=self, start=start, end=end)
         # Offset
-        if offset:
-            regest_date.start_offset = offset
+        if start_offset:
+            regest_date.start_offset = start_offset
             regest_date.save()
         else:
-            regest_date.start_offset = ''
+            if end_offset:
+                if end_offset == 'zwischen':
+                    regest_date.start_offset = 'nach'
+                    regest_date.end_offset = 'vor'
+                    regest_date.save()
+                else:
+                    regest_date.start_offset = end_offset
+                    regest_date.end_offset = end_offset
+                    regest_date.save()
+            else:
+                regest_date.start_offset = ''
+                regest_date.save()
+        if end_offset:
+            if end_offset == 'zwischen':
+                regest_date.end_offset = 'vor'
+                regest_date.save()
+            else:
+                regest_date.end_offset = end_offset
+                regest_date.save()
+        else:
+            regest_date.end_offset = ''
             regest_date.save()
 
     def __unicode__(self):
