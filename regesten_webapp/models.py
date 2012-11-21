@@ -149,74 +149,107 @@ class Regest(models.Model):
         # 1500 (c) (15. Jh., Ende)
         # 1500 (e) (16. Jh., Anfang)
         """
-        start, start_offset, end, end_offset = re.search(
-            '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
-                ' ?(\([a-z]\)|[\w\. ]+)? ?' \
-                '\(?(?P<start_offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
-                ' ?-? ?' \
-                '(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})?' \
-                ' ?(\([a-z]\)|[\w\. ]+)? ?' \
-                '\(?(?P<end_offset>' \
-                'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
-            self.title).group('start', 'start_offset', 'end', 'end_offset')
-        # Start
-        year, month, day = re.search(
-            '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
-            start).group('year', 'month', 'day')
-        if year and month and day:
-            start = date(int(year), int(month), int(day))
-        elif year and month and not day:
-            start = date(int(year), int(month), DAY_DEFAULT)
-        elif year and not month and not day:
-            start = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
-        # End
-        if end:
+        # Custom logic for "simple ranges"
+        if re.match('^\d{4}-\d{4}', self.title):
+            start, end, offset = re.search(
+                '(?P<start>\d{4})-(?P<end>\d{4})' \
+                    ' ?(\([a-z]\))? ?' \
+                    '\(?(?P<offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
+                self.title).group('start', 'end', 'offset')
+            start = date(int(start), MONTH_DEFAULT, DAY_DEFAULT)
+            end = date(int(end), MONTH_DEFAULT, DAY_DEFAULT)
+            if offset:
+                if offset == 'zwischen':
+                    start_offset = 'nach'
+                    end_offset = 'vor'
+                else:
+                    start_offset = offset
+                    end_offset = offset
+            else:
+                start_offset, end_offset = '', ''
+            # Create or update RegestDate
+            if RegestDate.objects.filter(regest=self).exists():
+                regest_date = RegestDate.objects.get(regest=self)
+                regest_date.start, regest_date.end = start, end
+                regest_date.start_offset = start_offset
+                regest_date.end_offset = end_offset
+                regest_date.save()
+            else:
+                regest_date = RegestDate.objects.create(
+                    regest=self, start=start, end=end,
+                    start_offset=start_offset, end_offset=end_offset)
+        else:
+            start, start_offset, end, end_offset = re.search(
+                '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
+                    ' ?(\([a-z]\)|[\w\. ]+)? ?' \
+                    '\(?(?P<start_offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor)?\)?' \
+                    ' ?-? ?' \
+                    '(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})?' \
+                    ' ?(\([a-z]\)|[\w\. ]+)? ?' \
+                    '\(?(?P<end_offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
+                self.title).group(
+                'start', 'start_offset', 'end', 'end_offset')
+            # Start
             year, month, day = re.search(
                 '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
-                end).group('year', 'month', 'day')
+                start).group('year', 'month', 'day')
+            if year and month and day:
+                start = date(int(year), int(month), int(day))
+            elif year and month and not day:
+                start = date(int(year), int(month), DAY_DEFAULT)
+            elif year and not month and not day:
+                start = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
+            # End
+            if end:
+                year, month, day = re.search(
+                    '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
+                    end).group('year', 'month', 'day')
             if year and month and day:
                 end = date(int(year), int(month), int(day))
             elif year and month and not day:
                 end = date(int(year), int(month), DAY_DEFAULT)
             elif year and not month and not day:
                 end = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
-        else:
-            end = start
-        # Create or update RegestDate
-        if RegestDate.objects.filter(regest=self).exists():
-            regest_date = RegestDate.objects.get(regest=self)
-            regest_date.start, regest_date.end = start, end
-            regest_date.save()
-        else:
-            regest_date = RegestDate.objects.create(
-                regest=self, start=start, end=end)
-        # Offset
-        if start_offset:
-            regest_date.start_offset = start_offset
-            regest_date.save()
-        else:
+            else:
+                end = start
+            # Create or update RegestDate
+            if RegestDate.objects.filter(regest=self).exists():
+                regest_date = RegestDate.objects.get(regest=self)
+                regest_date.start, regest_date.end = start, end
+                regest_date.save()
+            else:
+                regest_date = RegestDate.objects.create(
+                    regest=self, start=start, end=end)
+            # Offset
+            if start_offset:
+                regest_date.start_offset = start_offset
+                regest_date.save()
+            else:
+                if end_offset:
+                    if end_offset == 'zwischen':
+                        regest_date.start_offset = 'nach'
+                        regest_date.end_offset = 'vor'
+                        regest_date.save()
+                    else:
+                        regest_date.start_offset = end_offset
+                        regest_date.end_offset = end_offset
+                        regest_date.save()
+                else:
+                    regest_date.start_offset = ''
+                    regest_date.save()
             if end_offset:
                 if end_offset == 'zwischen':
-                    regest_date.start_offset = 'nach'
                     regest_date.end_offset = 'vor'
                     regest_date.save()
                 else:
-                    regest_date.start_offset = end_offset
                     regest_date.end_offset = end_offset
                     regest_date.save()
             else:
-                regest_date.start_offset = ''
+                regest_date.end_offset = ''
                 regest_date.save()
-        if end_offset:
-            if end_offset == 'zwischen':
-                regest_date.end_offset = 'vor'
-                regest_date.save()
-            else:
-                regest_date.end_offset = end_offset
-                regest_date.save()
-        else:
-            regest_date.end_offset = ''
-            regest_date.save()
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
