@@ -151,8 +151,8 @@ class Regest(models.Model):
         """
         year, month, day, offset = re.search(
             '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?' \
-                ' ?(\([a-z]\)|[\w\.]+)? ?' \
             self.title).group('year', 'month', 'day', 'offset')
+                ' ?(\([a-z]\)|[\w\. ]+)? ?' \
                 '\(?(?P<offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
         if year and month and day:
             start = date(int(year), int(month), int(day))
