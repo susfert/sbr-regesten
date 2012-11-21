@@ -149,18 +149,37 @@ class Regest(models.Model):
         # 1500 (c) (15. Jh., Ende)
         # 1500 (e) (16. Jh., Anfang)
         """
-        year, month, day, offset = re.search(
-            '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?' \
-            self.title).group('year', 'month', 'day', 'offset')
+        start, offset, end = re.search(
+            '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
                 ' ?(\([a-z]\)|[\w\. ]+)? ?' \
                 '\(?(?P<offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
+                ' ?-? ?' \
+                '(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})?',
+            self.title).group('start', 'offset', 'end')
+        # Start
+        year, month, day = re.search(
+            '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
+            start).group('year', 'month', 'day')
         if year and month and day:
             start = date(int(year), int(month), int(day))
         elif year and month and not day:
             start = date(int(year), int(month), DAY_DEFAULT)
         elif year and not month and not day:
             start = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
-        end = start
+        # End
+        if end:
+            year, month, day = re.search(
+                '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
+                end).group('year', 'month', 'day')
+            if year and month and day:
+                end = date(int(year), int(month), int(day))
+            elif year and month and not day:
+                end = date(int(year), int(month), DAY_DEFAULT)
+            elif year and not month and not day:
+                end = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
+        else:
+            end = start
+        # Create or update RegestDate
         if RegestDate.objects.filter(regest=self).exists():
             regest_date = RegestDate.objects.get(regest=self)
             regest_date.start, regest_date.end = start, end
@@ -168,6 +187,7 @@ class Regest(models.Model):
         else:
             regest_date = RegestDate.objects.create(
                 regest=self, start=start, end=end)
+        # Offset
         if offset:
             regest_date.start_offset = offset
             regest_date.save()
