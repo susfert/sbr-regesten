@@ -217,7 +217,7 @@ class Regest(models.Model):
           case, we need to manually set end_offset to the empty string
           ('').
 
-        - not start_offset and end_offset # Covered by current code
+        - not start_offset and end_offset
           This is the most complex case. If we do not get a match for
           start_offset and end_offset is one of {nach, kurz nach,
           post, um, vor}, we want to set start_offset to the same
