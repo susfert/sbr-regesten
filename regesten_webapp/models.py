@@ -226,30 +226,24 @@ class Regest(models.Model):
             # Offset
             if start_offset:
                 regest_date.start_offset = start_offset
-                regest_date.save()
             else:
                 if end_offset:
                     if end_offset == 'zwischen':
                         regest_date.start_offset = 'nach'
                         regest_date.end_offset = 'vor'
-                        regest_date.save()
                     else:
                         regest_date.start_offset = end_offset
                         regest_date.end_offset = end_offset
-                        regest_date.save()
                 else:
                     regest_date.start_offset = ''
-                    regest_date.save()
             if end_offset:
                 if end_offset == 'zwischen':
                     regest_date.end_offset = 'vor'
-                    regest_date.save()
                 else:
                     regest_date.end_offset = end_offset
-                    regest_date.save()
             else:
                 regest_date.end_offset = ''
-                regest_date.save()
+            regest_date.save()
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
