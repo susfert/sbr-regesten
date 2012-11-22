@@ -199,12 +199,12 @@ class Regest(models.Model):
                 year, month, day = re.search(
                     '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
                     end).group('year', 'month', 'day')
-            if year and month and day:
-                end = date(int(year), int(month), int(day))
-            elif year and month and not day:
-                end = date(int(year), int(month), DAY_DEFAULT)
-            elif year and not month and not day:
-                end = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
+                if year and month and day:
+                    end = date(int(year), int(month), int(day))
+                elif year and month and not day:
+                    end = date(int(year), int(month), DAY_DEFAULT)
+                elif year and not month and not day:
+                    end = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
             else:
                 end = start
             # Create or update RegestDate
