@@ -159,15 +159,8 @@ class Regest(models.Model):
                 self.title).group('start', 'end', 'offset')
             start = date(int(start), MONTH_DEFAULT, DAY_DEFAULT)
             end = date(int(end), MONTH_DEFAULT, DAY_DEFAULT)
-            if offset:
-                if offset == 'zwischen':
-                    start_offset = 'nach'
-                    end_offset = 'vor'
-                else:
-                    start_offset = offset
-                    end_offset = offset
-            else:
-                start_offset, end_offset = '', ''
+            start_offset, end_offset = self.__determine_offsets(
+                start_offset=offset, end_offset=offset)
             # Create or update RegestDate
             self.__create_or_update_date(
                 start, end, start_offset, end_offset)
@@ -192,14 +185,8 @@ class Regest(models.Model):
             else:
                 end = start
             # Offset
-            start_offset = start_offset or ''
-            end_offset = end_offset or ''
-            if end_offset and not start_offset:
-                if end_offset == 'zwischen':
-                    start_offset = 'nach'
-                    end_offset = 'vor'
-                else:
-                    start_offset = end_offset
+            start_offset, end_offset = self.__determine_offsets(
+                start_offset, end_offset)
             # Create or update RegestDate
             self.__create_or_update_date(
                 start, end, start_offset, end_offset)
@@ -214,6 +201,50 @@ class Regest(models.Model):
             return date(int(year), int(month), DAY_DEFAULT)
         elif year and not month and not day:
             return date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
+
+    def __determine_offsets(self, start_offset, end_offset):
+        '''
+        To determine the final values for start_offset and end_offset
+        the following combinations of values need to be considered:
+
+        - start_offset and end_offset
+          If a given regest title contains both a start_offset and an
+          end_offset, we don't have to do anything; both values
+          returned by the regex search will be different from the
+          empty string ('') or None so we can simply use these values
+          as is.
+
+        - start_offset and not end_offset
+          If we do not get a match for end_offset in a regest title,
+          the regex search returns None for this variable. In this
+          case, we need to manually set end_offset to the empty string
+          ('').
+
+        - not start_offset and end_offset # Covered by current code
+          This is the most complex case. If we do not get a match for
+          start_offset and end_offset is one of {nach, kurz nach,
+          post, um, vor}, we want to set start_offset to the same
+          value as end_offset. If end_offset == 'zwischen', this means
+          that the events covered by the regest took place over a
+          period of time that *excludes* the start and end dates given
+          in the title. In this case, start_offset needs to be set to
+          'nach', and end_offset needs to be set to 'vor'.
+
+        - not start_offset and not end_offset
+          If a regest title contains no offsets at all, the regex
+          search returns None for the start_offset and end_offset
+          variables. In this case, we need to manually set the values
+          of both of these variables to the empty string ('').
+        '''
+        start_offset = start_offset or ''
+        end_offset = end_offset or ''
+        if end_offset and not start_offset:
+            if end_offset == 'zwischen':
+                start_offset = 'nach'
+                end_offset = 'vor'
+            else:
+                start_offset = end_offset
+        return start_offset, end_offset
 
     def __create_or_update_date(
         self, start, end, start_offset='', end_offset=''):
