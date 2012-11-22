@@ -185,26 +185,10 @@ class Regest(models.Model):
                 self.title).group(
                 'start', 'start_offset', 'end', 'end_offset')
             # Start
-            year, month, day = re.search(
-                '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
-                start).group('year', 'month', 'day')
-            if year and month and day:
-                start = date(int(year), int(month), int(day))
-            elif year and month and not day:
-                start = date(int(year), int(month), DAY_DEFAULT)
-            elif year and not month and not day:
-                start = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
+            start = self.__extract_date(start)
             # End
             if end:
-                year, month, day = re.search(
-                    '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
-                    end).group('year', 'month', 'day')
-                if year and month and day:
-                    end = date(int(year), int(month), int(day))
-                elif year and month and not day:
-                    end = date(int(year), int(month), DAY_DEFAULT)
-                elif year and not month and not day:
-                    end = date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
+                end = self.__extract_date(end)
             else:
                 end = start
             # Create or update RegestDate
@@ -230,6 +214,17 @@ class Regest(models.Model):
             else:
                 regest_date.end_offset = ''
             regest_date.save()
+
+    def __extract_date(self, string):
+        year, month, day = re.search(
+            '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
+            string).group('year', 'month', 'day')
+        if year and month and day:
+            return date(int(year), int(month), int(day))
+        elif year and month and not day:
+            return date(int(year), int(month), DAY_DEFAULT)
+        elif year and not month and not day:
+            return date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
 
     def __create_or_update_date(
         self, start, end, start_offset='', end_offset=''):
