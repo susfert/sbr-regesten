@@ -169,16 +169,8 @@ class Regest(models.Model):
             else:
                 start_offset, end_offset = '', ''
             # Create or update RegestDate
-            if RegestDate.objects.filter(regest=self).exists():
-                regest_date = RegestDate.objects.get(regest=self)
-                regest_date.start, regest_date.end = start, end
-                regest_date.start_offset = start_offset
-                regest_date.end_offset = end_offset
-                regest_date.save()
-            else:
-                regest_date = RegestDate.objects.create(
-                    regest=self, start=start, end=end,
-                    start_offset=start_offset, end_offset=end_offset)
+            self.__create_or_update_date(
+                start, end, start_offset, end_offset)
         else:
             start, start_offset, end, end_offset = re.search(
                 '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
@@ -216,13 +208,7 @@ class Regest(models.Model):
             else:
                 end = start
             # Create or update RegestDate
-            if RegestDate.objects.filter(regest=self).exists():
-                regest_date = RegestDate.objects.get(regest=self)
-                regest_date.start, regest_date.end = start, end
-                regest_date.save()
-            else:
-                regest_date = RegestDate.objects.create(
-                    regest=self, start=start, end=end)
+            regest_date = self.__create_or_update_date(start, end)
             # Offset
             if start_offset:
                 regest_date.start_offset = start_offset
@@ -244,6 +230,21 @@ class Regest(models.Model):
             else:
                 regest_date.end_offset = ''
             regest_date.save()
+
+    def __create_or_update_date(
+        self, start, end, start_offset='', end_offset=''):
+        if RegestDate.objects.filter(regest=self).exists():
+            regest_date = RegestDate.objects.get(regest=self)
+            regest_date.start, regest_date.end = start, end
+            regest_date.start_offset = start_offset
+            regest_date.end_offset = end_offset
+            regest_date.save()
+        else:
+            regest_date = RegestDate.objects.create(
+                regest=self, start=start, end=end,
+                start_offset=start_offset, end_offset=end_offset)
+        return regest_date
+
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
