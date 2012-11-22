@@ -181,10 +181,10 @@ class Regest(models.Model):
                 end = self.__extract_date(end)
             else:
                 end = start
-            # Offset
+            # Offsets
             start_offset, end_offset = self.__determine_offsets(
                 start_offset, end_offset)
-        # Create or update RegestDate
+        # Create or update RegestDate using the extracted values
         self.__create_or_update_date(
             start, end, start_offset, end_offset)
 
