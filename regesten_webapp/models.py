@@ -161,9 +161,6 @@ class Regest(models.Model):
             end = date(int(end), MONTH_DEFAULT, DAY_DEFAULT)
             start_offset, end_offset = self.__determine_offsets(
                 start_offset=offset, end_offset=offset)
-            # Create or update RegestDate
-            self.__create_or_update_date(
-                start, end, start_offset, end_offset)
         else:
             start, start_offset, end, end_offset = re.search(
                 '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
@@ -187,9 +184,9 @@ class Regest(models.Model):
             # Offset
             start_offset, end_offset = self.__determine_offsets(
                 start_offset, end_offset)
-            # Create or update RegestDate
-            self.__create_or_update_date(
-                start, end, start_offset, end_offset)
+        # Create or update RegestDate
+        self.__create_or_update_date(
+            start, end, start_offset, end_offset)
 
     def __extract_date(self, string):
         year, month, day = re.search(
