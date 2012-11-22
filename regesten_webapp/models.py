@@ -191,29 +191,18 @@ class Regest(models.Model):
                 end = self.__extract_date(end)
             else:
                 end = start
-            # Create or update RegestDate
-            regest_date = self.__create_or_update_date(start, end)
             # Offset
-            if start_offset:
-                regest_date.start_offset = start_offset
-            else:
-                if end_offset:
-                    if end_offset == 'zwischen':
-                        regest_date.start_offset = 'nach'
-                        regest_date.end_offset = 'vor'
-                    else:
-                        regest_date.start_offset = end_offset
-                        regest_date.end_offset = end_offset
-                else:
-                    regest_date.start_offset = ''
-            if end_offset:
+            start_offset = start_offset or ''
+            end_offset = end_offset or ''
+            if end_offset and not start_offset:
                 if end_offset == 'zwischen':
-                    regest_date.end_offset = 'vor'
+                    start_offset = 'nach'
+                    end_offset = 'vor'
                 else:
-                    regest_date.end_offset = end_offset
-            else:
-                regest_date.end_offset = ''
-            regest_date.save()
+                    start_offset = end_offset
+            # Create or update RegestDate
+            self.__create_or_update_date(
+                start, end, start_offset, end_offset)
 
     def __extract_date(self, string):
         year, month, day = re.search(
