@@ -162,26 +162,19 @@ class Regest(models.Model):
             start_offset, end_offset = self.__determine_offsets(
                 start_offset=offset, end_offset=offset)
         # Custom logic for elliptic ranges
-        elif re.match('^\d{4}-\d{2} bis \d{2}', self.title):
-            start, end_month, offset = re.search(
-                '(?P<start>\d{4}-\d{2}) bis (?P<end_month>\d{2})' \
+        elif re.match('^\d{4}-\d{2}(-\d{2})? bis \d{2}(\D.*|)$', self.title):
+            start, end, offset = re.search(
+                '(?P<start>\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
+                    ' bis (?P<end>\d{2})' \
                     ' ?(\([a-z]\))? ?' \
                     '\(?(?P<offset>' \
                     'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
-                self.title).group('start', 'end_month', 'offset')
+                self.title).group('start', 'end', 'offset')
             start = self.__extract_date(start)
-            end = date(start.year, int(end_month), DAY_DEFAULT)
-            start_offset, end_offset = self.__determine_offsets(
-                start_offset=offset, end_offset=offset)
-        elif re.match('^\d{4}-\d{2}-\d{2} bis \d{2}', self.title):
-            start, end_day, offset = re.search(
-                '(?P<start>\d{4}-\d{2}-\d{2}) bis (?P<end_day>\d{2})' \
-                    ' ?(\([a-z]\))? ?' \
-                    '\(?(?P<offset>' \
-                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
-                self.title).group('start', 'end_day', 'offset')
-            start = self.__extract_date(start)
-            end = date(start.year, start.month, int(end_day))
+            if re.match('^\d{4}-\d{2} bis \d{2}', self.title):
+                end = date(start.year, int(end), DAY_DEFAULT)
+            elif re.match('^\d{4}-\d{2}-\d{2} bis \d{2}', self.title):
+                end = date(start.year, start.month, int(end))
             start_offset, end_offset = self.__determine_offsets(
                 start_offset=offset, end_offset=offset)
         # Regular dates and ranges
