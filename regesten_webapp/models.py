@@ -150,7 +150,7 @@ class Regest(models.Model):
         # 1500 (e) (16. Jh., Anfang)
         """
         # Custom logic for "simple ranges"
-        if re.match('^\d{4}-\d{4}', self.title):
+        if self.__is_simple_range(self.title):
             start, end, offset = re.search(
                 '(?P<start>\d{4})-(?P<end>\d{4})' \
                     ' ?(\([a-z]\))? ?' \
@@ -162,7 +162,7 @@ class Regest(models.Model):
             start_offset, end_offset = self.__determine_offsets(
                 start_offset=offset, end_offset=offset)
         # Custom logic for elliptic ranges
-        elif re.match('^\d{4}-\d{2}(-\d{2})? bis \d{2}(\D.*|)$', self.title):
+        elif self.__is_elliptical_range(self.title):
             start, end, offset = re.search(
                 '(?P<start>\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
                     ' bis (?P<end>\d{2})' \
@@ -204,6 +204,34 @@ class Regest(models.Model):
         # Create or update RegestDate using the extracted values
         self.__create_or_update_date(
             start, end, start_offset, end_offset)
+
+    def __is_simple_range(self, string):
+        '''
+        Checks whether or not string starts with a "simple" date
+        range.
+
+        Simple date ranges are of the form yyyy-yyyy.
+        '''
+        return re.match('^\d{4}-\d{4}', string)
+
+    def __is_elliptical_range(self, string):
+        '''
+        Checks whether or not string starts with an "elliptical" date
+        range.
+
+        Elliptical date ranges are used to denote time spans that are
+        shorter than one year. Depending on the level of precision
+        (month or day), they omit year or year and month information
+        in the end date. In the Sbr Regesten, they always use 'bis'
+        instead of '-' to separate start and end date of the range.
+
+        Examples:
+        - 1419-05 bis 06 (denotes a time span of one month ranging
+          from May to June of 1419)
+        - 1419-05-10 bis 20 (denotes a time span of ten days ranging
+          from May 10th to May 20th, 1419).
+        '''
+        return re.match('^\d{4}-\d{2}(-\d{2})? bis \d{2}(\D.*|)$', string)
 
     def __extract_date(self, string):
         year, month, day = re.search(
