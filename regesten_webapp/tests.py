@@ -294,6 +294,7 @@ class RegestTest(TestCase):
         - 1419-05 - 1419-06
         - 1419-05 bis 06
         - 1482-07-16 - 1499-01-03
+        - 1419-05-10 bis 20
         '''
         regest = Regest.objects.create(title='1024-1030')
         self.assertEqual(regest.regestdate.start, date(1024, 01, 01))
@@ -320,6 +321,11 @@ class RegestTest(TestCase):
         self.assertEqual(regest.regestdate.end, date(1499, 01, 03))
         self.assertEqual(regest.regestdate.start_offset, '')
         self.assertEqual(regest.regestdate.end_offset, '')
+        regest = Regest.objects.create(title='1419-05-10 bis 20')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 10))
+        self.assertEqual(regest.regestdate.end, date(1419, 05, 20))
+        self.assertEqual(regest.regestdate.start_offset, '')
+        self.assertEqual(regest.regestdate.end_offset, '')
 
     def test_date_ranges_with_offset(self):
         '''
@@ -331,8 +337,10 @@ class RegestTest(TestCase):
         - 1431 - 1459 (zwischen)
         - 1419-05 - 1419-06 (um)
         - 1419-05 (nach) - 1419-06 (vor)
+        - 1419-05 bis 06 (kurz nach)
         - 1482-07-16 - 1499-01-08 (ca.)
         - 1482-07-16 (nach) - 1499-01-08 (vor)
+        - 1419-05-10 bis 20 (ca.)
         '''
         regest = Regest.objects.create(title='0935-1000 (ca.)')
         self.assertEqual(regest.regestdate.start, date(935, 01, 01))
@@ -355,6 +363,11 @@ class RegestTest(TestCase):
         self.assertEqual(regest.regestdate.end, date(1419, 06, 01))
         self.assertEqual(regest.regestdate.start_offset, 'nach')
         self.assertEqual(regest.regestdate.end_offset, 'vor')
+        regest = Regest.objects.create(title='1419-05 bis 06 (kurz nach)')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 01))
+        self.assertEqual(regest.regestdate.end, date(1419, 06, 01))
+        self.assertEqual(regest.regestdate.start_offset, 'kurz nach')
+        self.assertEqual(regest.regestdate.end_offset, 'kurz nach')
         regest = Regest.objects.create(
             title='1484-07-16 - 1499-01-03 (ca.)')
         self.assertEqual(regest.regestdate.start, date(1484, 07, 16))
@@ -367,6 +380,11 @@ class RegestTest(TestCase):
         self.assertEqual(regest.regestdate.end, date(1499, 01, 03))
         self.assertEqual(regest.regestdate.start_offset, 'nach')
         self.assertEqual(regest.regestdate.end_offset, 'vor')
+        regest = Regest.objects.create(title='1419-05-10 bis 20 (ca.)')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 10))
+        self.assertEqual(regest.regestdate.end, date(1419, 05, 20))
+        self.assertEqual(regest.regestdate.start_offset, 'ca.')
+        self.assertEqual(regest.regestdate.end_offset, 'ca.')
 
     def test_date_ranges_with_offset_and_duplicates(self):
         '''
@@ -380,9 +398,15 @@ class RegestTest(TestCase):
         - 1419-05 - 1419-06 (a) um
         - 1419-05 - 1419-06 (um) (b)
         - 1419-05 - 1419-06 (c) (um)
+        - 1419-05 bis 06 (a) kurz nach
+        - 1419-05 bis 06 (kurz nach) (b)
+        - 1419-05 bis 06 (c) (kurz nach)
         - 1482-07-16 - 1499-01-08 (a) ca.
         - 1482-07-16 - 1499-01-08 (ca.) (b)
         - 1482-07-16 - 1499-01-08 (c) (ca.)
+        - 1419-05-10 bis 20 (a) ca.
+        - 1419-05-10 bis 20 (ca.) (b)
+        - 1419-05-10 bis 20 (c) (ca.)
         - 1482-07-16 (nach) - 1499-01-08 (vor) (a)
         '''
         regest = Regest.objects.create(title='1460-1466 (a) ca.')
@@ -416,6 +440,24 @@ class RegestTest(TestCase):
         self.assertEqual(regest.regestdate.start_offset, 'um')
         self.assertEqual(regest.regestdate.end_offset, 'um')
         regest = Regest.objects.create(
+            title='1419-05 bis 06 (a) kurz nach')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 01))
+        self.assertEqual(regest.regestdate.end, date(1419, 06, 01))
+        self.assertEqual(regest.regestdate.start_offset, 'kurz nach')
+        self.assertEqual(regest.regestdate.end_offset, 'kurz nach')
+        regest = Regest.objects.create(
+            title='1419-05 bis 06 (kurz nach) (b)')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 01))
+        self.assertEqual(regest.regestdate.end, date(1419, 06, 01))
+        self.assertEqual(regest.regestdate.start_offset, 'kurz nach')
+        self.assertEqual(regest.regestdate.end_offset, 'kurz nach')
+        regest = Regest.objects.create(
+            title='1419-05 bis 06 (c) (kurz nach)')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 01))
+        self.assertEqual(regest.regestdate.end, date(1419, 06, 01))
+        self.assertEqual(regest.regestdate.start_offset, 'kurz nach')
+        self.assertEqual(regest.regestdate.end_offset, 'kurz nach')
+        regest = Regest.objects.create(
             title='1484-07-16 - 1499-01-03 (a) ca.')
         self.assertEqual(regest.regestdate.start, date(1484, 07, 16))
         self.assertEqual(regest.regestdate.end, date(1499, 01, 03))
@@ -431,6 +473,21 @@ class RegestTest(TestCase):
             title='1484-07-16 - 1499-01-03 (c) (ca.)')
         self.assertEqual(regest.regestdate.start, date(1484, 07, 16))
         self.assertEqual(regest.regestdate.end, date(1499, 01, 03))
+        self.assertEqual(regest.regestdate.start_offset, 'ca.')
+        self.assertEqual(regest.regestdate.end_offset, 'ca.')
+        regest = Regest.objects.create(title='1419-05-10 bis 20 (a) ca.')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 10))
+        self.assertEqual(regest.regestdate.end, date(1419, 05, 20))
+        self.assertEqual(regest.regestdate.start_offset, 'ca.')
+        self.assertEqual(regest.regestdate.end_offset, 'ca.')
+        regest = Regest.objects.create(title='1419-05-10 bis 20 (ca.) (b)')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 10))
+        self.assertEqual(regest.regestdate.end, date(1419, 05, 20))
+        self.assertEqual(regest.regestdate.start_offset, 'ca.')
+        self.assertEqual(regest.regestdate.end_offset, 'ca.')
+        regest = Regest.objects.create(title='1419-05-10 bis 20 (c) (ca.)')
+        self.assertEqual(regest.regestdate.start, date(1419, 05, 10))
+        self.assertEqual(regest.regestdate.end, date(1419, 05, 20))
         self.assertEqual(regest.regestdate.start_offset, 'ca.')
         self.assertEqual(regest.regestdate.end_offset, 'ca.')
         regest = Regest.objects.create(
