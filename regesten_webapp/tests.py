@@ -457,7 +457,12 @@ class RegestTest(TestCase):
         - 1502 (1503)
         - 1502-11 (1503-02)
         - 1502-11-22 (1503-02-07)
+        - 1520 [bzw. 1519]
+        - 1520-02 [bzw. 1519-03]
         - 1520-02-18 [bzw. 1519-03-06]
+        - 1520 bzw. 1519
+        - 1520-02 bzw. 1519-03
+        - 1520-02-18 bzw. 1519-03-06
         '''
         regest = Regest.objects.create(title='1524/1525')
         self.__check_date(
@@ -531,9 +536,52 @@ class RegestTest(TestCase):
             regest, start=date(1503, 02, 07), end=date(1503, 02, 07),
             start_offset='', end_offset='')
         regest = Regest.objects.create(
+            title='1520 [bzw. 1519]')
+        self.__check_date(
+            regest, start=date(1520, 01, 01), end=date(1520, 01, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1520-02 [bzw. 1519-03]')
+        self.__check_date(
+            regest, start=date(1520, 02, 01), end=date(1520, 02, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
             title='1520-02-18 [bzw. 1519-03-06]')
         self.__check_date(
             regest, start=date(1520, 02, 18), end=date(1520, 02, 18),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1520 bzw. 1519')
+        self.__check_date(
+            regest, start=date(1520, 01, 01), end=date(1520, 01, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1520-02 bzw. 1519-03')
+        self.__check_date(
+            regest, start=date(1520, 02, 01), end=date(1520, 02, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1520-02-18 bzw. 1519-03-06')
+        self.__check_date(
+            regest, start=date(1520, 02, 18), end=date(1520, 02, 18),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
             start_offset='', end_offset='')
 
     def test_elliptical_alternatives(self):
