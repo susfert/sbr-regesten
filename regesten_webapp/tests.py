@@ -454,6 +454,8 @@ class RegestTest(TestCase):
         - 1419-05 / 1419-06
         - 1421-10-05/1422-10-04
         - 1421-10-05 / 1422-10-04
+        - 1502 (1503)
+        - 1502-11 (1503-02)
         - 1502-11-22 (1503-02-07)
         - 1520-02-18 [bzw. 1519-03-06]
         '''
@@ -505,9 +507,28 @@ class RegestTest(TestCase):
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
             start_offset='', end_offset='')
         regest = Regest.objects.create(
+            title='1502 (1503)')
+        self.__check_date(
+            regest, start=date(1502, 01, 01), end=date(1502, 01, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1503, 01, 01), end=date(1503, 01, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1502-11 (1503-02)')
+        self.__check_date(
+            regest, start=date(1502, 11, 01), end=date(1502, 11, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1503, 02, 01), end=date(1503, 02, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
             title='1502-11-22 (1503-02-07)')
         self.__check_date(
             regest, start=date(1502, 11, 22), end=date(1502, 11, 22),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1503, 02, 07), end=date(1503, 02, 07),
             start_offset='', end_offset='')
         regest = Regest.objects.create(
             title='1520-02-18 [bzw. 1519-03-06]')
