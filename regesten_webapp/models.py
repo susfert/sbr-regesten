@@ -151,11 +151,13 @@ class Regest(models.Model):
         """
         # Custom logic for "simple alternatives"
         if re.match(
-            '\d{4}(-\d{2}){0,2} ?/ ?\d{4}(-\d{2}){0,2}', self.title):
+            '\d{4}(-\d{2}){0,2}( ?/ ?| \()\d{4}(-\d{2}){0,2}\)?',
+            self.title):
             main_date, alt_date = re.search(
                 '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
-                    ' ?/ ?' \
-                    '(?P<alt_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})',
+                    '( ?/ ?| \()' \
+                    '(?P<alt_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
+                    '\)?',
                 self.title).group('main_date', 'alt_date')
             start = self.__extract_date(main_date)
             end = start
