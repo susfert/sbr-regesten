@@ -159,14 +159,10 @@ class Regest(models.Model):
                 self.title).group('main_date', 'alt_date')
             start = self.__extract_date(main_date)
             end = start
-            start_offset, end_offset = '', ''
             start_alt = self.__extract_date(alt_date)
             end_alt = start_alt
-            regest_date = self.__create_or_update_date(start, end)
-            alt_date = RegestDate.objects.create(
-                regest=self, start=start_alt, end=end_alt,
-                start_offset=start_offset, end_offset=end_offset)
-            regest_date.alt_dates.add(alt_date)
+            self.__create_or_update_date(start, end)
+            self.__create_or_update_date(start_alt, end_alt, alt_date=True)
         # Custom logic for "simple ranges"
         elif self.__is_simple_range(self.title):
             start, end, offset = re.search(
@@ -313,9 +309,11 @@ class Regest(models.Model):
         return start_offset, end_offset
 
     def __create_or_update_date(
-        self, start, end, start_offset='', end_offset=''):
-        if RegestDate.objects.filter(regest=self).exists():
-            regest_date = RegestDate.objects.get(regest=self)
+        self, start, end, start_offset='', end_offset='', alt_date=False):
+        if RegestDate.objects.filter(
+            regest=self, alt_date=alt_date).exists():
+            regest_date = RegestDate.objects.get(
+                regest=self, alt_date=alt_date)
             regest_date.start, regest_date.end = start, end
             regest_date.start_offset = start_offset
             regest_date.end_offset = end_offset
@@ -323,7 +321,8 @@ class Regest(models.Model):
         else:
             regest_date = RegestDate.objects.create(
                 regest=self, start=start, end=end,
-                start_offset=start_offset, end_offset=end_offset)
+                start_offset=start_offset, end_offset=end_offset,
+                alt_date=alt_date)
         return regest_date
 
 
@@ -368,8 +367,7 @@ class RegestDate(models.Model):
     end = models.DateField(_('to'))
     end_offset = models.CharField(
         _('end offset'), max_length=20, choices=OFFSET_TYPES)
-    alt_dates = models.ManyToManyField(
-        'self', verbose_name=_('alternative date'), null=True)
+    alt_date = models.BooleanField(_('alternative date'))
 
     @property
     def exact(self):
