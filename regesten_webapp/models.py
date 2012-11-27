@@ -344,7 +344,8 @@ class RegestDate(models.Model):
     end = models.DateField(_('to'))
     end_offset = models.CharField(
         _('end offset'), max_length=20, choices=OFFSET_TYPES, blank=True)
-    alt_date = models.DateField(_('alternative date'), null=True, blank=True)
+    alt_date = models.ManyToManyField(
+        'self', verbose_name=_('alternative date'), null=True, blank=True)
 
     @property
     def exact(self):
