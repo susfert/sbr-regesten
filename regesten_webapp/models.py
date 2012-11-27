@@ -149,8 +149,26 @@ class Regest(models.Model):
         # 1500 (c) (15. Jh., Ende)
         # 1500 (e) (16. Jh., Anfang)
         """
+        # Custom logic for "simple alternatives"
+        if re.match(
+            '\d{4}(-\d{2}){0,2} ?/ ?\d{4}(-\d{2}){0,2}', self.title):
+            main_date, alt_date = re.search(
+                '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
+                    ' ?/ ?' \
+                    '(?P<alt_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})',
+                self.title).group('main_date', 'alt_date')
+            start = self.__extract_date(main_date)
+            end = start
+            start_offset, end_offset = '', ''
+            start_alt = self.__extract_date(alt_date)
+            end_alt = start_alt
+            regest_date = self.__create_or_update_date(start, end)
+            alt_date = RegestDate.objects.create(
+                regest=self, start=start_alt, end=end_alt,
+                start_offset=start_offset, end_offset=end_offset)
+            regest_date.alt_dates.add(alt_date)
         # Custom logic for "simple ranges"
-        if self.__is_simple_range(self.title):
+        elif self.__is_simple_range(self.title):
             start, end, offset = re.search(
                 '(?P<start>\d{4})-(?P<end>\d{4})' \
                     ' ?(\([a-z]\))? ?' \
@@ -161,6 +179,9 @@ class Regest(models.Model):
             end = date(int(end), MONTH_DEFAULT, DAY_DEFAULT)
             start_offset, end_offset = self.__determine_offsets(
                 start_offset=offset, end_offset=offset)
+            # Create or update RegestDate using the extracted values
+            self.__create_or_update_date(
+                start, end, start_offset, end_offset)
         # Custom logic for elliptic ranges
         elif self.__is_elliptical_range(self.title):
             start, end, offset = re.search(
@@ -177,6 +198,9 @@ class Regest(models.Model):
                 end = date(start.year, start.month, int(end))
             start_offset, end_offset = self.__determine_offsets(
                 start_offset=offset, end_offset=offset)
+            # Create or update RegestDate using the extracted values
+            self.__create_or_update_date(
+                start, end, start_offset, end_offset)
         # Regular dates and ranges
         else:
             start, start_offset, end, end_offset = re.search(
@@ -201,9 +225,9 @@ class Regest(models.Model):
             # Offsets
             start_offset, end_offset = self.__determine_offsets(
                 start_offset, end_offset)
-        # Create or update RegestDate using the extracted values
-        self.__create_or_update_date(
-            start, end, start_offset, end_offset)
+            # Create or update RegestDate using the extracted values
+            self.__create_or_update_date(
+                start, end, start_offset, end_offset)
 
     def __is_simple_range(self, string):
         '''
