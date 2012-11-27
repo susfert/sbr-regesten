@@ -186,15 +186,15 @@ msgstr "Konzepte"
 
 #: models.py:198
 msgid "landmark type"
-msgstr "wahrzeichentyp"
+msgstr "Typ des Flurnamens"
 
 #: models.py:207
 msgid "Landmark"
-msgstr "Wahrzeichen"
+msgstr "Flurname"
 
 #: models.py:208
 msgid "Landmarks"
-msgstr "Wahrzeichen"
+msgstr "Flurnamen"
 
 #: models.py:218
 msgid "location type"
