@@ -12,11 +12,15 @@ from regesten_webapp.models import Regest
 
 
 class RegestTest(TestCase):
-    def __check_date(self, regest, start, end, start_offset, end_offset):
-        self.assertEqual(regest.regestdate.start, start)
-        self.assertEqual(regest.regestdate.end, end)
-        self.assertEqual(regest.regestdate.start_offset, start_offset)
-        self.assertEqual(regest.regestdate.end_offset, end_offset)
+    def __check_date(
+        self, regest, start, end, start_offset, end_offset):
+        regest_date = regest.regestdate_set.get(
+            regest=regest, start=start, end=end,
+            start_offset=start_offset, end_offset=end_offset)
+        self.assertEqual(regest_date.start, start)
+        self.assertEqual(regest_date.end, end)
+        self.assertEqual(regest_date.start_offset, start_offset)
+        self.assertEqual(regest_date.end_offset, end_offset)
 
     def test_regular_dates(self):
         '''

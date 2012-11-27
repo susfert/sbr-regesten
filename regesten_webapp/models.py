@@ -337,7 +337,7 @@ class RegestDate(models.Model):
     TODO: Add examples
     """
 
-    regest = models.OneToOneField('Regest')
+    regest = models.ForeignKey('Regest')
     start = models.DateField(_('from'))
     start_offset = models.CharField(
         _('start offset'), max_length=20, choices=OFFSET_TYPES)
