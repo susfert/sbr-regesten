@@ -598,23 +598,41 @@ class RegestTest(TestCase):
         self.__check_date(
             regest, start=date(1270, 04, 27), end=date(1270, 04, 27),
             start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 04, 28), end=date(1270, 04, 28),
+            start_offset='', end_offset='')
         regest = Regest.objects.create(
             title='1466 [04-28 / 05-01]')
         self.__check_date(
             regest, start=date(1466, 04, 28), end=date(1466, 04, 28),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
             start_offset='', end_offset='')
         regest = Regest.objects.create(
             title='1440-11-12/17')
         self.__check_date(
             regest, start=date(1440, 11, 12), end=date(1440, 11, 12),
             start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
+            start_offset='', end_offset='')
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10 bzw. 12-01')
         self.__check_date(
             regest, start=date(1506, 05, 12), end=date(1506, 05, 12),
             start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
+            start_offset='', end_offset='')
         regest = Regest.objects.create(
             title='1343-04-12 oder 19')
         self.__check_date(
             regest, start=date(1343, 04, 12), end=date(1343, 04, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1343, 04, 19), end=date(1343, 04, 19),
             start_offset='', end_offset='')
