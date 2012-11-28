@@ -172,6 +172,32 @@ class Regest(models.Model):
                 start, end, start_offset, end_offset)
             self.__create_or_update_date(
                 start_alt, end_alt, start_offset, end_offset, alt_date=True)
+        # Custom logic for elliptic alternatives
+        elif re.match(
+            '\d{4}(-\d{2}){1,2} ?/ ?\d{2}(-\d{2})?',
+            self.title):
+            main_date, alt_date = re.search(
+                '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
+                    ' ?/ ?' \
+                    '(?P<alt_date>\d{2}-\d{2}|\d{2})',
+                self.title).group('main_date', 'alt_date')
+            start = self.__extract_date(main_date)
+            end = start
+            # month different, no day:
+            if re.match('\d{4}-\d{2} ?/ ?\d{2}([^\d-].*|)$', self.title):
+                alt_start = date(start.year, int(alt_date), DAY_DEFAULT)
+            # day different:
+            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}([^\d-].*|)$', self.title):
+                alt_start = date(start.year, start.month, int(alt_date))
+            # month *and* day different:
+            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}-\d{2}', self.title):
+                alt_month, alt_day = re.search(
+                    '(?P<alt_month>\d{2})-(?P<alt_day>\d{2})',
+                    alt_date).group('alt_month', 'alt_day')
+                alt_start = date(start.year, int(alt_month), int(alt_day))
+            alt_end = alt_start
+            self.__create_or_update_date(start, end)
+            self.__create_or_update_date(alt_start, alt_end, alt_date=True)
         # Custom logic for "simple ranges"
         elif self.__is_simple_range(self.title):
             start, end, offset = re.search(
