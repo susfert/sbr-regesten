@@ -174,23 +174,30 @@ class Regest(models.Model):
                 start_alt, end_alt, start_offset, end_offset, alt_date=True)
         # Custom logic for elliptic alternatives
         elif re.match(
-            '\d{4}(-\d{2}){1,2} ?/ ?\d{2}(-\d{2})?',
+            '\d{4}(-\d{2}| \[\d{2})?(-\d{2}| \[\d{2})? ?(/|bzw\.|oder) ?\d{2}(-\d{2})?\]?',
             self.title):
+            # Preprocessing for non-standard formatting
+            # - Replace ']' with ''
+            # - Replace ' [' with '-'
+            # - Replace 'bzw.' and 'oder' with '/'
+            title = self.title.strip(']')
+            title = re.sub(' \[', '-', title)
+            title = re.sub('(bzw\.|oder)', '/', title)
             main_date, alt_date = re.search(
                 '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
                     ' ?/ ?' \
                     '(?P<alt_date>\d{2}-\d{2}|\d{2})',
-                self.title).group('main_date', 'alt_date')
+                title).group('main_date', 'alt_date')
             start = self.__extract_date(main_date)
             end = start
             # month different, no day:
-            if re.match('\d{4}-\d{2} ?/ ?\d{2}([^\d-].*|)$', self.title):
+            if re.match('\d{4}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
                 alt_start = date(start.year, int(alt_date), DAY_DEFAULT)
             # day different:
-            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}([^\d-].*|)$', self.title):
+            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
                 alt_start = date(start.year, start.month, int(alt_date))
             # month *and* day different:
-            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}-\d{2}', self.title):
+            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}-\d{2}', title):
                 alt_month, alt_day = re.search(
                     '(?P<alt_month>\d{2})-(?P<alt_day>\d{2})',
                     alt_date).group('alt_month', 'alt_day')
