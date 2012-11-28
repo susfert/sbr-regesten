@@ -180,16 +180,20 @@ class Regest(models.Model):
             # - Replace ']' with ''
             # - Replace ' [' with '-'
             # - Replace 'bzw.' and 'oder' with '/'
-            title = self.title.strip(']')
+            title = re.sub('\]', '', self.title)
             title = re.sub(' \[', '-', title)
             title = re.sub('(bzw\.|oder)', '/', title)
-            main_date, alt_date = re.search(
+            main_date, alt_date, offset = re.search(
                 '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
                     ' ?/ ?' \
-                    '(?P<alt_date>\d{2}-\d{2}|\d{2})',
-                title).group('main_date', 'alt_date')
+                    '(?P<alt_date>\d{2}-\d{2}|\d{2})' \
+                    ' ?(\([a-z]\))? ?' \
+                    '\(?(?P<offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor)?\)?',
+                title).group('main_date', 'alt_date', 'offset')
             start = self.__extract_date(main_date)
             end = start
+            start_offset, end_offset = offset or '', offset or ''
             # month different, no day:
             if re.match('\d{4}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
                 alt_start = date(start.year, int(alt_date), DAY_DEFAULT)
@@ -203,8 +207,11 @@ class Regest(models.Model):
                     alt_date).group('alt_month', 'alt_day')
                 alt_start = date(start.year, int(alt_month), int(alt_day))
             alt_end = alt_start
-            self.__create_or_update_date(start, end)
-            self.__create_or_update_date(alt_start, alt_end, alt_date=True)
+            self.__create_or_update_date(
+                start, end, start_offset, end_offset)
+            self.__create_or_update_date(
+                alt_start, alt_end,
+                start_offset, end_offset, alt_date=True)
         # Custom logic for "simple ranges"
         elif self.__is_simple_range(self.title):
             start, end, offset = re.search(
