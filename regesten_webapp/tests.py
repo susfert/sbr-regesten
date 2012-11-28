@@ -589,8 +589,8 @@ class RegestTest(TestCase):
         Examples:
         - 1270-04-27/04-28
         - 1466 [04-28 / 05-01]
-        - 1506-05-12 bzw. 11-10 bzw. 12-01
         - 1440-11-12/17
+        - 1506-05-12 bzw. 11-10 bzw. 12-01
         - 1343-04-12 oder 19
         '''
         regest = Regest.objects.create(
@@ -604,14 +604,14 @@ class RegestTest(TestCase):
             regest, start=date(1466, 04, 28), end=date(1466, 04, 28),
             start_offset='', end_offset='')
         regest = Regest.objects.create(
-            title='1506-05-12 bzw. 11-10 bzw. 12-01')
-        self.__check_date(
-            regest, start=date(1506, 05, 12), end=date(1506, 05, 12),
-            start_offset='', end_offset='')
-        regest = Regest.objects.create(
             title='1440-11-12/17')
         self.__check_date(
             regest, start=date(1440, 11, 12), end=date(1440, 11, 12),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1506-05-12 bzw. 11-10 bzw. 12-01')
+        self.__check_date(
+            regest, start=date(1506, 05, 12), end=date(1506, 05, 12),
             start_offset='', end_offset='')
         regest = Regest.objects.create(
             title='1343-04-12 oder 19')
