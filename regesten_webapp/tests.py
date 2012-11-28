@@ -1345,3 +1345,209 @@ class RegestTest(TestCase):
         self.__check_date(
             regest, start=date(1343, 05, 19), end=date(1343, 05, 19),
             start_offset='', end_offset='')
+
+    def test_elliptical_alternatives_with_location(self):
+        '''
+        Examples:
+        - 1270-04/05 Diedenhofen
+        - 1270-04 / 05 Frankfurt am Main
+        - 1440-11-12/17 St. Arnual
+        - 1440-11-12 / 17 Diedenhofen
+        - 1270-04-27/05-28 Frankfurt am Main
+        - 1270-04-27 / 05-28 St. Arnual
+
+        - 1466 [04/05] Diedenhofen
+        - 1466 [04 / 05] Frankfurt am Main
+        - 1466-04 [28/29] St. Arnual
+        - 1466-04 [28 / 29] Diedenhofen
+        - 1466 [04-28/05-01] Frankfurt am Main
+        - 1466 [04-28 / 05-01] St. Arnual
+
+        - 1506-05 bzw. 11 Diedenhofen
+        - 1506-05-12 bzw. 10 Frankfurt am Main
+        - 1506-05-12 bzw. 11-10 St. Arnual
+        - 1506-05 bzw. 11 bzw. 12 Diedenhofen
+        - 1506-05-12 bzw. 10 bzw. 01 Frankfurt am Main
+        - 1506-05-12 bzw. 11-10 bzw. 12-01 St. Arnual
+
+        - 1343-04 oder 05 Diedenhofen
+        - 1343-04-12 oder 19 Frankfurt am Main
+        - 1343-04-12 oder 05-19 St. Arnual
+        '''
+        regest = Regest.objects.create(
+            title='1270-04/05 Diedenhofen')
+        self.__check_date(
+            regest, start=date(1270, 04, 01), end=date(1270, 04, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1270-04 / 05 Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1270, 04, 01), end=date(1270, 04, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1440-11-12/17 St. Arnual')
+        self.__check_date(
+            regest, start=date(1440, 11, 12), end=date(1440, 11, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1440-11-12 / 17 Diedenhofen')
+        self.__check_date(
+            regest, start=date(1440, 11, 12), end=date(1440, 11, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1270-04-27/05-28 Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1270, 04, 27), end=date(1270, 04, 27),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1270-04-27 / 05-28 St. Arnual')
+        self.__check_date(
+            regest, start=date(1270, 04, 27), end=date(1270, 04, 27),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1466 [04/05] Diedenhofen')
+        self.__check_date(
+            regest, start=date(1466, 04, 01), end=date(1466, 04, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1466 [04 / 05] Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1466, 04, 01), end=date(1466, 04, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1466-04 [28/29] St. Arnual')
+        self.__check_date(
+            regest, start=date(1466, 04, 28), end=date(1466, 04, 28),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1466-04 [28 / 29] Diedenhofen')
+        self.__check_date(
+            regest, start=date(1466, 04, 28), end=date(1466, 04, 28),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1466 [04-28/05-01] Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1466, 04, 28), end=date(1466, 04, 28),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1466 [04-28/05-01] St. Arnual')
+        self.__check_date(
+            regest, start=date(1466, 04, 28), end=date(1466, 04, 28),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1506-05 bzw. 11 Diedenhofen')
+        self.__check_date(
+            regest, start=date(1506, 05, 01), end=date(1506, 05, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1506-05-12 bzw. 10 Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1506, 05, 12), end=date(1506, 05, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1506-05-12 bzw. 11-10 St. Arnual')
+        self.__check_date(
+            regest, start=date(1506, 05, 12), end=date(1506, 05, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1506-05 bzw. 11 bzw. 12 Diedenhofen')
+        self.__check_date(
+            regest, start=date(1506, 05, 01), end=date(1506, 05, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1506-05-12 bzw. 10 bzw. 01 Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1506, 05, 12), end=date(1506, 05, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 05, 01), end=date(1506, 05, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1506-05-12 bzw. 11-10 bzw. 12-01 St. Arnual')
+        self.__check_date(
+            regest, start=date(1506, 05, 12), end=date(1506, 05, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1343-04 oder 05 Diedenhofen')
+        self.__check_date(
+            regest, start=date(1343, 04, 01), end=date(1343, 04, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1343, 05, 01), end=date(1343, 05, 01),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1343-04-12 oder 19 Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1343, 04, 12), end=date(1343, 04, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1343, 04, 19), end=date(1343, 04, 19),
+            start_offset='', end_offset='')
+        regest = Regest.objects.create(
+            title='1343-04-12 oder 05-19 St. Arnual')
+        self.__check_date(
+            regest, start=date(1343, 04, 12), end=date(1343, 04, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1343, 05, 19), end=date(1343, 05, 19),
+            start_offset='', end_offset='')
