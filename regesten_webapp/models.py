@@ -154,18 +154,24 @@ class Regest(models.Model):
             '\d{4}(-\d{2}){0,2}( ?/ ?| \(| \[?bzw\. )' \
                 '\d{4}(-\d{2}){0,2}[\)\]]?',
             self.title):
-            main_date, alt_date = re.search(
+            main_date, alt_date, offset = re.search(
                 '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
                     '( ?/ ?| \(| \[?bzw\. )' \
                     '(?P<alt_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
-                    '[\)\]]?',
-                self.title).group('main_date', 'alt_date')
+                    '[\)\]]?' \
+                    ' ?(\([a-z]\))? ?' \
+                    '\(?(?P<offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor)?\)?',
+                self.title).group('main_date', 'alt_date', 'offset')
             start = self.__extract_date(main_date)
             end = start
+            start_offset, end_offset = offset or '', offset or ''
             start_alt = self.__extract_date(alt_date)
             end_alt = start_alt
-            self.__create_or_update_date(start, end)
-            self.__create_or_update_date(start_alt, end_alt, alt_date=True)
+            self.__create_or_update_date(
+                start, end, start_offset, end_offset)
+            self.__create_or_update_date(
+                start_alt, end_alt, start_offset, end_offset, alt_date=True)
         # Custom logic for "simple ranges"
         elif self.__is_simple_range(self.title):
             start, end, offset = re.search(
