@@ -1147,8 +1147,8 @@ class RegestTest(TestCase):
         - 1270-04 / 05 (month different, no day)
         - 1440-11-12/17 (day different)
         - 1440-11-12 / 17 (day different)
-        - 1270-04-27/04-28 (month *and* day different)
-        - 1270-04-27 / 04-28 (month *and* day different)
+        - 1270-04-27/05-28 (month *and* day different)
+        - 1270-04-27 / 05-28 (month *and* day different)
 
         - 1466 [04/05] (month different, no day)
         - 1466 [04 / 05] (month different, no day)
@@ -1201,20 +1201,20 @@ class RegestTest(TestCase):
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
             start_offset='', end_offset='')
         regest = Regest.objects.create(
-            title='1270-04-27/04-28')
+            title='1270-04-27/05-28')
         self.__check_date(
             regest, start=date(1270, 04, 27), end=date(1270, 04, 27),
             start_offset='', end_offset='')
         self.__check_date(
-            regest, start=date(1270, 04, 28), end=date(1270, 04, 28),
+            regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
             start_offset='', end_offset='')
         regest = Regest.objects.create(
-            title='1270-04-27 / 04-28')
+            title='1270-04-27 / 05-28')
         self.__check_date(
             regest, start=date(1270, 04, 27), end=date(1270, 04, 27),
             start_offset='', end_offset='')
         self.__check_date(
-            regest, start=date(1270, 04, 28), end=date(1270, 04, 28),
+            regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
             start_offset='', end_offset='')
         regest = Regest.objects.create(
             title='1466 [04/05]')
