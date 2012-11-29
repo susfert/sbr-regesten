@@ -183,35 +183,53 @@ class Regest(models.Model):
             title = re.sub('\]', '', self.title)
             title = re.sub(' \[', '-', title)
             title = re.sub('(bzw\.|oder)', '/', title)
-            main_date, alt_date, offset = re.search(
-                '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
-                    ' ?/ ?' \
-                    '(?P<alt_date>\d{2}-\d{2}|\d{2})' \
+            main_date, offset = re.search(
+                '(?P<main_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
+                    '(?P<alt_dates> ?/ ?\d{2}-\d{2}| ?/ ?\d{2})+' \
                     ' ?(\([a-z]\))? ?' \
                     '\(?(?P<offset>' \
                     'ca\.|nach|kurz nach|post|um|vor)?\)?',
-                title).group('main_date', 'alt_date', 'offset')
+                title).group('main_date', 'offset')
             start = self.__extract_date(main_date)
             end = start
             start_offset, end_offset = offset or '', offset or ''
-            # month different, no day:
-            if re.match('\d{4}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
-                alt_start = date(start.year, int(alt_date), DAY_DEFAULT)
-            # day different:
-            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
-                alt_start = date(start.year, start.month, int(alt_date))
-            # month *and* day different:
-            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}-\d{2}', title):
-                alt_month, alt_day = re.search(
-                    '(?P<alt_month>\d{2})-(?P<alt_day>\d{2})',
-                    alt_date).group('alt_month', 'alt_day')
-                alt_start = date(start.year, int(alt_month), int(alt_day))
-            alt_end = alt_start
             self.__create_or_update_date(
                 start, end, start_offset, end_offset)
-            self.__create_or_update_date(
-                alt_start, alt_end,
-                start_offset, end_offset, alt_date=True)
+            # Delete existing alt_dates for current regest to make
+            # sure we're not keeping old ones when updating regests in
+            # the admin interface
+            for alt_date in self.regestdate_set.filter(alt_date=True):
+                alt_date.delete()
+            # month different, no day:
+            if re.match('\d{4}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
+                alt_dates = re.findall(' ?/ ?(\d{2})', title)
+                for alt_date in alt_dates:
+                    alt_start = date(start.year, int(alt_date), DAY_DEFAULT)
+                    alt_end = alt_start
+                    self.__create_or_update_date(
+                        alt_start, alt_end,
+                        start_offset, end_offset, alt_date=True)
+            # day different:
+            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
+                alt_dates = re.findall(' ?/ ?(\d{2})', title)
+                for alt_date in alt_dates:
+                    alt_start = date(start.year, start.month, int(alt_date))
+                    alt_end = alt_start
+                    self.__create_or_update_date(
+                        alt_start, alt_end,
+                        start_offset, end_offset, alt_date=True)
+            # month *and* day different:
+            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}-\d{2}', title):
+                alt_dates = re.findall(' ?/ ?(\d{2}-\d{2})', title)
+                for alt_date in alt_dates:
+                    alt_month, alt_day = re.search(
+                        '(?P<alt_month>\d{2})-(?P<alt_day>\d{2})',
+                        alt_date).group('alt_month', 'alt_day')
+                    alt_start = date(start.year, int(alt_month), int(alt_day))
+                    alt_end = alt_start
+                    self.__create_or_update_date(
+                        alt_start, alt_end,
+                        start_offset, end_offset, alt_date=True)
         # Custom logic for "simple ranges"
         elif self.__is_simple_range(self.title):
             start, end, offset = re.search(
@@ -358,20 +376,29 @@ class Regest(models.Model):
         return start_offset, end_offset
 
     def __create_or_update_date(
+        # if not alt_date: keep current logic (check for existing date
+        # first, update if it exists, create if it doesn't')
+        # if alt_date: don't ask any questions, just create it
         self, start, end, start_offset='', end_offset='', alt_date=False):
-        if RegestDate.objects.filter(
-            regest=self, alt_date=alt_date).exists():
-            regest_date = RegestDate.objects.get(
-                regest=self, alt_date=alt_date)
-            regest_date.start, regest_date.end = start, end
-            regest_date.start_offset = start_offset
-            regest_date.end_offset = end_offset
-            regest_date.save()
+        if not alt_date:
+            if RegestDate.objects.filter(
+                regest=self, alt_date=False).exists():
+                regest_date = RegestDate.objects.get(
+                    regest=self, alt_date=False)
+                regest_date.start, regest_date.end = start, end
+                regest_date.start_offset = start_offset
+                regest_date.end_offset = end_offset
+                regest_date.save()
+            else:
+                regest_date = RegestDate.objects.create(
+                    regest=self, start=start, end=end,
+                    start_offset=start_offset, end_offset=end_offset,
+                    alt_date=False)
         else:
             regest_date = RegestDate.objects.create(
                 regest=self, start=start, end=end,
                 start_offset=start_offset, end_offset=end_offset,
-                alt_date=alt_date)
+                alt_date=True)
         return regest_date
 
 
