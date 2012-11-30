@@ -151,8 +151,9 @@ class Regest(models.Model):
         """
         # Custom logic for "simple alternatives"
         if re.match(
-            '\d{4}(-\d{2}){0,2}( ?/ ?| \(| \[?bzw\. )' \
-                '\d{4}(-\d{2}){0,2}[\)\]]?',
+            '\d{4}(-\d{2}){0,2}' \
+                '( ?/ ?| [\(\]]| [\(\[]?bzw\.? | [\(\[]?oder )' \
+                '\d{4}(-\d{2}){0,2}',
             self.title):
             # Extract offset
             offset = self.__extract_offset()
@@ -182,7 +183,9 @@ class Regest(models.Model):
                     alt_date=True)
         # Custom logic for elliptic alternatives
         elif re.match(
-            '\d{4}(-\d{2}| \[\d{2})?(-\d{2}| \[\d{2})? ?(/|bzw\.|oder) ?\d{2}(-\d{2})?\]?',
+            '\d{4}(-\d{2}){0,2}' \
+                '( ?/ ?| [\(\[]| [\(\[]?bzw\.? | [\(\[]?oder )' \
+                '\d{2}(-\d{2})?',
             self.title):
             # Extract offset
             offset = self.__extract_offset()
