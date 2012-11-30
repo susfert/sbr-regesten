@@ -151,140 +151,25 @@ class Regest(models.Model):
         """
         # Custom logic for "simple alternatives"
         if self.__contains_simple_alternatives(self.title):
-            # Extract offset
-            offset = self.__extract_offset()
-            title = self.__remove_non_standard_formatting(
-                title_type=RegestTitleType.SIMPLE_ALTERNATIVES)
-            # Extract main date and alternative dates
-            main_date, alt_dates = re.search(
-                '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
-                    '(?P<alt_dates>' \
-                    '( ?/ ?\d{4}-\d{2}-\d{2})+|' \
-                    '( ?/ ?\d{4}-\d{2})+|' \
-                    '( ?/ ?\d{4})+)',
-                title).group('main_date', 'alt_dates')
-            # Save main date
-            start = self.__extract_date(main_date)
-            end = start
-            self.__create_or_update_date(
-                start, end, start_offset=offset, end_offset=offset)
+            dates = self.__extract_dates(
+                RegestTitleType.SIMPLE_ALTERNATIVES)
             self.__delete_existing_alt_dates()
-            # Save alternative dates
-            for alt_date in re.findall(
-                ' ?/ ?(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})', alt_dates):
-                start = self.__extract_date(alt_date)
-                end = start
-                self.__create_or_update_date(
-                    start, end, start_offset=offset, end_offset=offset,
-                    alt_date=True)
-        # Custom logic for elliptic alternatives
         elif self.__contains_elliptical_alternatives(self.title):
-            # Extract offset
-            offset = self.__extract_offset()
-            title = self.__remove_non_standard_formatting(
-                title_type=RegestTitleType.ELLIPTICAL_ALTERNATIVES)
-            main_date, alt_dates = re.search(
-                '(?P<main_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
-                    '(?P<alt_dates>' \
-                    '( ?/ ?\d{2}-\d{2})+|' \
-                    '( ?/ ?\d{2})+)',
-                title).group('main_date', 'alt_dates')
-            start = self.__extract_date(main_date)
-            end = start
-            self.__create_or_update_date(
-                start, end, start_offset=offset, end_offset=offset)
+            dates = self.__extract_dates(
+                RegestTitleType.ELLIPTICAL_ALTERNATIVES)
             self.__delete_existing_alt_dates()
-            # month different, no day:
-            if re.match('\d{4}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
-                for alt_date in re.findall(' ?/ ?(\d{2})', alt_dates):
-                    alt_start = date(start.year, int(alt_date), DAY_DEFAULT)
-                    alt_end = alt_start
-                    self.__create_or_update_date(
-                        alt_start, alt_end,
-                        start_offset=offset, end_offset=offset,
-                        alt_date=True)
-            # day different:
-            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
-                for alt_date in re.findall(' ?/ ?(\d{2})', alt_dates):
-                    alt_start = date(start.year, start.month, int(alt_date))
-                    alt_end = alt_start
-                    self.__create_or_update_date(
-                        alt_start, alt_end,
-                        start_offset=offset, end_offset=offset,
-                        alt_date=True)
-            # month *and* day different:
-            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}-\d{2}', title):
-                for alt_date in re.findall(' ?/ ?(\d{2}-\d{2})', alt_dates):
-                    alt_month, alt_day = re.search(
-                        '(?P<alt_month>\d{2})-(?P<alt_day>\d{2})',
-                        alt_date).group('alt_month', 'alt_day')
-                    alt_start = date(start.year, int(alt_month), int(alt_day))
-                    alt_end = alt_start
-                    self.__create_or_update_date(
-                        alt_start, alt_end,
-                        start_offset=offset, end_offset=offset,
-                        alt_date=True)
-        # Custom logic for "simple ranges"
         elif self.__is_simple_range(self.title):
-            start, end, offset = re.search(
-                '(?P<start>\d{4})-(?P<end>\d{4})' \
-                    ' ?(\([a-z]\))? ?' \
-                    '\(?(?P<offset>' \
-                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
-                self.title).group('start', 'end', 'offset')
-            start = date(int(start), MONTH_DEFAULT, DAY_DEFAULT)
-            end = date(int(end), MONTH_DEFAULT, DAY_DEFAULT)
-            start_offset, end_offset = self.__determine_offsets(
-                start_offset=offset, end_offset=offset)
-            # Create or update RegestDate using the extracted values
-            self.__create_or_update_date(
-                start, end, start_offset, end_offset)
-        # Custom logic for elliptic ranges
+            dates = self.__extract_dates(
+                RegestTitleType.SIMPLE_RANGE)
         elif self.__is_elliptical_range(self.title):
-            start, end, offset = re.search(
-                '(?P<start>\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
-                    ' bis (?P<end>\d{2})' \
-                    ' ?(\([a-z]\))? ?' \
-                    '\(?(?P<offset>' \
-                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
-                self.title).group('start', 'end', 'offset')
-            start = self.__extract_date(start)
-            if re.match('^\d{4}-\d{2} bis \d{2}', self.title):
-                end = date(start.year, int(end), DAY_DEFAULT)
-            elif re.match('^\d{4}-\d{2}-\d{2} bis \d{2}', self.title):
-                end = date(start.year, start.month, int(end))
-            start_offset, end_offset = self.__determine_offsets(
-                start_offset=offset, end_offset=offset)
-            # Create or update RegestDate using the extracted values
-            self.__create_or_update_date(
-                start, end, start_offset, end_offset)
-        # Regular dates and ranges
+            dates = self.__extract_dates(
+                RegestTitleType.ELLIPTICAL_RANGE)
         else:
-            start, start_offset, end, end_offset = re.search(
-                '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
-                    ' ?(\([a-z]\)|[\w\. ]+)? ?' \
-                    '\(?(?P<start_offset>' \
-                    'ca\.|nach|kurz nach|post|um|vor)?\)?' \
-                    ' ?-? ?' \
-                    '(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})?' \
-                    ' ?(\([a-z]\)|[\w\. ]+)? ?' \
-                    '\(?(?P<end_offset>' \
-                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
-                self.title).group(
-                'start', 'start_offset', 'end', 'end_offset')
-            # Start
-            start = self.__extract_date(start)
-            # End
-            if end:
-                end = self.__extract_date(end)
-            else:
-                end = start
-            # Offsets
-            start_offset, end_offset = self.__determine_offsets(
-                start_offset, end_offset)
-            # Create or update RegestDate using the extracted values
+            dates = self.__extract_dates(
+                RegestTitleType.REGULAR)
+        for start, end, start_offset, end_offset, alt_date in dates:
             self.__create_or_update_date(
-                start, end, start_offset, end_offset)
+                start, end, start_offset, end_offset, alt_date)
 
     def __contains_simple_alternatives(self, string):
         return re.match(
@@ -325,6 +210,101 @@ class Regest(models.Model):
           from May 10th to May 20th, 1419).
         '''
         return re.match('^\d{4}-\d{2}(-\d{2})? bis \d{2}(\D.*|)$', string)
+
+    def __extract_dates(self, title_type):
+        if title_type == RegestTitleType.REGULAR:
+            start, start_offset, end, end_offset = re.search(
+                '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
+                    ' ?(\([a-z]\)|[\w\. ]+)? ?' \
+                    '\(?(?P<start_offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor)?\)?' \
+                    ' ?-? ?' \
+                    '(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})?' \
+                    ' ?(\([a-z]\)|[\w\. ]+)? ?' \
+                    '\(?(?P<end_offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
+                self.title).group(
+                'start', 'start_offset', 'end', 'end_offset')
+            start = self.__extract_date(start)
+            end = self.__extract_date(end) if end else start
+            start_offset, end_offset = self.__determine_offsets(
+                start_offset, end_offset)
+            return [(start, end, start_offset, end_offset, False)]
+        elif title_type == RegestTitleType.SIMPLE_RANGE:
+            start, end, offset = re.search(
+                '(?P<start>\d{4})-(?P<end>\d{4})' \
+                    ' ?(\([a-z]\))? ?' \
+                    '\(?(?P<offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
+                self.title).group('start', 'end', 'offset')
+            start = date(int(start), MONTH_DEFAULT, DAY_DEFAULT)
+            end = date(int(end), MONTH_DEFAULT, DAY_DEFAULT)
+            start_offset, end_offset = self.__determine_offsets(
+                start_offset=offset, end_offset=offset)
+            return [(start, end, start_offset, end_offset, False)]
+        elif title_type == RegestTitleType.ELLIPTICAL_RANGE:
+            start, end, offset = re.search(
+                '(?P<start>\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
+                    ' bis (?P<end>\d{2})' \
+                    ' ?(\([a-z]\))? ?' \
+                    '\(?(?P<offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
+                self.title).group('start', 'end', 'offset')
+            start = self.__extract_date(start)
+            if re.match('^\d{4}-\d{2} bis \d{2}', self.title):
+                end = date(start.year, int(end), DAY_DEFAULT)
+            elif re.match('^\d{4}-\d{2}-\d{2} bis \d{2}', self.title):
+                end = date(start.year, start.month, int(end))
+            start_offset, end_offset = self.__determine_offsets(
+                start_offset=offset, end_offset=offset)
+            return [(start, end, start_offset, end_offset, False)]
+        elif title_type == RegestTitleType.SIMPLE_ALTERNATIVES:
+            offset = self.__extract_offset()
+            title = self.__remove_non_standard_formatting(title_type)
+            main_date, alt_dates = re.search(
+                '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
+                    '(?P<alt_dates>' \
+                    '( ?/ ?\d{4}-\d{2}-\d{2})+|' \
+                    '( ?/ ?\d{4}-\d{2})+|' \
+                    '( ?/ ?\d{4})+)',
+                title).group('main_date', 'alt_dates')
+            start = self.__extract_date(main_date)
+            dates = [(start, start, offset, offset, False)]
+            for alt_date in re.findall(
+                ' ?/ ?(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})', alt_dates):
+                start = self.__extract_date(alt_date)
+                dates.append((start, start, offset, offset, True))
+            return dates
+        elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES:
+            offset = self.__extract_offset()
+            title = self.__remove_non_standard_formatting(title_type)
+            main_date, alt_dates = re.search(
+                '(?P<main_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
+                    '(?P<alt_dates>' \
+                    '( ?/ ?\d{2}-\d{2})+|' \
+                    '( ?/ ?\d{2})+)',
+                title).group('main_date', 'alt_dates')
+            start = self.__extract_date(main_date)
+            dates = [(start, start, offset, offset, False)]
+            # month different, no day:
+            if re.match('\d{4}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
+                for alt_date in re.findall(' ?/ ?(\d{2})', alt_dates):
+                    start = date(start.year, int(alt_date), DAY_DEFAULT)
+                    dates.append((start, start, offset, offset, True))
+            # day different:
+            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
+                for alt_date in re.findall(' ?/ ?(\d{2})', alt_dates):
+                    start = date(start.year, start.month, int(alt_date))
+                    dates.append((start, start, offset, offset, True))
+            # month *and* day different:
+            elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}-\d{2}', title):
+                for alt_date in re.findall(' ?/ ?(\d{2}-\d{2})', alt_dates):
+                    alt_month, alt_day = re.search(
+                        '(?P<alt_month>\d{2})-(?P<alt_day>\d{2})',
+                        alt_date).group('alt_month', 'alt_day')
+                    start = date(start.year, int(alt_month), int(alt_day))
+                    dates.append((start, start, offset, offset, True))
+            return dates
 
     def __extract_offset(self):
         match = re.search(
