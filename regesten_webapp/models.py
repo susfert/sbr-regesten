@@ -164,16 +164,16 @@ class Regest(models.Model):
             else:
                 offset = ''
             # Preprocessing for non-standard formatting
-            # - Replace 'bzw.' and '[bzw.' with '/'
-            # - Remove ']'
+            # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
+            #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
             # - Remove duplicates and offsets
-            # - Replace '(' with '/ '
-            # - Remove ')'
-            title = re.sub('\[?bzw\.', '/', self.title)
-            title = re.sub('\]', '', title)
+            # - Remove ')' and ']'
+            title = re.sub('[\(\[]?(bzw\.?|oder)', '/', self.title)
             title = re.sub('\(\D+\)', '', title)
-            title = re.sub('\(', '/ ', title)
-            title = re.sub('\)', '', title)
+            title = re.sub('[\)\]]', '', title)
+            # - Replace '(' and '[' with '/ '
+            title = re.sub('[\(\[]', '/ ', title)
+
             # Extract main date and alternative dates
             main_date, alt_dates = re.search(
                 '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
@@ -204,25 +204,36 @@ class Regest(models.Model):
         elif re.match(
             '\d{4}(-\d{2}| \[\d{2})?(-\d{2}| \[\d{2})? ?(/|bzw\.|oder) ?\d{2}(-\d{2})?\]?',
             self.title):
+            # Extract offset
+            match = re.search(
+                '(?P<offset>ca\.|nach|kurz nach|post|um|vor)',
+                self.title
+                )
+            if match:
+                offset = match.group('offset')
+            else:
+                offset = ''
             # Preprocessing for non-standard formatting
-            # - Replace ']' with ''
-            # - Replace ' [' with '-'
-            # - Replace 'bzw.' and 'oder' with '/'
-            title = re.sub('\]', '', self.title)
-            title = re.sub(' \[', '-', title)
-            title = re.sub('(bzw\.|oder)', '/', title)
-            main_date, offset = re.search(
+            # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
+            #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
+            # - Remove duplicates and offsets
+            # - Remove ')' and ']'
+            title = re.sub('[\(\[]?(bzw\.?|oder)', '/', self.title)
+            title = re.sub('\(\D+\)', '', title)
+            title = re.sub('[\)\]]', '', title)
+            # - Replace ' (' and ' [' with '-'
+            title = re.sub(' [\(\[]', '-', title)
+
+            main_date, alt_dates = re.search(
                 '(?P<main_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
-                    '(?P<alt_dates> ?/ ?\d{2}-\d{2}| ?/ ?\d{2})+' \
-                    ' ?(\([a-z]\))? ?' \
-                    '\(?(?P<offset>' \
-                    'ca\.|nach|kurz nach|post|um|vor)?\)?',
-                title).group('main_date', 'offset')
+                    '(?P<alt_dates>' \
+                    '( ?/ ?\d{2}-\d{2})+|' \
+                    '( ?/ ?\d{2})+)',
+                title).group('main_date', 'alt_dates')
             start = self.__extract_date(main_date)
             end = start
-            start_offset, end_offset = offset or '', offset or ''
             self.__create_or_update_date(
-                start, end, start_offset, end_offset)
+                start, end, start_offset=offset, end_offset=offset)
             # Delete existing alt_dates for current regest to make
             # sure we're not keeping old ones when updating regests in
             # the admin interface
@@ -230,26 +241,25 @@ class Regest(models.Model):
                 alt_date.delete()
             # month different, no day:
             if re.match('\d{4}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
-                alt_dates = re.findall(' ?/ ?(\d{2})', title)
-                for alt_date in alt_dates:
+                for alt_date in re.findall(' ?/ ?(\d{2})', alt_dates):
                     alt_start = date(start.year, int(alt_date), DAY_DEFAULT)
                     alt_end = alt_start
                     self.__create_or_update_date(
                         alt_start, alt_end,
-                        start_offset, end_offset, alt_date=True)
+                        start_offset=offset, end_offset=offset,
+                        alt_date=True)
             # day different:
             elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
-                alt_dates = re.findall(' ?/ ?(\d{2})', title)
-                for alt_date in alt_dates:
+                for alt_date in re.findall(' ?/ ?(\d{2})', alt_dates):
                     alt_start = date(start.year, start.month, int(alt_date))
                     alt_end = alt_start
                     self.__create_or_update_date(
                         alt_start, alt_end,
-                        start_offset, end_offset, alt_date=True)
+                        start_offset=offset, end_offset=offset,
+                        alt_date=True)
             # month *and* day different:
             elif re.match('\d{4}-\d{2}-\d{2} ?/ ?\d{2}-\d{2}', title):
-                alt_dates = re.findall(' ?/ ?(\d{2}-\d{2})', title)
-                for alt_date in alt_dates:
+                for alt_date in re.findall(' ?/ ?(\d{2}-\d{2})', alt_dates):
                     alt_month, alt_day = re.search(
                         '(?P<alt_month>\d{2})-(?P<alt_day>\d{2})',
                         alt_date).group('alt_month', 'alt_day')
@@ -257,7 +267,8 @@ class Regest(models.Model):
                     alt_end = alt_start
                     self.__create_or_update_date(
                         alt_start, alt_end,
-                        start_offset, end_offset, alt_date=True)
+                        start_offset=offset, end_offset=offset,
+                        alt_date=True)
         # Custom logic for "simple ranges"
         elif self.__is_simple_range(self.title):
             start, end, offset = re.search(
