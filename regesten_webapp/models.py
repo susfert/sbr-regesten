@@ -237,8 +237,8 @@ class Regest(models.Model):
                     '\(?(?P<offset>' \
                     'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
                 self.title).group('start', 'end', 'offset')
-            start = date(int(start), MONTH_DEFAULT, DAY_DEFAULT)
-            end = date(int(end), MONTH_DEFAULT, DAY_DEFAULT)
+            start = self.__extract_date(start)
+            end = self.__extract_date(end)
             start_offset, end_offset = self.__determine_offsets(
                 start_offset=offset, end_offset=offset)
             return [(start, end, start_offset, end_offset, False)]
