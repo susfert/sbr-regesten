@@ -156,17 +156,8 @@ class Regest(models.Model):
             self.title):
             # Extract offset
             offset = self.__extract_offset()
-            # Preprocessing for non-standard formatting
-            # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
-            #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
-            # - Remove duplicates and offsets
-            # - Remove ')' and ']'
-            title = re.sub('[\(\[]?(bzw\.?|oder)', '/', self.title)
-            title = re.sub('\(\D+\)', '', title)
-            title = re.sub('[\)\]]', '', title)
-            # - Replace '(' and '[' with '/ '
-            title = re.sub('[\(\[]', '/ ', title)
-
+            title = self.__remove_non_standard_formatting(
+                simple_alternatives=True)
             # Extract main date and alternative dates
             main_date, alt_dates = re.search(
                 '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
@@ -199,17 +190,8 @@ class Regest(models.Model):
             self.title):
             # Extract offset
             offset = self.__extract_offset()
-            # Preprocessing for non-standard formatting
-            # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
-            #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
-            # - Remove duplicates and offsets
-            # - Remove ')' and ']'
-            title = re.sub('[\(\[]?(bzw\.?|oder)', '/', self.title)
-            title = re.sub('\(\D+\)', '', title)
-            title = re.sub('[\)\]]', '', title)
-            # - Replace ' (' and ' [' with '-'
-            title = re.sub(' [\(\[]', '-', title)
-
+            title = self.__remove_non_standard_formatting(
+                simple_alternatives=False)
             main_date, alt_dates = re.search(
                 '(?P<main_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
                     '(?P<alt_dates>' \
@@ -349,6 +331,22 @@ class Regest(models.Model):
         match = re.search(
             '(?P<offset>ca\.|nach|kurz nach|post|um|vor)', self.title)
         return match.group('offset') if match else ''
+
+    def __remove_non_standard_formatting(self, simple_alternatives):
+        # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
+        #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
+        # - Remove duplicates and offsets
+        # - Remove ')' and ']'
+        title = re.sub('[\(\[]?(bzw\.?|oder)', '/', self.title)
+        title = re.sub('\(\D+\)', '', title)
+        title = re.sub('[\)\]]', '', title)
+        if simple_alternatives:
+            # - Replace '(' and '[' with '/ '
+            title = re.sub('[\(\[]', '/ ', title)
+        else:
+            # - Replace ' (' and ' [' with '-'
+            title = re.sub(' [\(\[]', '-', title)
+        return title
 
     def __extract_date(self, string):
         year, month, day = re.search(
