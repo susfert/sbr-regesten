@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from regesten_webapp import AUTHORS, COUNTRIES, OFFSET_TYPES, REGION_TYPES
-from regesten_webapp import DAY_DEFAULT, MONTH_DEFAULT
+from regesten_webapp import DAY_DEFAULT, MONTH_DEFAULT, RegestTitleType
 
 class Regest(models.Model):
     """
@@ -154,7 +154,7 @@ class Regest(models.Model):
             # Extract offset
             offset = self.__extract_offset()
             title = self.__remove_non_standard_formatting(
-                simple_alternatives=True)
+                title_type=RegestTitleType.SIMPLE_ALTERNATIVES)
             # Extract main date and alternative dates
             main_date, alt_dates = re.search(
                 '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
@@ -182,7 +182,7 @@ class Regest(models.Model):
             # Extract offset
             offset = self.__extract_offset()
             title = self.__remove_non_standard_formatting(
-                simple_alternatives=False)
+                title_type=RegestTitleType.ELLIPTICAL_ALTERNATIVES)
             main_date, alt_dates = re.search(
                 '(?P<main_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
                     '(?P<alt_dates>' \
@@ -331,7 +331,7 @@ class Regest(models.Model):
             '(?P<offset>ca\.|nach|kurz nach|post|um|vor)', self.title)
         return match.group('offset') if match else ''
 
-    def __remove_non_standard_formatting(self, simple_alternatives):
+    def __remove_non_standard_formatting(self, title_type):
         # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
         #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
         # - Remove duplicates and offsets
@@ -339,10 +339,10 @@ class Regest(models.Model):
         title = re.sub('[\(\[]?(bzw\.?|oder)', '/', self.title)
         title = re.sub('\(\D+\)', '', title)
         title = re.sub('[\)\]]', '', title)
-        if simple_alternatives:
+        if title_type == RegestTitleType.SIMPLE_ALTERNATIVES:
             # - Replace '(' and '[' with '/ '
             title = re.sub('[\(\[]', '/ ', title)
-        else:
+        elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES:
             # - Replace ' (' and ' [' with '-'
             title = re.sub(' [\(\[]', '-', title)
         return title

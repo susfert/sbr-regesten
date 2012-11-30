@@ -3,6 +3,13 @@
 DAY_DEFAULT = 1
 MONTH_DEFAULT = 1
 
+class RegestTitleType(object):
+    REGULAR = 'regular'
+    SIMPLE_RANGE = 'simple range'
+    ELLIPTICAL_RANGE = 'elliptical range'
+    SIMPLE_ALTERNATIVES = 'simple alternatives'
+    ELLIPTICAL_ALTERNATIVES = 'elliptical alternatives'
+
 AUTHORS = (
     ('Ed', 'Irmtraut Eder-Stein, Koblenz'),
     ('He', 'Hans-Walter Herrmann, Saarbrücken'),
