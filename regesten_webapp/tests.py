@@ -1116,29 +1116,29 @@ class RegestTest(TestCase):
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
             start_offset='post', end_offset='post')
         regest = Regest.objects.create(
-            title='1520 bzw. 1519 (ca.)')
+            title='1520 bzw. 1519 (um)')
         self.__check_date(
             regest, start=date(1520, 01, 01), end=date(1520, 01, 01),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='um', end_offset='um')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='um', end_offset='um')
         regest = Regest.objects.create(
-            title='1520-02 bzw. 1519-03 (kurz nach)')
+            title='1520-02 bzw. 1519-03 (ca.)')
         self.__check_date(
             regest, start=date(1520, 02, 01), end=date(1520, 02, 01),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='ca.', end_offset='ca.')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='ca.', end_offset='ca.')
         regest = Regest.objects.create(
-            title='1520-02-18 bzw. 1519-03-06 (post)')
+            title='1520-02-18 bzw. 1519-03-06 (kurz nach)')
         self.__check_date(
             regest, start=date(1520, 02, 18), end=date(1520, 02, 18),
-            start_offset='post', end_offset='post')
+            start_offset='kurz nach', end_offset='kurz nach')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='post', end_offset='post')
+            start_offset='kurz nach', end_offset='kurz nach')
 
     def test_elliptical_alternatives(self):
         '''
