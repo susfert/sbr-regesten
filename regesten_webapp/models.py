@@ -150,11 +150,7 @@ class Regest(models.Model):
         # 1500 (e) (16. Jh., Anfang)
         """
         # Custom logic for "simple alternatives"
-        if re.match(
-            '\d{4}(-\d{2}){0,2}' \
-                '( ?/ ?| [\(\]]| [\(\[]?bzw\.? | [\(\[]?oder )' \
-                '\d{4}(-\d{2}){0,2}',
-            self.title):
+        if self.__contains_simple_alternatives(self.title):
             # Extract offset
             offset = self.__extract_offset()
             title = self.__remove_non_standard_formatting(
@@ -182,11 +178,7 @@ class Regest(models.Model):
                     start, end, start_offset=offset, end_offset=offset,
                     alt_date=True)
         # Custom logic for elliptic alternatives
-        elif re.match(
-            '\d{4}(-\d{2}){0,2}' \
-                '( ?/ ?| [\(\[]| [\(\[]?bzw\.? | [\(\[]?oder )' \
-                '\d{2}(-\d{2})?',
-            self.title):
+        elif self.__contains_elliptical_alternatives(self.title):
             # Extract offset
             offset = self.__extract_offset()
             title = self.__remove_non_standard_formatting(
@@ -293,6 +285,18 @@ class Regest(models.Model):
             # Create or update RegestDate using the extracted values
             self.__create_or_update_date(
                 start, end, start_offset, end_offset)
+
+    def __contains_simple_alternatives(self, string):
+        return re.match(
+            '\d{4}(-\d{2}){0,2}' \
+                '( ?/ ?| [\(\]]| [\(\[]?bzw\.? | [\(\[]?oder )' \
+                '\d{4}(-\d{2}){0,2}', string)
+
+    def __contains_elliptical_alternatives(self, string):
+        return re.match(
+            '\d{4}(-\d{2}){0,2}' \
+                '( ?/ ?| [\(\[]| [\(\[]?bzw\.? | [\(\[]?oder )' \
+                '\d{2}(-\d{2})?', string)
 
     def __is_simple_range(self, string):
         '''
