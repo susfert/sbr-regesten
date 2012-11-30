@@ -171,11 +171,7 @@ class Regest(models.Model):
             end = start
             self.__create_or_update_date(
                 start, end, start_offset=offset, end_offset=offset)
-            # Delete existing alt_dates for current regest to make
-            # sure we're not keeping old ones when updating regests in
-            # the admin interface
-            for alt_date in self.regestdate_set.filter(alt_date=True):
-                alt_date.delete()
+            self.__delete_existing_alt_dates()
             # Save alternative dates
             for alt_date in re.findall(
                 ' ?/ ?(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})', alt_dates):
@@ -202,11 +198,7 @@ class Regest(models.Model):
             end = start
             self.__create_or_update_date(
                 start, end, start_offset=offset, end_offset=offset)
-            # Delete existing alt_dates for current regest to make
-            # sure we're not keeping old ones when updating regests in
-            # the admin interface
-            for alt_date in self.regestdate_set.filter(alt_date=True):
-                alt_date.delete()
+            self.__delete_existing_alt_dates()
             # month different, no day:
             if re.match('\d{4}-\d{2} ?/ ?\d{2}([^\d-].*|)$', title):
                 for alt_date in re.findall(' ?/ ?(\d{2})', alt_dates):
@@ -347,6 +339,13 @@ class Regest(models.Model):
             # - Replace ' (' and ' [' with '-'
             title = re.sub(' [\(\[]', '-', title)
         return title
+
+    def __delete_existing_alt_dates(self):
+        # Delete existing alt_dates for current regest to make
+        # sure we're not keeping old ones when updating regests in
+        # the admin interface
+        for alt_date in self.regestdate_set.filter(alt_date=True):
+            alt_date.delete()
 
     def __extract_date(self, string):
         year, month, day = re.search(
