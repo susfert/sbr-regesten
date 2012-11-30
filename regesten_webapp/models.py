@@ -155,14 +155,7 @@ class Regest(models.Model):
                 '\d{4}(-\d{2}){0,2}[\)\]]?',
             self.title):
             # Extract offset
-            match = re.search(
-                '(?P<offset>ca\.|nach|kurz nach|post|um|vor)',
-                self.title
-                )
-            if match:
-                offset = match.group('offset')
-            else:
-                offset = ''
+            offset = self.__extract_offset()
             # Preprocessing for non-standard formatting
             # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
             #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
@@ -205,14 +198,7 @@ class Regest(models.Model):
             '\d{4}(-\d{2}| \[\d{2})?(-\d{2}| \[\d{2})? ?(/|bzw\.|oder) ?\d{2}(-\d{2})?\]?',
             self.title):
             # Extract offset
-            match = re.search(
-                '(?P<offset>ca\.|nach|kurz nach|post|um|vor)',
-                self.title
-                )
-            if match:
-                offset = match.group('offset')
-            else:
-                offset = ''
+            offset = self.__extract_offset()
             # Preprocessing for non-standard formatting
             # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
             #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
@@ -358,6 +344,11 @@ class Regest(models.Model):
           from May 10th to May 20th, 1419).
         '''
         return re.match('^\d{4}-\d{2}(-\d{2})? bis \d{2}(\D.*|)$', string)
+
+    def __extract_offset(self):
+        match = re.search(
+            '(?P<offset>ca\.|nach|kurz nach|post|um|vor)', self.title)
+        return match.group('offset') if match else ''
 
     def __extract_date(self, string):
         year, month, day = re.search(
