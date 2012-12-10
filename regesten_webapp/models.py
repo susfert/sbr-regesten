@@ -149,15 +149,18 @@ class Regest(models.Model):
         # 1500 (c) (15. Jh., Ende)
         # 1500 (e) (16. Jh., Anfang)
         """
-        # Custom logic for "simple alternatives"
-        if self.__contains_simple_alternatives(self.title):
+        if self.__contains_simple_additions(self.title):
+            dates = self.__extract_dates(
+                RegestTitleType.SIMPLE_ADDITIONS)
+        elif self.__contains_elliptical_additions(self.title):
+            dates = self.__extract_dates(
+                RegestTitleType.ELLIPTICAL_ADDITIONS)
+        elif self.__contains_simple_alternatives(self.title):
             dates = self.__extract_dates(
                 RegestTitleType.SIMPLE_ALTERNATIVES)
-            self.__delete_existing_alt_dates()
         elif self.__contains_elliptical_alternatives(self.title):
             dates = self.__extract_dates(
                 RegestTitleType.ELLIPTICAL_ALTERNATIVES)
-            self.__delete_existing_alt_dates()
         elif self.__is_simple_range(self.title):
             dates = self.__extract_dates(
                 RegestTitleType.SIMPLE_RANGE)
@@ -167,9 +170,22 @@ class Regest(models.Model):
         else:
             dates = self.__extract_dates(
                 RegestTitleType.REGULAR)
+        self.__delete_existing_dates()
         for start, end, start_offset, end_offset, alt_date in dates:
             self.__create_or_update_date(
                 start, end, start_offset, end_offset, alt_date)
+
+    def __contains_simple_additions(self, string):
+        return re.match(
+            '\d{4}(-\d{2}){0,2}' \
+                ' [\(\[]?und ' \
+                '\d{4}(-\d{2}){0,2}', string)
+
+    def __contains_elliptical_additions(self, string):
+        return re.match(
+            '\d{4}(-\d{2}){0,2}' \
+                ' [\(\[]?und ' \
+                '\d{2}(-\d{2})?', string)
 
     def __contains_simple_alternatives(self, string):
         return re.match(
@@ -305,6 +321,53 @@ class Regest(models.Model):
                     start = date(start.year, int(alt_month), int(alt_day))
                     dates.append((start, start, offset, offset, True))
             return dates
+        elif title_type == RegestTitleType.SIMPLE_ADDITIONS:
+            offset = self.__extract_offset()
+            title = self.__remove_non_standard_formatting(title_type)
+            main_date, alt_dates = re.search(
+                '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
+                    '(?P<alt_dates>' \
+                    '( ?und ?\d{4}-\d{2}-\d{2})+|' \
+                    '( ?und ?\d{4}-\d{2})+|' \
+                    '( ?und ?\d{4})+)',
+                title).group('main_date', 'alt_dates')
+            start = self.__extract_date(main_date)
+            dates = [(start, start, offset, offset, False)]
+            for alt_date in re.findall(
+                ' ?und ?(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})', alt_dates):
+                start = self.__extract_date(alt_date)
+                dates.append((start, start, offset, offset, False))
+            return dates
+        elif title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
+            offset = self.__extract_offset()
+            title = self.__remove_non_standard_formatting(title_type)
+            main_date, alt_dates = re.search(
+                '(?P<main_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
+                    '(?P<alt_dates>' \
+                    '( ?und ?\d{2}-\d{2})+|' \
+                    '( ?und ?\d{2})+)',
+                title).group('main_date', 'alt_dates')
+            start = self.__extract_date(main_date)
+            dates = [(start, start, offset, offset, False)]
+            # month different, no day:
+            if re.match('\d{4}-\d{2} ?und ?\d{2}([^\d-].*|)$', title):
+                for alt_date in re.findall(' ?und ?(\d{2})', alt_dates):
+                    start = date(start.year, int(alt_date), DAY_DEFAULT)
+                    dates.append((start, start, offset, offset, False))
+            # day different:
+            elif re.match('\d{4}-\d{2}-\d{2} ?und ?\d{2}([^\d-].*|)$', title):
+                for alt_date in re.findall(' ?und ?(\d{2})', alt_dates):
+                    start = date(start.year, start.month, int(alt_date))
+                    dates.append((start, start, offset, offset, False))
+            # month *and* day different:
+            elif re.match('\d{4}-\d{2}-\d{2} ?und ?\d{2}-\d{2}', title):
+                for alt_date in re.findall(' ?und ?(\d{2}-\d{2})', alt_dates):
+                    alt_month, alt_day = re.search(
+                        '(?P<alt_month>\d{2})-(?P<alt_day>\d{2})',
+                        alt_date).group('alt_month', 'alt_day')
+                    start = date(start.year, int(alt_month), int(alt_day))
+                    dates.append((start, start, offset, offset, False))
+            return dates
 
     def __extract_offset(self):
         match = re.search(
@@ -325,14 +388,18 @@ class Regest(models.Model):
         elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES:
             # - Replace ' (' and ' [' with '-'
             title = re.sub(' [\(\[]', '-', title)
+        elif title_type == RegestTitleType.SIMPLE_ADDITIONS or \
+                title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
+            # - Remove '(' and '['
+            title = re.sub('[\(\[]', '', title)
         return title
 
-    def __delete_existing_alt_dates(self):
-        # Delete existing alt_dates for current regest to make
-        # sure we're not keeping old ones when updating regests in
-        # the admin interface
-        for alt_date in self.regestdate_set.filter(alt_date=True):
-            alt_date.delete()
+    def __delete_existing_dates(self):
+        # Delete existing dates for current regest to make sure we're
+        # not keeping old ones when updating regests in the admin
+        # interface
+        for regest_date in self.regestdate_set.all():
+            regest_date.delete()
 
     def __extract_date(self, string):
         year, month, day = re.search(
@@ -390,29 +457,11 @@ class Regest(models.Model):
         return start_offset, end_offset
 
     def __create_or_update_date(
-        # if not alt_date: keep current logic (check for existing date
-        # first, update if it exists, create if it doesn't')
-        # if alt_date: don't ask any questions, just create it
         self, start, end, start_offset='', end_offset='', alt_date=False):
-        if not alt_date:
-            if RegestDate.objects.filter(
-                regest=self, alt_date=False).exists():
-                regest_date = RegestDate.objects.get(
-                    regest=self, alt_date=False)
-                regest_date.start, regest_date.end = start, end
-                regest_date.start_offset = start_offset
-                regest_date.end_offset = end_offset
-                regest_date.save()
-            else:
-                regest_date = RegestDate.objects.create(
-                    regest=self, start=start, end=end,
-                    start_offset=start_offset, end_offset=end_offset,
-                    alt_date=False)
-        else:
-            regest_date = RegestDate.objects.create(
-                regest=self, start=start, end=end,
-                start_offset=start_offset, end_offset=end_offset,
-                alt_date=True)
+        regest_date = RegestDate.objects.create(
+            regest=self, start=start, end=end,
+            start_offset=start_offset, end_offset=end_offset,
+            alt_date=alt_date)
         return regest_date
 
 

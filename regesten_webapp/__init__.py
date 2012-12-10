@@ -9,6 +9,8 @@ class RegestTitleType(object):
     ELLIPTICAL_RANGE = 'elliptical range'
     SIMPLE_ALTERNATIVES = 'simple alternatives'
     ELLIPTICAL_ALTERNATIVES = 'elliptical alternatives'
+    SIMPLE_ADDITIONS = 'simple additions'
+    ELLIPTICAL_ADDITIONS = 'elliptical additions'
 
 AUTHORS = (
     ('Ed', 'Irmtraut Eder-Stein, Koblenz'),
