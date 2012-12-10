@@ -18,11 +18,6 @@ class RegestTest(TestCase):
             regest=regest, start=start, end=end,
             start_offset=start_offset, end_offset=end_offset,
             alt_date=alt_date)
-        self.assertEqual(regest_date.start, start)
-        self.assertEqual(regest_date.end, end)
-        self.assertEqual(regest_date.start_offset, start_offset)
-        self.assertEqual(regest_date.end_offset, end_offset)
-        self.assertEqual(regest_date.alt_date, alt_date)
 
     def test_regular_dates(self):
         '''
