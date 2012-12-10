@@ -14,10 +14,15 @@ from regesten_webapp.models import Regest
 class RegestTest(TestCase):
     def __check_date(
         self, regest, start, end, start_offset, end_offset, alt_date=False):
-        regest_date = regest.regestdate_set.get(
-            regest=regest, start=start, end=end,
-            start_offset=start_offset, end_offset=end_offset,
-            alt_date=alt_date)
+        try:
+            regest.regestdate_set.get(
+                regest=regest, start=start, end=end,
+                start_offset=start_offset, end_offset=end_offset,
+                alt_date=alt_date)
+        except Exception as e:
+            self.fail(
+                msg='\nRegest title: {0}\nException: {1}'.format(
+                    regest.title, e.message))
 
     def test_regular_dates(self):
         '''
