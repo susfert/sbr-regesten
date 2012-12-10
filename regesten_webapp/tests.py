@@ -16,7 +16,7 @@ class RegestTest(TestCase):
         self, regest, start, end, start_offset, end_offset, alt_date=False):
         try:
             regest.regestdate_set.get(
-                regest=regest, start=start, end=end,
+                start=start, end=end,
                 start_offset=start_offset, end_offset=end_offset,
                 alt_date=alt_date)
         except Exception as e:
