@@ -13,14 +13,16 @@ from regesten_webapp.models import Regest
 
 class RegestTest(TestCase):
     def __check_date(
-        self, regest, start, end, start_offset, end_offset):
+        self, regest, start, end, start_offset, end_offset, alt_date=False):
         regest_date = regest.regestdate_set.get(
             regest=regest, start=start, end=end,
-            start_offset=start_offset, end_offset=end_offset)
+            start_offset=start_offset, end_offset=end_offset,
+            alt_date=alt_date)
         self.assertEqual(regest_date.start, start)
         self.assertEqual(regest_date.end, end)
         self.assertEqual(regest_date.start_offset, start_offset)
         self.assertEqual(regest_date.end_offset, end_offset)
+        self.assertEqual(regest_date.alt_date, alt_date)
 
     def test_regular_dates(self):
         '''
@@ -473,7 +475,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1524 / 1525')
         self.__check_date(
@@ -481,7 +483,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1419-05/1419-06')
         self.__check_date(
@@ -489,7 +491,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1419-05 / 1419-06')
         self.__check_date(
@@ -497,7 +499,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1421-10-05/1422-10-04')
         self.__check_date(
@@ -505,7 +507,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1421-10-05 / 1422-10-04')
         self.__check_date(
@@ -513,7 +515,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502 (1503)')
         self.__check_date(
@@ -521,7 +523,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 01, 01), end=date(1503, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502-11 (1503-02)')
         self.__check_date(
@@ -529,7 +531,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 02, 01), end=date(1503, 02, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502-11-22 (1503-02-07)')
         self.__check_date(
@@ -537,7 +539,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 02, 07), end=date(1503, 02, 07),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 [bzw. 1519]')
         self.__check_date(
@@ -545,7 +547,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 [bzw. 1519-03]')
         self.__check_date(
@@ -553,7 +555,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 [bzw. 1519-03-06]')
         self.__check_date(
@@ -561,7 +563,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 bzw. 1519')
         self.__check_date(
@@ -569,7 +571,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 bzw. 1519-03')
         self.__check_date(
@@ -577,7 +579,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 bzw. 1519-03-06')
         self.__check_date(
@@ -585,7 +587,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 bzw. 1519 bzw. 1518')
         self.__check_date(
@@ -593,10 +595,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 01, 01), end=date(1518, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 bzw. 1519-03 bzw. 1518-04')
         self.__check_date(
@@ -604,10 +606,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 04, 01), end=date(1518, 04, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23')
         self.__check_date(
@@ -615,10 +617,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 04, 23), end=date(1518, 04, 23),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
 
     def test_simple_alternatives_with_location(self):
         '''
@@ -648,7 +650,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1524 / 1525 Frankfurt am Main')
         self.__check_date(
@@ -656,7 +658,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1419-05/1419-06 St. Arnual')
         self.__check_date(
@@ -664,7 +666,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1419-05 / 1419-06 Diedenhofen')
         self.__check_date(
@@ -672,7 +674,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1421-10-05/1422-10-04 Frankfurt am Main')
         self.__check_date(
@@ -680,7 +682,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1421-10-05 / 1422-10-04 St. Arnual')
         self.__check_date(
@@ -688,7 +690,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502 (1503) Diedenhofen')
         self.__check_date(
@@ -696,7 +698,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 01, 01), end=date(1503, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502-11 (1503-02) Frankfurt am Main')
         self.__check_date(
@@ -704,7 +706,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 02, 01), end=date(1503, 02, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502-11-22 (1503-02-07) St. Arnual')
         self.__check_date(
@@ -712,7 +714,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 02, 07), end=date(1503, 02, 07),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 [bzw. 1519] Diedenhofen')
         self.__check_date(
@@ -720,7 +722,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 [bzw. 1519-03] Frankfurt am Main')
         self.__check_date(
@@ -728,7 +730,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 [bzw. 1519-03-06] St. Arnual')
         self.__check_date(
@@ -736,7 +738,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 bzw. 1519 Diedenhofen')
         self.__check_date(
@@ -744,7 +746,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 bzw. 1519-03 Frankfurt am Main')
         self.__check_date(
@@ -752,7 +754,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 bzw. 1519-03-06 St. Arnual')
         self.__check_date(
@@ -760,7 +762,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 bzw. 1519 bzw. 1518 Diedenhofen')
         self.__check_date(
@@ -768,10 +770,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 01, 01), end=date(1518, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 bzw. 1519-03 bzw. 1518-04 Frankfurt am Main')
         self.__check_date(
@@ -779,10 +781,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 04, 01), end=date(1518, 04, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 St. Arnual')
         self.__check_date(
@@ -790,10 +792,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 04, 23), end=date(1518, 04, 23),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
 
     def test_simple_alternatives_with_duplicates(self):
         '''
@@ -823,7 +825,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1524 / 1525 (b)')
         self.__check_date(
@@ -831,7 +833,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1419-05/1419-06 (c)')
         self.__check_date(
@@ -839,7 +841,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1419-05 / 1419-06 (a)')
         self.__check_date(
@@ -847,7 +849,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1421-10-05/1422-10-04 (b)')
         self.__check_date(
@@ -855,7 +857,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1421-10-05 / 1422-10-04 (c)')
         self.__check_date(
@@ -863,7 +865,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502 (1503) (a)')
         self.__check_date(
@@ -871,7 +873,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 01, 01), end=date(1503, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502-11 (1503-02) (b)')
         self.__check_date(
@@ -879,7 +881,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 02, 01), end=date(1503, 02, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502-11-22 (1503-02-07) (c)')
         self.__check_date(
@@ -887,7 +889,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 02, 07), end=date(1503, 02, 07),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 [bzw. 1519] (a)')
         self.__check_date(
@@ -895,7 +897,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 [bzw. 1519-03] (b)')
         self.__check_date(
@@ -903,7 +905,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 [bzw. 1519-03-06] (c)')
         self.__check_date(
@@ -911,7 +913,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 bzw. 1519 (a)')
         self.__check_date(
@@ -919,7 +921,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 bzw. 1519-03 (b)')
         self.__check_date(
@@ -927,7 +929,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 bzw. 1519-03-06 (c)')
         self.__check_date(
@@ -935,7 +937,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 bzw. 1519 bzw. 1518 (a)')
         self.__check_date(
@@ -943,10 +945,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 01, 01), end=date(1518, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 bzw. 1519-03 bzw. 1518-04 (b)')
         self.__check_date(
@@ -954,10 +956,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 04, 01), end=date(1518, 04, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 (c)')
         self.__check_date(
@@ -965,10 +967,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 04, 23), end=date(1518, 04, 23),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
 
     def test_simple_alternatives_with_duplicates_and_location(self):
         '''
@@ -998,7 +1000,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1524 / 1525 (b) Frankfurt am Main')
         self.__check_date(
@@ -1006,7 +1008,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1419-05/1419-06 (c) St. Arnual')
         self.__check_date(
@@ -1014,7 +1016,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1419-05 / 1419-06 (a) Diedenhofen')
         self.__check_date(
@@ -1022,7 +1024,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1421-10-05/1422-10-04 (b) Frankfurt am Main')
         self.__check_date(
@@ -1030,7 +1032,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1421-10-05 / 1422-10-04 (c) St. Arnual')
         self.__check_date(
@@ -1038,7 +1040,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502 (1503) (a) Diedenhofen')
         self.__check_date(
@@ -1046,7 +1048,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 01, 01), end=date(1503, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502-11 (1503-02) (b) Frankfurt am Main')
         self.__check_date(
@@ -1054,7 +1056,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 02, 01), end=date(1503, 02, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1502-11-22 (1503-02-07) (c) St. Arnual')
         self.__check_date(
@@ -1062,7 +1064,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1503, 02, 07), end=date(1503, 02, 07),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 [bzw. 1519] (a) Diedenhofen')
         self.__check_date(
@@ -1070,7 +1072,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 [bzw. 1519-03] (b) Frankfurt am Main')
         self.__check_date(
@@ -1078,7 +1080,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 [bzw. 1519-03-06] (c) St. Arnual')
         self.__check_date(
@@ -1086,7 +1088,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 bzw. 1519 (a) Diedenhofen')
         self.__check_date(
@@ -1094,7 +1096,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 bzw. 1519-03 (b) Frankfurt am Main')
         self.__check_date(
@@ -1102,7 +1104,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 bzw. 1519-03-06 (c) St. Arnual')
         self.__check_date(
@@ -1110,7 +1112,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520 bzw. 1519 bzw. 1518 (a) Diedenhofen')
         self.__check_date(
@@ -1118,10 +1120,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 01, 01), end=date(1518, 01, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 bzw. 1519-03 bzw. 1518-04 (b) Frankfurt am Main')
         self.__check_date(
@@ -1129,10 +1131,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 04, 01), end=date(1518, 04, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 (c) St. Arnual')
         self.__check_date(
@@ -1140,10 +1142,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 04, 23), end=date(1518, 04, 23),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
 
     def test_simple_alternatives_with_offset(self):
         '''
@@ -1173,7 +1175,7 @@ class RegestTest(TestCase):
             start_offset='vor', end_offset='vor')
         self.__check_date(
             regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
-            start_offset='vor', end_offset='vor')
+            start_offset='vor', end_offset='vor', alt_date=True)
         regest = Regest.objects.create(
             title='1524 / 1525 (nach)')
         self.__check_date(
@@ -1181,7 +1183,7 @@ class RegestTest(TestCase):
             start_offset='nach', end_offset='nach')
         self.__check_date(
             regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
-            start_offset='nach', end_offset='nach')
+            start_offset='nach', end_offset='nach', alt_date=True)
         regest = Regest.objects.create(
             title='1419-05/1419-06 (um)')
         self.__check_date(
@@ -1189,7 +1191,7 @@ class RegestTest(TestCase):
             start_offset='um', end_offset='um')
         self.__check_date(
             regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
-            start_offset='um', end_offset='um')
+            start_offset='um', end_offset='um', alt_date=True)
         regest = Regest.objects.create(
             title='1419-05 / 1419-06 (ca.)')
         self.__check_date(
@@ -1197,7 +1199,7 @@ class RegestTest(TestCase):
             start_offset='ca.', end_offset='ca.')
         self.__check_date(
             regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='ca.', end_offset='ca.', alt_date=True)
         regest = Regest.objects.create(
             title='1421-10-05/1422-10-04 (kurz nach)')
         self.__check_date(
@@ -1205,7 +1207,7 @@ class RegestTest(TestCase):
             start_offset='kurz nach', end_offset='kurz nach')
         self.__check_date(
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=True)
         regest = Regest.objects.create(
             title='1421-10-05 / 1422-10-04 (post)')
         self.__check_date(
@@ -1213,7 +1215,7 @@ class RegestTest(TestCase):
             start_offset='post', end_offset='post')
         self.__check_date(
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
-            start_offset='post', end_offset='post')
+            start_offset='post', end_offset='post', alt_date=True)
         regest = Regest.objects.create(
             title='1502 (1503) (vor)')
         self.__check_date(
@@ -1221,7 +1223,7 @@ class RegestTest(TestCase):
             start_offset='vor', end_offset='vor')
         self.__check_date(
             regest, start=date(1503, 01, 01), end=date(1503, 01, 01),
-            start_offset='vor', end_offset='vor')
+            start_offset='vor', end_offset='vor', alt_date=True)
         regest = Regest.objects.create(
             title='1502-11 (1503-02) (nach)')
         self.__check_date(
@@ -1229,7 +1231,7 @@ class RegestTest(TestCase):
             start_offset='nach', end_offset='nach')
         self.__check_date(
             regest, start=date(1503, 02, 01), end=date(1503, 02, 01),
-            start_offset='nach', end_offset='nach')
+            start_offset='nach', end_offset='nach', alt_date=True)
         regest = Regest.objects.create(
             title='1502-11-22 (1503-02-07) (um)')
         self.__check_date(
@@ -1237,7 +1239,7 @@ class RegestTest(TestCase):
             start_offset='um', end_offset='um')
         self.__check_date(
             regest, start=date(1503, 02, 07), end=date(1503, 02, 07),
-            start_offset='um', end_offset='um')
+            start_offset='um', end_offset='um', alt_date=True)
         regest = Regest.objects.create(
             title='1520 [bzw. 1519] (ca.)')
         self.__check_date(
@@ -1245,7 +1247,7 @@ class RegestTest(TestCase):
             start_offset='ca.', end_offset='ca.')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='ca.', end_offset='ca.', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 [bzw. 1519-03] (kurz nach)')
         self.__check_date(
@@ -1253,7 +1255,7 @@ class RegestTest(TestCase):
             start_offset='kurz nach', end_offset='kurz nach')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 [bzw. 1519-03-06] (post)')
         self.__check_date(
@@ -1261,7 +1263,7 @@ class RegestTest(TestCase):
             start_offset='post', end_offset='post')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='post', end_offset='post')
+            start_offset='post', end_offset='post', alt_date=True)
         regest = Regest.objects.create(
             title='1520 bzw. 1519 (um)')
         self.__check_date(
@@ -1269,7 +1271,7 @@ class RegestTest(TestCase):
             start_offset='um', end_offset='um')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='um', end_offset='um')
+            start_offset='um', end_offset='um', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 bzw. 1519-03 (ca.)')
         self.__check_date(
@@ -1277,7 +1279,7 @@ class RegestTest(TestCase):
             start_offset='ca.', end_offset='ca.')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='ca.', end_offset='ca.', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 bzw. 1519-03-06 (kurz nach)')
         self.__check_date(
@@ -1285,7 +1287,7 @@ class RegestTest(TestCase):
             start_offset='kurz nach', end_offset='kurz nach')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=True)
         regest = Regest.objects.create(
             title='1520 bzw. 1519 bzw. 1518 (um)')
         self.__check_date(
@@ -1293,10 +1295,10 @@ class RegestTest(TestCase):
             start_offset='um', end_offset='um')
         self.__check_date(
             regest, start=date(1519, 01, 01), end=date(1519, 01, 01),
-            start_offset='um', end_offset='um')
+            start_offset='um', end_offset='um', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 01, 01), end=date(1518, 01, 01),
-            start_offset='um', end_offset='um')
+            start_offset='um', end_offset='um', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02 bzw. 1519-03 bzw. 1518-04 (ca.)')
         self.__check_date(
@@ -1304,10 +1306,10 @@ class RegestTest(TestCase):
             start_offset='ca.', end_offset='ca.')
         self.__check_date(
             regest, start=date(1519, 03, 01), end=date(1519, 03, 01),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='ca.', end_offset='ca.', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 04, 01), end=date(1518, 04, 01),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='ca.', end_offset='ca.', alt_date=True)
         regest = Regest.objects.create(
             title='1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 (kurz nach)')
         self.__check_date(
@@ -1315,10 +1317,10 @@ class RegestTest(TestCase):
             start_offset='kurz nach', end_offset='kurz nach')
         self.__check_date(
             regest, start=date(1519, 03, 06), end=date(1519, 03, 06),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=True)
         self.__check_date(
             regest, start=date(1518, 04, 23), end=date(1518, 04, 23),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=True)
 
     def test_elliptical_alternatives(self):
         '''
@@ -1355,7 +1357,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04 / 05')
         self.__check_date(
@@ -1363,7 +1365,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1440-11-12/17')
         self.__check_date(
@@ -1371,7 +1373,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1440-11-12 / 17')
         self.__check_date(
@@ -1379,7 +1381,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04-27/05-28')
         self.__check_date(
@@ -1387,7 +1389,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04-27 / 05-28')
         self.__check_date(
@@ -1395,7 +1397,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04/05]')
         self.__check_date(
@@ -1403,7 +1405,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04 / 05]')
         self.__check_date(
@@ -1411,7 +1413,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466-04 [28/29]')
         self.__check_date(
@@ -1419,7 +1421,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466-04 [28 / 29]')
         self.__check_date(
@@ -1427,7 +1429,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04-28/05-01]')
         self.__check_date(
@@ -1435,7 +1437,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04-28/05-01]')
         self.__check_date(
@@ -1443,7 +1445,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05 bzw. 11')
         self.__check_date(
@@ -1451,7 +1453,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 10')
         self.__check_date(
@@ -1459,7 +1461,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10')
         self.__check_date(
@@ -1467,7 +1469,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05 bzw. 11 bzw. 12')
         self.__check_date(
@@ -1475,10 +1477,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 10 bzw. 01')
         self.__check_date(
@@ -1486,10 +1488,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 05, 01), end=date(1506, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10 bzw. 12-01')
         self.__check_date(
@@ -1497,10 +1499,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04 oder 05')
         self.__check_date(
@@ -1508,7 +1510,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 05, 01), end=date(1343, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04-12 oder 19')
         self.__check_date(
@@ -1516,7 +1518,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 04, 19), end=date(1343, 04, 19),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04-12 oder 05-19')
         self.__check_date(
@@ -1524,7 +1526,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 05, 19), end=date(1343, 05, 19),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
 
     def test_elliptical_alternatives_with_location(self):
         '''
@@ -1561,7 +1563,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04 / 05 Frankfurt am Main')
         self.__check_date(
@@ -1569,7 +1571,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1440-11-12/17 St. Arnual')
         self.__check_date(
@@ -1577,7 +1579,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1440-11-12 / 17 Diedenhofen')
         self.__check_date(
@@ -1585,7 +1587,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04-27/05-28 Frankfurt am Main')
         self.__check_date(
@@ -1593,7 +1595,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04-27 / 05-28 St. Arnual')
         self.__check_date(
@@ -1601,7 +1603,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04/05] Diedenhofen')
         self.__check_date(
@@ -1609,7 +1611,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04 / 05] Frankfurt am Main')
         self.__check_date(
@@ -1617,7 +1619,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466-04 [28/29] St. Arnual')
         self.__check_date(
@@ -1625,7 +1627,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466-04 [28 / 29] Diedenhofen')
         self.__check_date(
@@ -1633,7 +1635,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04-28/05-01] Frankfurt am Main')
         self.__check_date(
@@ -1641,7 +1643,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04-28/05-01] St. Arnual')
         self.__check_date(
@@ -1649,7 +1651,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05 bzw. 11 Diedenhofen')
         self.__check_date(
@@ -1657,7 +1659,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 10 Frankfurt am Main')
         self.__check_date(
@@ -1665,7 +1667,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10 St. Arnual')
         self.__check_date(
@@ -1673,7 +1675,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05 bzw. 11 bzw. 12 Diedenhofen')
         self.__check_date(
@@ -1681,10 +1683,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 10 bzw. 01 Frankfurt am Main')
         self.__check_date(
@@ -1692,10 +1694,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 05, 01), end=date(1506, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10 bzw. 12-01 St. Arnual')
         self.__check_date(
@@ -1703,10 +1705,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04 oder 05 Diedenhofen')
         self.__check_date(
@@ -1714,7 +1716,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 05, 01), end=date(1343, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04-12 oder 19 Frankfurt am Main')
         self.__check_date(
@@ -1722,7 +1724,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 04, 19), end=date(1343, 04, 19),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04-12 oder 05-19 St. Arnual')
         self.__check_date(
@@ -1730,7 +1732,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 05, 19), end=date(1343, 05, 19),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
 
     def test_elliptical_alternatives_with_duplicates(self):
         '''
@@ -1767,7 +1769,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04 / 05 (b)')
         self.__check_date(
@@ -1775,7 +1777,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1440-11-12/17 (c)')
         self.__check_date(
@@ -1783,7 +1785,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1440-11-12 / 17 (a)')
         self.__check_date(
@@ -1791,7 +1793,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04-27/05-28 (b)')
         self.__check_date(
@@ -1799,7 +1801,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04-27 / 05-28 (c)')
         self.__check_date(
@@ -1807,7 +1809,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04/05] (a)')
         self.__check_date(
@@ -1815,7 +1817,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04 / 05] (b)')
         self.__check_date(
@@ -1823,7 +1825,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466-04 [28/29] (c)')
         self.__check_date(
@@ -1831,7 +1833,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466-04 [28 / 29] (a)')
         self.__check_date(
@@ -1839,7 +1841,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04-28/05-01] (b)')
         self.__check_date(
@@ -1847,7 +1849,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04-28/05-01] (c)')
         self.__check_date(
@@ -1855,7 +1857,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05 bzw. 11 (a)')
         self.__check_date(
@@ -1863,7 +1865,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 10 (b)')
         self.__check_date(
@@ -1871,7 +1873,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10 (c)')
         self.__check_date(
@@ -1879,7 +1881,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05 bzw. 11 bzw. 12 (a)')
         self.__check_date(
@@ -1887,10 +1889,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 10 bzw. 01 (b)')
         self.__check_date(
@@ -1898,10 +1900,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 05, 01), end=date(1506, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10 bzw. 12-01 (c)')
         self.__check_date(
@@ -1909,10 +1911,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04 oder 05 (a)')
         self.__check_date(
@@ -1920,7 +1922,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 05, 01), end=date(1343, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04-12 oder 19 (b)')
         self.__check_date(
@@ -1928,7 +1930,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 04, 19), end=date(1343, 04, 19),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04-12 oder 05-19 (c)')
         self.__check_date(
@@ -1936,7 +1938,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 05, 19), end=date(1343, 05, 19),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
 
     def test_elliptical_alternatives_with_duplicates_and_location(self):
         '''
@@ -1973,7 +1975,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04 / 05 (b) Frankfurt am Main')
         self.__check_date(
@@ -1981,7 +1983,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1440-11-12/17 (c) St. Arnual')
         self.__check_date(
@@ -1989,7 +1991,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1440-11-12 / 17 (a) Diedenhofen')
         self.__check_date(
@@ -1997,7 +1999,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04-27/05-28 (b) Frankfurt am Main')
         self.__check_date(
@@ -2005,7 +2007,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04-27 / 05-28 (c) St. Arnual')
         self.__check_date(
@@ -2013,7 +2015,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04/05] (a) Diedenhofen')
         self.__check_date(
@@ -2021,7 +2023,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04 / 05] (b) Frankfurt am Main')
         self.__check_date(
@@ -2029,7 +2031,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466-04 [28/29] (c) St. Arnual')
         self.__check_date(
@@ -2037,7 +2039,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466-04 [28 / 29] (a) Diedenhofen')
         self.__check_date(
@@ -2045,7 +2047,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04-28/05-01] (b) Frankfurt am Main')
         self.__check_date(
@@ -2053,7 +2055,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04-28/05-01] (c) St. Arnual')
         self.__check_date(
@@ -2061,7 +2063,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05 bzw. 11 (a) Diedenhofen')
         self.__check_date(
@@ -2069,7 +2071,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 10 (b) Frankfurt am Main')
         self.__check_date(
@@ -2077,7 +2079,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10 (c) St. Arnual')
         self.__check_date(
@@ -2085,7 +2087,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05 bzw. 11 bzw. 12 (a) Diedenhofen')
         self.__check_date(
@@ -2093,10 +2095,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 10 bzw. 01 (b) Frankfurt am Main')
         self.__check_date(
@@ -2104,10 +2106,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 05, 01), end=date(1506, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10 bzw. 12-01 (c) St. Arnual')
         self.__check_date(
@@ -2115,10 +2117,10 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04 oder 05 (a) Diedenhofen')
         self.__check_date(
@@ -2126,7 +2128,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 05, 01), end=date(1343, 05, 01),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04-12 oder 19 (b) Frankfurt am Main')
         self.__check_date(
@@ -2134,7 +2136,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 04, 19), end=date(1343, 04, 19),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04-12 oder 05-19 (c) St. Arnual')
         self.__check_date(
@@ -2142,7 +2144,7 @@ class RegestTest(TestCase):
             start_offset='', end_offset='')
         self.__check_date(
             regest, start=date(1343, 05, 19), end=date(1343, 05, 19),
-            start_offset='', end_offset='')
+            start_offset='', end_offset='', alt_date=True)
 
     def test_elliptical_alternatives_with_offset(self):
         '''
@@ -2179,7 +2181,7 @@ class RegestTest(TestCase):
             start_offset='vor', end_offset='vor')
         self.__check_date(
             regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
-            start_offset='vor', end_offset='vor')
+            start_offset='vor', end_offset='vor', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04 / 05 (nach)')
         self.__check_date(
@@ -2187,7 +2189,7 @@ class RegestTest(TestCase):
             start_offset='nach', end_offset='nach')
         self.__check_date(
             regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
-            start_offset='nach', end_offset='nach')
+            start_offset='nach', end_offset='nach', alt_date=True)
         regest = Regest.objects.create(
             title='1440-11-12/17 (um)')
         self.__check_date(
@@ -2195,7 +2197,7 @@ class RegestTest(TestCase):
             start_offset='um', end_offset='um')
         self.__check_date(
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
-            start_offset='um', end_offset='um')
+            start_offset='um', end_offset='um', alt_date=True)
         regest = Regest.objects.create(
             title='1440-11-12 / 17 (ca.)')
         self.__check_date(
@@ -2203,7 +2205,7 @@ class RegestTest(TestCase):
             start_offset='ca.', end_offset='ca.')
         self.__check_date(
             regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='ca.', end_offset='ca.', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04-27/05-28 (kurz nach)')
         self.__check_date(
@@ -2211,7 +2213,7 @@ class RegestTest(TestCase):
             start_offset='kurz nach', end_offset='kurz nach')
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=True)
         regest = Regest.objects.create(
             title='1270-04-27 / 05-28 (post)')
         self.__check_date(
@@ -2219,7 +2221,7 @@ class RegestTest(TestCase):
             start_offset='post', end_offset='post')
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
-            start_offset='post', end_offset='post')
+            start_offset='post', end_offset='post', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04/05] (vor)')
         self.__check_date(
@@ -2227,7 +2229,7 @@ class RegestTest(TestCase):
             start_offset='vor', end_offset='vor')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='vor', end_offset='vor')
+            start_offset='vor', end_offset='vor', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04 / 05] (nach)')
         self.__check_date(
@@ -2235,7 +2237,7 @@ class RegestTest(TestCase):
             start_offset='nach', end_offset='nach')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='nach', end_offset='nach')
+            start_offset='nach', end_offset='nach', alt_date=True)
         regest = Regest.objects.create(
             title='1466-04 [28/29] (um)')
         self.__check_date(
@@ -2243,7 +2245,7 @@ class RegestTest(TestCase):
             start_offset='um', end_offset='um')
         self.__check_date(
             regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
-            start_offset='um', end_offset='um')
+            start_offset='um', end_offset='um', alt_date=True)
         regest = Regest.objects.create(
             title='1466-04 [28 / 29] (ca.)')
         self.__check_date(
@@ -2251,7 +2253,7 @@ class RegestTest(TestCase):
             start_offset='ca.', end_offset='ca.')
         self.__check_date(
             regest, start=date(1466, 04, 29), end=date(1466, 04, 29),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='ca.', end_offset='ca.', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04-28/05-01] (kurz nach)')
         self.__check_date(
@@ -2259,7 +2261,7 @@ class RegestTest(TestCase):
             start_offset='kurz nach', end_offset='kurz nach')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=True)
         regest = Regest.objects.create(
             title='1466 [04-28/05-01] (post)')
         self.__check_date(
@@ -2267,7 +2269,7 @@ class RegestTest(TestCase):
             start_offset='post', end_offset='post')
         self.__check_date(
             regest, start=date(1466, 05, 01), end=date(1466, 05, 01),
-            start_offset='post', end_offset='post')
+            start_offset='post', end_offset='post', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05 bzw. 11 (vor)')
         self.__check_date(
@@ -2275,7 +2277,7 @@ class RegestTest(TestCase):
             start_offset='vor', end_offset='vor')
         self.__check_date(
             regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
-            start_offset='vor', end_offset='vor')
+            start_offset='vor', end_offset='vor', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 10 (nach)')
         self.__check_date(
@@ -2283,7 +2285,7 @@ class RegestTest(TestCase):
             start_offset='nach', end_offset='nach')
         self.__check_date(
             regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
-            start_offset='nach', end_offset='nach')
+            start_offset='nach', end_offset='nach', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10 (um)')
         self.__check_date(
@@ -2291,7 +2293,7 @@ class RegestTest(TestCase):
             start_offset='um', end_offset='um')
         self.__check_date(
             regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
-            start_offset='um', end_offset='um')
+            start_offset='um', end_offset='um', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05 bzw. 11 bzw. 12 (ca.)')
         self.__check_date(
@@ -2299,10 +2301,10 @@ class RegestTest(TestCase):
             start_offset='ca.', end_offset='ca.')
         self.__check_date(
             regest, start=date(1506, 11, 01), end=date(1506, 11, 01),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='ca.', end_offset='ca.', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='ca.', end_offset='ca.', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 10 bzw. 01 (kurz nach)')
         self.__check_date(
@@ -2310,10 +2312,10 @@ class RegestTest(TestCase):
             start_offset='kurz nach', end_offset='kurz nach')
         self.__check_date(
             regest, start=date(1506, 05, 10), end=date(1506, 05, 10),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 05, 01), end=date(1506, 05, 01),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=True)
         regest = Regest.objects.create(
             title='1506-05-12 bzw. 11-10 bzw. 12-01 (post)')
         self.__check_date(
@@ -2321,10 +2323,10 @@ class RegestTest(TestCase):
             start_offset='post', end_offset='post')
         self.__check_date(
             regest, start=date(1506, 11, 10), end=date(1506, 11, 10),
-            start_offset='post', end_offset='post')
+            start_offset='post', end_offset='post', alt_date=True)
         self.__check_date(
             regest, start=date(1506, 12, 01), end=date(1506, 12, 01),
-            start_offset='post', end_offset='post')
+            start_offset='post', end_offset='post', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04 oder 05 (um)')
         self.__check_date(
@@ -2332,7 +2334,7 @@ class RegestTest(TestCase):
             start_offset='um', end_offset='um')
         self.__check_date(
             regest, start=date(1343, 05, 01), end=date(1343, 05, 01),
-            start_offset='um', end_offset='um')
+            start_offset='um', end_offset='um', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04-12 oder 19 (ca.)')
         self.__check_date(
@@ -2340,7 +2342,7 @@ class RegestTest(TestCase):
             start_offset='ca.', end_offset='ca.')
         self.__check_date(
             regest, start=date(1343, 04, 19), end=date(1343, 04, 19),
-            start_offset='ca.', end_offset='ca.')
+            start_offset='ca.', end_offset='ca.', alt_date=True)
         regest = Regest.objects.create(
             title='1343-04-12 oder 05-19 (kurz nach)')
         self.__check_date(
@@ -2348,4 +2350,4 @@ class RegestTest(TestCase):
             start_offset='kurz nach', end_offset='kurz nach')
         self.__check_date(
             regest, start=date(1343, 05, 19), end=date(1343, 05, 19),
-            start_offset='kurz nach', end_offset='kurz nach')
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=True)
