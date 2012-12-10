@@ -1582,7 +1582,8 @@ class RegestTest(TestCase):
                 date(1270, 05, 01), date(1270, 05, 01), 'vor', 'vor', True))
         self.__create_and_check_dates(
             '1270-04 / 05 (nach)', self.RegestDate(
-                date(1270, 04, 01), date(1270, 04, 01), 'nach', 'nach', False),
+                date(1270, 04, 01), date(1270, 04, 01),
+                'nach', 'nach', False),
             self.RegestDate(
                 date(1270, 05, 01), date(1270, 05, 01), 'nach', 'nach', True))
         self.__create_and_check_dates(
@@ -1597,12 +1598,15 @@ class RegestTest(TestCase):
                 date(1440, 11, 17), date(1440, 11, 17), 'ca.', 'ca.', True))
         self.__create_and_check_dates(
             '1270-04-27/05-28 (kurz nach)', self.RegestDate(
-                date(1270, 04, 27), date(1270, 04, 27), 'kurz nach', 'kurz nach', False),
+                date(1270, 04, 27), date(1270, 04, 27),
+                'kurz nach', 'kurz nach', False),
             self.RegestDate(
-                date(1270, 05, 28), date(1270, 05, 28), 'kurz nach', 'kurz nach', True))
+                date(1270, 05, 28), date(1270, 05, 28),
+                'kurz nach', 'kurz nach', True))
         self.__create_and_check_dates(
             '1270-04-27 / 05-28 (post)', self.RegestDate(
-                date(1270, 04, 27), date(1270, 04, 27), 'post', 'post', False),
+                date(1270, 04, 27), date(1270, 04, 27),
+                'post', 'post', False),
             self.RegestDate(
                 date(1270, 05, 28), date(1270, 05, 28), 'post', 'post', True))
         self.__create_and_check_dates(
