@@ -2383,6 +2383,131 @@ class RegestTest(TestCase):
             regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
             start_offset='', end_offset='', alt_date=False)
 
+    def test_simple_additions_with_location(self):
+        '''
+        Examples:
+        - 1524 und 1525 Diedenhofen
+        - 1419-05 und 1419-06 Frankfurt am Main
+        - 1421-10-05 und 1422-10-04 St. Arnual
+        '''
+        regest = Regest.objects.create(title='1524 und 1525 Diedenhofen')
+        self.__check_date(
+            regest, start=date(1524, 01, 01), end=date(1524, 01, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1419-05 und 1419-06 Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1419, 05, 01), end=date(1419, 05, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1421-10-05 und 1422-10-04 St. Arnual')
+        self.__check_date(
+            regest, start=date(1421, 10, 05), end=date(1421, 10, 05),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
+            start_offset='', end_offset='', alt_date=False)
+
+    def test_simple_additions_with_duplicates(self):
+        '''
+        Examples:
+        - 1524 und 1525 (a)
+        - 1419-05 und 1419-06 (b)
+        - 1421-10-05 und 1422-10-04 (c)
+        '''
+        regest = Regest.objects.create(title='1524 und 1525 (a)')
+        self.__check_date(
+            regest, start=date(1524, 01, 01), end=date(1524, 01, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1419-05 und 1419-06 (b)')
+        self.__check_date(
+            regest, start=date(1419, 05, 01), end=date(1419, 05, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1421-10-05 und 1422-10-04 (c)')
+        self.__check_date(
+            regest, start=date(1421, 10, 05), end=date(1421, 10, 05),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
+            start_offset='', end_offset='', alt_date=False)
+
+    def test_simple_additions_with_duplicates_and_location(self):
+        '''
+        Examples:
+        - 1524 und 1525 (a) Diedenhofen
+        - 1419-05 und 1419-06 (b) Frankfurt am Main
+        - 1421-10-05 und 1422-10-04 (c) St. Arnual
+        '''
+        regest = Regest.objects.create(
+            title='1524 und 1525 (a) Diedenhofen')
+        self.__check_date(
+            regest, start=date(1524, 01, 01), end=date(1524, 01, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1419-05 und 1419-06 (b) Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1419, 05, 01), end=date(1419, 05, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1421-10-05 und 1422-10-04 (c) St. Arnual')
+        self.__check_date(
+            regest, start=date(1421, 10, 05), end=date(1421, 10, 05),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
+            start_offset='', end_offset='', alt_date=False)
+
+    def test_simple_additions_with_offset(self):
+        '''
+        Examples:
+        - 1524 und 1525 (um)
+        - 1419-05 und 1419-06 (ca.)
+        - 1421-10-05 und 1422-10-04 (kurz nach)
+        '''
+        regest = Regest.objects.create(title='1524 und 1525 (um)')
+        self.__check_date(
+            regest, start=date(1524, 01, 01), end=date(1524, 01, 01),
+            start_offset='um', end_offset='um')
+        self.__check_date(
+            regest, start=date(1525, 01, 01), end=date(1525, 01, 01),
+            start_offset='um', end_offset='um', alt_date=False)
+        regest = Regest.objects.create(
+            title='1419-05 und 1419-06 (ca.)')
+        self.__check_date(
+            regest, start=date(1419, 05, 01), end=date(1419, 05, 01),
+            start_offset='ca.', end_offset='ca.')
+        self.__check_date(
+            regest, start=date(1419, 06, 01), end=date(1419, 06, 01),
+            start_offset='ca.', end_offset='ca.', alt_date=False)
+        regest = Regest.objects.create(
+            title='1421-10-05 und 1422-10-04 (kurz nach)')
+        self.__check_date(
+            regest, start=date(1421, 10, 05), end=date(1421, 10, 05),
+            start_offset='kurz nach', end_offset='kurz nach')
+        self.__check_date(
+            regest, start=date(1422, 10, 04), end=date(1422, 10, 04),
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=False)
+
     def test_elliptical_additions(self):
         '''
         Examples:
@@ -2414,3 +2539,131 @@ class RegestTest(TestCase):
         self.__check_date(
             regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
             start_offset='', end_offset='', alt_date=False)
+
+    def test_elliptical_additions_with_location(self):
+        '''
+        Examples:
+        - 1270-04 und 05 Diedenhofen
+        - 1440-11-12 und 17 Frankfurt am Main
+        - 1270-04-27 und 05-28 St. Arnual
+        '''
+        regest = Regest.objects.create(
+            title='1270-04 und 05 Diedenhofen')
+        self.__check_date(
+            regest, start=date(1270, 04, 01), end=date(1270, 04, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1440-11-12 und 17 Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1440, 11, 12), end=date(1440, 11, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1270-04-27 und 05-28 St. Arnual')
+        self.__check_date(
+            regest, start=date(1270, 04, 27), end=date(1270, 04, 27),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
+            start_offset='', end_offset='', alt_date=False)
+
+    def test_elliptical_additions_with_duplicates(self):
+        '''
+        Examples:
+        - 1270-04 und 05 (a)
+        - 1440-11-12 und 17 (b)
+        - 1270-04-27 und 05-28 (c)
+        '''
+        regest = Regest.objects.create(
+            title='1270-04 und 05 (a)')
+        self.__check_date(
+            regest, start=date(1270, 04, 01), end=date(1270, 04, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1440-11-12 und 17 (b)')
+        self.__check_date(
+            regest, start=date(1440, 11, 12), end=date(1440, 11, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1270-04-27 und 05-28 (c)')
+        self.__check_date(
+            regest, start=date(1270, 04, 27), end=date(1270, 04, 27),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
+            start_offset='', end_offset='', alt_date=False)
+
+    def test_elliptical_additions_with_duplicates_and_location(self):
+        '''
+        Examples:
+        - 1270-04 und 05 (a) Diedenhofen
+        - 1440-11-12 und 17 (b) Frankfurt am Main
+        - 1270-04-27 und 05-28 (c) St. Arnual
+        '''
+        regest = Regest.objects.create(
+            title='1270-04 und 05 (a) Diedenhofen')
+        self.__check_date(
+            regest, start=date(1270, 04, 01), end=date(1270, 04, 01),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1440-11-12 und 17 (b) Frankfurt am Main')
+        self.__check_date(
+            regest, start=date(1440, 11, 12), end=date(1440, 11, 12),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
+            start_offset='', end_offset='', alt_date=False)
+        regest = Regest.objects.create(
+            title='1270-04-27 und 05-28 (c) St. Arnual')
+        self.__check_date(
+            regest, start=date(1270, 04, 27), end=date(1270, 04, 27),
+            start_offset='', end_offset='')
+        self.__check_date(
+            regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
+            start_offset='', end_offset='', alt_date=False)
+
+    def test_elliptical_additions_with_offset(self):
+        '''
+        Examples:
+        - 1270-04 und 05 (um)
+        - 1440-11-12 und 17 (ca.)
+        - 1270-04-27 und 05-28 (kurz nach)
+        '''
+        regest = Regest.objects.create(
+            title='1270-04 und 05 (um)')
+        self.__check_date(
+            regest, start=date(1270, 04, 01), end=date(1270, 04, 01),
+            start_offset='um', end_offset='um')
+        self.__check_date(
+            regest, start=date(1270, 05, 01), end=date(1270, 05, 01),
+            start_offset='um', end_offset='um', alt_date=False)
+        regest = Regest.objects.create(
+            title='1440-11-12 und 17 (ca.)')
+        self.__check_date(
+            regest, start=date(1440, 11, 12), end=date(1440, 11, 12),
+            start_offset='ca.', end_offset='ca.')
+        self.__check_date(
+            regest, start=date(1440, 11, 17), end=date(1440, 11, 17),
+            start_offset='ca.', end_offset='ca.', alt_date=False)
+        regest = Regest.objects.create(
+            title='1270-04-27 und 05-28 (kurz nach)')
+        self.__check_date(
+            regest, start=date(1270, 04, 27), end=date(1270, 04, 27),
+            start_offset='kurz nach', end_offset='kurz nach')
+        self.__check_date(
+            regest, start=date(1270, 05, 28), end=date(1270, 05, 28),
+            start_offset='kurz nach', end_offset='kurz nach', alt_date=False)
