@@ -174,7 +174,7 @@ class Regest(models.Model):
     def __contains_simple_alternatives(self, string):
         return re.match(
             '\d{4}(-\d{2}){0,2}' \
-                '( ?/ ?| [\(\]]| [\(\[]?bzw\.? | [\(\[]?oder )' \
+                '( ?/ ?| [\(\[]| [\(\[]?bzw\.? | [\(\[]?oder )' \
                 '\d{4}(-\d{2}){0,2}', string)
 
     def __contains_elliptical_alternatives(self, string):
