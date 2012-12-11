@@ -69,7 +69,7 @@ class RegestTitleAnalyzer(object):
           from May 10th to May 20th, 1419).
         '''
         return re.match('^\d{4}-\d{2}(-\d{2})?' \
-                            '( \(\D{2,}\))? bis \d{2}(\D.*|)$', string)
+                            '( \(\D{2,}\))? bis \d{2}(-\d{2})?', string)
 
 
 class RegestTitleParser(object):
@@ -99,10 +99,14 @@ class RegestTitleParser(object):
             start_offset, end_offset = cls.extract_offsets(title, title_type)
             start, end = re.search(
                 '(?P<start>\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
-                    '( \(\D{2,}\))? bis (?P<end>\d{2})',
+                    '( \(\D{2,}\))? bis (?P<end>\d{2}-\d{2}|\d{2})',
                 title).group('start', 'end')
             start = cls.extract_date(start)
-            if re.match('^\d{4}-\d{2}( \(\D{2,}\))? bis \d{2}', title):
+            if re.match(
+                '^\d{4}-\d{2}-\d{2}( \(\D{2,}\))? bis \d{2}-\d{2}', title):
+                end_month, end_day = re.split('-', end)
+                end = date(start.year, int(end_month), int(end_day))
+            elif re.match('^\d{4}-\d{2}( \(\D{2,}\))? bis \d{2}', title):
                 end = date(start.year, int(end), DAY_DEFAULT)
             elif re.match(
                 '^\d{4}-\d{2}-\d{2}( \(\D{2,}\))? bis \d{2}', title):
