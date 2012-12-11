@@ -68,7 +68,8 @@ class RegestTitleAnalyzer(object):
         - 1419-05-10 bis 20 (denotes a time span of ten days ranging
           from May 10th to May 20th, 1419).
         '''
-        return re.match('^\d{4}-\d{2}(-\d{2})? bis \d{2}(\D.*|)$', string)
+        return re.match('^\d{4}-\d{2}(-\d{2})?' \
+                            '( \(\D{2,}\))? bis \d{2}(\D.*|)$', string)
 
 
 class RegestTitleParser(object):
@@ -95,18 +96,19 @@ class RegestTitleParser(object):
             start_offset, end_offset = cls.determine_final_offsets(
                 start_offset, end_offset, title_type)
         elif title_type == RegestTitleType.ELLIPTICAL_RANGE:
-            offset = cls.extract_offsets(title, title_type)
+            start_offset, end_offset = cls.extract_offsets(title, title_type)
             start, end = re.search(
                 '(?P<start>\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
-                    ' bis (?P<end>\d{2})',
+                    '( \(\D{2,}\))? bis (?P<end>\d{2})',
                 title).group('start', 'end')
             start = cls.extract_date(start)
-            if re.match('^\d{4}-\d{2} bis \d{2}', title):
+            if re.match('^\d{4}-\d{2}( \(\D{2,}\))? bis \d{2}', title):
                 end = date(start.year, int(end), DAY_DEFAULT)
-            elif re.match('^\d{4}-\d{2}-\d{2} bis \d{2}', title):
+            elif re.match(
+                '^\d{4}-\d{2}-\d{2}( \(\D{2,}\))? bis \d{2}', title):
                 end = date(start.year, start.month, int(end))
             start_offset, end_offset = cls.determine_final_offsets(
-                offset, offset, title_type)
+                start_offset, end_offset, title_type)
         return [(start, end, start_offset, end_offset, False)]
 
     @classmethod
@@ -176,6 +178,17 @@ class RegestTitleParser(object):
                 '\(?(?P<start_offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
                     ' ?- ?' \
                     '(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
+                    ' ?(\([a-z]\)|[\w\. ]+)? ?' \
+                    '\(?(?P<end_offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
+                title)
+            return match.group('start_offset') or '', \
+                match.group('end_offset') or ''
+        elif title_type == RegestTitleType.ELLIPTICAL_RANGE:
+            match = re.search(
+                '\(?(?P<start_offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
+                    ' bis ' \
+                    '(\d{2}-\d{2}|\d{2})' \
                     ' ?(\([a-z]\)|[\w\. ]+)? ?' \
                     '\(?(?P<end_offset>' \
                     'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
