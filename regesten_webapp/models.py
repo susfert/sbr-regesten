@@ -172,8 +172,9 @@ class Regest(models.Model):
                 RegestTitleType.REGULAR)
         self.__delete_existing_dates()
         for start, end, start_offset, end_offset, alt_date in dates:
-            self.__create_or_update_date(
-                start, end, start_offset, end_offset, alt_date)
+            RegestDate.objects.create(
+                regest=self, start=start, end=end, start_offset=start_offset,
+                end_offset=end_offset, alt_date=alt_date)
 
     def __contains_simple_additions(self, string):
         return re.match(
@@ -455,14 +456,6 @@ class Regest(models.Model):
             else:
                 start_offset = end_offset
         return start_offset, end_offset
-
-    def __create_or_update_date(
-        self, start, end, start_offset='', end_offset='', alt_date=False):
-        regest_date = RegestDate.objects.create(
-            regest=self, start=start, end=end,
-            start_offset=start_offset, end_offset=end_offset,
-            alt_date=alt_date)
-        return regest_date
 
 
     def __unicode__(self):
