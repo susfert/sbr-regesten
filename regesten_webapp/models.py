@@ -245,7 +245,7 @@ class Regest(models.Model):
             start = self.__extract_date(start)
             end = self.__extract_date(end) if end else start
             start_offset, end_offset = self.__determine_offsets(
-                start_offset, end_offset)
+                start_offset, end_offset, title_type)
             return [(start, end, start_offset, end_offset, False)]
         elif title_type == RegestTitleType.SIMPLE_RANGE:
             start, end, offset = re.search(
@@ -257,7 +257,7 @@ class Regest(models.Model):
             start = self.__extract_date(start)
             end = self.__extract_date(end)
             start_offset, end_offset = self.__determine_offsets(
-                start_offset=offset, end_offset=offset)
+                start_offset=offset, end_offset=offset, title_type=title_type)
             return [(start, end, start_offset, end_offset, False)]
         elif title_type == RegestTitleType.ELLIPTICAL_RANGE:
             start, end, offset = re.search(
@@ -273,7 +273,7 @@ class Regest(models.Model):
             elif re.match('^\d{4}-\d{2}-\d{2} bis \d{2}', self.title):
                 end = date(start.year, start.month, int(end))
             start_offset, end_offset = self.__determine_offsets(
-                start_offset=offset, end_offset=offset)
+                start_offset=offset, end_offset=offset, title_type=title_type)
             return [(start, end, start_offset, end_offset, False)]
         elif title_type == RegestTitleType.SIMPLE_ALTERNATIVES:
             offset = self.__extract_offset()
@@ -413,7 +413,7 @@ class Regest(models.Model):
         elif year and not month and not day:
             return date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
 
-    def __determine_offsets(self, start_offset, end_offset):
+    def __determine_offsets(self, start_offset, end_offset, title_type):
         '''
         To determine the final values for start_offset and end_offset
         the following combinations of values need to be considered:
@@ -428,8 +428,9 @@ class Regest(models.Model):
         - start_offset and not end_offset
           If we do not get a match for end_offset in a regest title,
           the regex search returns None for this variable. In this
-          case, we need to manually set end_offset to the empty string
-          ('').
+          case, we minimally need to set end_offset to the empty
+          string (''). If we are dealing with a non-range, we want to
+          set end_offset to start_offset.
 
         - not start_offset and end_offset
           This is the most complex case. If we do not get a match for
@@ -449,7 +450,10 @@ class Regest(models.Model):
         '''
         start_offset = start_offset or ''
         end_offset = end_offset or ''
-        if end_offset and not start_offset:
+        if start_offset and not end_offset and \
+                title_type == RegestTitleType.REGULAR:
+            end_offset = start_offset
+        elif not start_offset and end_offset:
             if end_offset == 'zwischen':
                 start_offset = 'nach'
                 end_offset = 'vor'

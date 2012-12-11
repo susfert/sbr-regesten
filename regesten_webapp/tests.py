@@ -99,11 +99,12 @@ class RegestTest(TestCase):
         constant in regesten_webapp.__init__.py.
         '''
         self.__create_and_check_dates('1009 (vor)', self.RegestDate(
-                date(1009, 01, 01), date(1009, 01, 01), 'vor', '', False))
+                date(1009, 01, 01), date(1009, 01, 01), 'vor', 'vor', False))
         self.__create_and_check_dates('1009-10 (nach)', self.RegestDate(
-                date(1009, 10, 01), date(1009, 10, 01), 'nach', '', False))
+                date(1009, 10, 01), date(1009, 10, 01),
+                'nach', 'nach', False))
         self.__create_and_check_dates('1009-10-20 (ca.)', self.RegestDate(
-                date(1009, 10, 20), date(1009, 10, 20), 'ca.', '', False))
+                date(1009, 10, 20), date(1009, 10, 20), 'ca.', 'ca.', False))
         self.__create_and_check_dates('1009 (?)', self.RegestDate(
                 date(1009, 01, 01), date(1009, 01, 01), '', '', False))
         self.__create_and_check_dates('1009-10 (?)', self.RegestDate(
@@ -130,23 +131,25 @@ class RegestTest(TestCase):
         '''
         self.__create_and_check_dates(
             '1009 (vor) Diedenhofen', self.RegestDate(
-                date(1009, 01, 01), date(1009, 01, 01), 'vor', '', False))
+                date(1009, 01, 01), date(1009, 01, 01), 'vor', 'vor', False))
         self.__create_and_check_dates(
             '1009-10 (nach) Frankfurt am Main', self.RegestDate(
-                date(1009, 10, 01), date(1009, 10, 01), 'nach', '', False))
+                date(1009, 10, 01), date(1009, 10, 01),
+                'nach', 'nach', False))
         self.__create_and_check_dates(
             '1009-10-20 (um) St. Arnual', self.RegestDate(
-                date(1009, 10, 20), date(1009, 10, 20), 'um', '', False))
+                date(1009, 10, 20), date(1009, 10, 20), 'um', 'um', False))
         self.__create_and_check_dates(
             '1009 Diedenhofen (kurz nach)', self.RegestDate(
                 date(1009, 01, 01), date(1009, 01, 01),
-                'kurz nach', '', False))
+                'kurz nach', 'kurz nach', False))
         self.__create_and_check_dates(
             '1009-10 Frankfurt am Main (post)', self.RegestDate(
-                date(1009, 10, 01), date(1009, 10, 01), 'post', '', False))
+                date(1009, 10, 01), date(1009, 10, 01),
+                'post', 'post', False))
         self.__create_and_check_dates(
             '1009-10-20 St. Arnual (ca.)', self.RegestDate(
-                date(1009, 10, 20), date(1009, 10, 20), 'ca.', '', False))
+                date(1009, 10, 20), date(1009, 10, 20), 'ca.', 'ca.', False))
 
     def test_regular_dates_with_duplicates(self):
         '''
@@ -216,21 +219,21 @@ class RegestTest(TestCase):
         - 1200-03-12 (c) (ca.)
         '''
         self.__create_and_check_dates('1200 (vor) (a)', self.RegestDate(
-                date(1200, 01, 01), date(1200, 01, 01), 'vor', '', False))
+                date(1200, 01, 01), date(1200, 01, 01), 'vor', 'vor', False))
         self.__create_and_check_dates('1200 (a) (vor)', self.RegestDate(
-                date(1200, 01, 01), date(1200, 01, 01), 'vor', '', False))
+                date(1200, 01, 01), date(1200, 01, 01), 'vor', 'vor', False))
         self.__create_and_check_dates(
             '1200-03 (kurz nach) (b)', self.RegestDate(
                 date(1200, 03, 01), date(1200, 03, 01),
-                'kurz nach', '', False))
+                'kurz nach', 'kurz nach', False))
         self.__create_and_check_dates(
             '1200-03 (b) (kurz nach)', self.RegestDate(
                 date(1200, 03, 01), date(1200, 03, 01),
-                'kurz nach', '', False))
+                'kurz nach', 'kurz nach', False))
         self.__create_and_check_dates('1200-03-12 (ca.) (c)', self.RegestDate(
-                date(1200, 03, 12), date(1200, 03, 12), 'ca.', '', False))
+                date(1200, 03, 12), date(1200, 03, 12), 'ca.', 'ca.', False))
         self.__create_and_check_dates('1200-03-12 (c) (ca.)', self.RegestDate(
-                date(1200, 03, 12), date(1200, 03, 12), 'ca.', '', False))
+                date(1200, 03, 12), date(1200, 03, 12), 'ca.', 'ca.', False))
 
     def test_date_ranges(self):
         '''
