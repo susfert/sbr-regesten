@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy
 
 from regesten_webapp import AUTHORS, COUNTRIES, OFFSET_TYPES, REGION_TYPES
 from regesten_webapp import DAY_DEFAULT, MONTH_DEFAULT, RegestTitleType
+from regesten_webapp.utils import RegestTitleParser
 
 class Regest(models.Model):
     """
@@ -149,22 +150,22 @@ class Regest(models.Model):
         # 1500 (c) (15. Jh., Ende)
         # 1500 (e) (16. Jh., Anfang)
         """
-        if self.__contains_simple_additions(self.title):
+        if RegestTitleParser.contains_simple_additions(self.title):
             dates = self.__extract_dates(
                 RegestTitleType.SIMPLE_ADDITIONS)
-        elif self.__contains_elliptical_additions(self.title):
+        elif RegestTitleParser.contains_elliptical_additions(self.title):
             dates = self.__extract_dates(
                 RegestTitleType.ELLIPTICAL_ADDITIONS)
-        elif self.__contains_simple_alternatives(self.title):
+        elif RegestTitleParser.contains_simple_alternatives(self.title):
             dates = self.__extract_dates(
                 RegestTitleType.SIMPLE_ALTERNATIVES)
-        elif self.__contains_elliptical_alternatives(self.title):
+        elif RegestTitleParser.contains_elliptical_alternatives(self.title):
             dates = self.__extract_dates(
                 RegestTitleType.ELLIPTICAL_ALTERNATIVES)
-        elif self.__is_simple_range(self.title):
+        elif RegestTitleParser.is_simple_range(self.title):
             dates = self.__extract_dates(
                 RegestTitleType.SIMPLE_RANGE)
-        elif self.__is_elliptical_range(self.title):
+        elif RegestTitleParser.is_elliptical_range(self.title):
             dates = self.__extract_dates(
                 RegestTitleType.ELLIPTICAL_RANGE)
         else:
@@ -175,61 +176,6 @@ class Regest(models.Model):
             RegestDate.objects.create(
                 regest=self, start=start, end=end, start_offset=start_offset,
                 end_offset=end_offset, alt_date=alt_date)
-
-    def __contains_simple_additions(self, string):
-        return re.match(
-            '\d{4}(-\d{2}){0,2}' \
-                ' [\(\[]?und ' \
-                '\d{4}(-\d{2}){0,2}', string)
-
-    def __contains_elliptical_additions(self, string):
-        return re.match(
-            '\d{4}(-\d{2}){0,2}' \
-                ' [\(\[]?und ' \
-                '\d{2}(-\d{2})?', string)
-
-    def __contains_simple_alternatives(self, string):
-        return re.match(
-            '\d{4}(-\d{2}){0,2}' \
-                '( ?/ ?| [\(\[]| [\(\[]?bzw\.? | [\(\[]?oder )' \
-                '\d{4}(-\d{2}){0,2}', string)
-
-    def __contains_elliptical_alternatives(self, string):
-        return re.match(
-            '\d{4}(-\d{2}){0,2}' \
-                '( ?/ ?| [\(\[]| [\(\[]?bzw\.? | [\(\[]?oder )' \
-                '\d{2}(-\d{2})?', string)
-
-    def __is_simple_range(self, string):
-        '''
-        Checks whether or not string represents a "simple" date range.
-
-        Simple date ranges are non-elliptical, i.e. they include year,
-        month, and day information for both start and end date.
-        '''
-        return re.match('(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
-                            '( \(.{2,}\))?' \
-                            ' ?- ?' \
-                            '(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})', string)
-
-    def __is_elliptical_range(self, string):
-        '''
-        Checks whether or not string starts with an "elliptical" date
-        range.
-
-        Elliptical date ranges are used to denote time spans that are
-        shorter than one year. Depending on the level of precision
-        (month or day), they omit year or year and month information
-        in the end date. In the Sbr Regesten, they always use 'bis'
-        instead of '-' to separate start and end date of the range.
-
-        Examples:
-        - 1419-05 bis 06 (denotes a time span of one month ranging
-          from May to June of 1419)
-        - 1419-05-10 bis 20 (denotes a time span of ten days ranging
-          from May 10th to May 20th, 1419).
-        '''
-        return re.match('^\d{4}-\d{2}(-\d{2})? bis \d{2}(\D.*|)$', string)
 
     def __extract_dates(self, title_type):
         if title_type == RegestTitleType.REGULAR:
