@@ -382,9 +382,11 @@ class Regest(models.Model):
         #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
         # - Remove duplicates and offsets
         # - Remove ')' and ']'
+        # - Remove locations
         title = re.sub('[\(\[]?(bzw\.?|oder)', '/', self.title)
-        title = re.sub('\(\D+\)', '', title)
+        title = re.sub(' \(\D+\)', '', title)
         title = re.sub('[\)\]]', '', title)
+        title = re.sub(' \D+$', '', title)
         if title_type == RegestTitleType.SIMPLE_ALTERNATIVES:
             # - Replace '(' and '[' with '/ '
             title = re.sub('[\(\[]', '/ ', title)
