@@ -4,13 +4,13 @@ DAY_DEFAULT = 1
 MONTH_DEFAULT = 1
 
 class RegestTitleType(object):
-    REGULAR = 'regular'
-    SIMPLE_RANGE = 'simple range'
-    ELLIPTICAL_RANGE = 'elliptical range'
-    SIMPLE_ALTERNATIVES = 'simple alternatives'
-    ELLIPTICAL_ALTERNATIVES = 'elliptical alternatives'
-    SIMPLE_ADDITIONS = 'simple additions'
-    ELLIPTICAL_ADDITIONS = 'elliptical additions'
+    REGULAR = 0
+    SIMPLE_RANGE = 1
+    ELLIPTICAL_RANGE = 2
+    SIMPLE_ALTERNATIVES = 3
+    ELLIPTICAL_ALTERNATIVES = 4
+    SIMPLE_ADDITIONS = 5
+    ELLIPTICAL_ADDITIONS = 6
 
 AUTHORS = (
     ('Ed', 'Irmtraut Eder-Stein, Koblenz'),
