@@ -358,8 +358,10 @@ class RegestTest(TestCase):
         Examples:
         - 1419-05 bis 06 (kurz nach)
         - 1419-05-10 bis 20 (ca.)
+        - 1419-05-10 bis 06-20 (ca.)
         - 1419-05 (nach) bis 06 (vor)
         - 1419-05-10 (nach) bis 20 (vor)
+        - 1419-05-10 (nach) bis 06-20 (vor)
         '''
         self.__create_and_check_dates(
             '1419-05 bis 06 (kurz nach)', self.RegestDate(
@@ -369,12 +371,18 @@ class RegestTest(TestCase):
             '1419-05-10 bis 20 (ca.)', self.RegestDate(
                 date(1419, 05, 10), date(1419, 05, 20), 'ca.', 'ca.', False))
         self.__create_and_check_dates(
+            '1419-05-10 bis 06-20 (ca.)', self.RegestDate(
+                date(1419, 05, 10), date(1419, 06, 20), 'ca.', 'ca.', False))
+        self.__create_and_check_dates(
             '1419-05 (nach) bis 06 (vor)', self.RegestDate(
                 date(1419, 05, 01), date(1419, 06, 01),
                 'nach', 'vor', False))
         self.__create_and_check_dates(
             '1419-05-10 (nach) bis 20 (vor)', self.RegestDate(
                 date(1419, 05, 10), date(1419, 05, 20), 'nach', 'vor', False))
+        self.__create_and_check_dates(
+            '1419-05-10 (nach) bis 06-20 (vor)', self.RegestDate(
+                date(1419, 05, 10), date(1419, 06, 20), 'nach', 'vor', False))
 
     def test_elliptical_ranges_with_offset_and_duplicates(self):
         '''
