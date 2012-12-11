@@ -184,9 +184,8 @@ class Regest(models.Model):
                 '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})',
                 self.title).group('start')
             start = self.__extract_date(start)
-            start_offset, end_offset = self.__determine_offsets(
-                offset, offset, title_type)
-            return [(start, start, start_offset, end_offset, False)]
+            end = start
+            start_offset, end_offset = offset, offset
         elif title_type == RegestTitleType.SIMPLE_RANGE:
             start_offset, end_offset = self.__extract_offset(title_type)
             title = self.__remove_non_standard_formatting(title_type)
@@ -198,9 +197,7 @@ class Regest(models.Model):
             start = self.__extract_date(start)
             end = self.__extract_date(end)
             start_offset, end_offset = self.__determine_offsets(
-                start_offset=start_offset, end_offset=end_offset,
-                title_type=title_type)
-            return [(start, end, start_offset, end_offset, False)]
+                start_offset, end_offset, title_type)
         elif title_type == RegestTitleType.ELLIPTICAL_RANGE:
             offset = self.__extract_offset(title_type)
             start, end = re.search(
@@ -213,8 +210,8 @@ class Regest(models.Model):
             elif re.match('^\d{4}-\d{2}-\d{2} bis \d{2}', self.title):
                 end = date(start.year, start.month, int(end))
             start_offset, end_offset = self.__determine_offsets(
-                start_offset=offset, end_offset=offset, title_type=title_type)
-            return [(start, end, start_offset, end_offset, False)]
+                offset, offset, title_type)
+        return [(start, end, start_offset, end_offset, False)]
 
     def __extract_multiple_dates(self, title_type):
         alt_date = title_type in (RegestTitleType.SIMPLE_ALTERNATIVES,
