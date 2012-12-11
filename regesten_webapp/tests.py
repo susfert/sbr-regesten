@@ -235,18 +235,19 @@ class RegestTest(TestCase):
         self.__create_and_check_dates('1200-03-12 (c) (ca.)', self.RegestDate(
                 date(1200, 03, 12), date(1200, 03, 12), 'ca.', 'ca.', False))
 
-    def test_date_ranges(self):
+    def test_simple_ranges(self):
         '''
-        Tests whether or not *date ranges* are extracted correctly
-        from the title of a given regest.
+        Tests whether or not "simple" date ranges are extracted
+        correctly from the title of a given regest.
+
+        Simple date ranges are non-elliptical, i.e. they include year,
+        month, and day information for both start and end date.
 
         Examples:
         - 1024-1030
         - 1024 - 1030
         - 1419-05 - 1419-06
-        - 1419-05 bis 06
         - 1482-07-16 - 1499-01-03
-        - 1419-05-10 bis 20
         '''
         self.__create_and_check_dates('1024-1030', self.RegestDate(
                 date(1024, 01, 01), date(1030, 01, 01), '', '', False))
@@ -254,18 +255,13 @@ class RegestTest(TestCase):
                 date(1024, 01, 01), date(1030, 01, 01), '', '', False))
         self.__create_and_check_dates('1419-05 - 1419-06', self.RegestDate(
                 date(1419, 05, 01), date(1419, 06, 01), '', '', False))
-        self.__create_and_check_dates('1419-05 bis 06', self.RegestDate(
-                date(1419, 05, 01), date(1419, 06, 01), '', '', False))
         self.__create_and_check_dates(
             '1484-07-16 - 1499-01-03', self.RegestDate(
                 date(1484, 07, 16), date(1499, 01, 03), '', '', False))
-        self.__create_and_check_dates(
-            '1419-05-10 bis 20', self.RegestDate(
-                date(1419, 05, 10), date(1419, 05, 20), '', '', False))
 
-    def test_date_ranges_with_offset(self):
+    def test_simple_ranges_with_offset(self):
         '''
-        Tests whether or not date ranges and their offsets are
+        Tests whether or not simple date ranges and their offsets are
         extracted correctly from the title of a given regest.
 
         Examples:
@@ -273,10 +269,8 @@ class RegestTest(TestCase):
         - 1431 - 1459 (zwischen)
         - 1419-05 - 1419-06 (um)
         - 1419-05 (nach) - 1419-06 (vor)
-        - 1419-05 bis 06 (kurz nach)
         - 1482-07-16 - 1499-01-08 (ca.)
         - 1482-07-16 (nach) - 1499-01-08 (vor)
-        - 1419-05-10 bis 20 (ca.)
         '''
         self.__create_and_check_dates('0935-1000 (ca.)', self.RegestDate(
                 date(935, 01, 01), date(1000, 01, 01), 'ca.', 'ca.', False))
@@ -290,22 +284,15 @@ class RegestTest(TestCase):
             '1419-05 (nach) - 1419-06 (vor)', self.RegestDate(
                 date(1419, 05, 01), date(1419, 06, 01), 'nach', 'vor', False))
         self.__create_and_check_dates(
-            '1419-05 bis 06 (kurz nach)', self.RegestDate(
-                date(1419, 05, 01), date(1419, 06, 01),
-                'kurz nach', 'kurz nach', False))
-        self.__create_and_check_dates(
             '1484-07-16 - 1499-01-03 (ca.)', self.RegestDate(
                 date(1484, 07, 16), date(1499, 01, 03), 'ca.', 'ca.', False))
         self.__create_and_check_dates(
             '1484-07-16 (nach) - 1499-01-03 (vor)', self.RegestDate(
                 date(1484, 07, 16), date(1499, 01, 03), 'nach', 'vor', False))
-        self.__create_and_check_dates(
-            '1419-05-10 bis 20 (ca.)', self.RegestDate(
-                date(1419, 05, 10), date(1419, 05, 20), 'ca.', 'ca.', False))
 
-    def test_date_ranges_with_offset_and_duplicates(self):
+    def test_simple_ranges_with_offset_and_duplicates(self):
         '''
-        Tests whether or not date ranges and their offsets are
+        Tests whether or not simple date ranges and their offsets are
         extracted correctly from regest titles containing duplicates.
 
         Examples:
@@ -315,15 +302,9 @@ class RegestTest(TestCase):
         - 1419-05 - 1419-06 (a) um
         - 1419-05 - 1419-06 (um) (b)
         - 1419-05 - 1419-06 (c) (um)
-        - 1419-05 bis 06 (a) kurz nach
-        - 1419-05 bis 06 (kurz nach) (b)
-        - 1419-05 bis 06 (c) (kurz nach)
         - 1482-07-16 - 1499-01-08 (a) ca.
         - 1482-07-16 - 1499-01-08 (ca.) (b)
         - 1482-07-16 - 1499-01-08 (c) (ca.)
-        - 1419-05-10 bis 20 (a) ca.
-        - 1419-05-10 bis 20 (ca.) (b)
-        - 1419-05-10 bis 20 (c) (ca.)
         - 1482-07-16 (nach) - 1499-01-08 (vor) (a)
         '''
         self.__create_and_check_dates('1460-1466 (a) ca.', self.RegestDate(
@@ -342,6 +323,65 @@ class RegestTest(TestCase):
             '1419-05 - 1419-06 (c) (um)', self.RegestDate(
                 date(1419, 05, 01), date(1419, 06, 01), 'um', 'um', False))
         self.__create_and_check_dates(
+            '1484-07-16 - 1499-01-03 (a) ca.', self.RegestDate(
+                date(1484, 07, 16), date(1499, 01, 03), 'ca.', 'ca.', False))
+        self.__create_and_check_dates(
+            '1484-07-16 - 1499-01-03 (ca.) (b)', self.RegestDate(
+                date(1484, 07, 16), date(1499, 01, 03), 'ca.', 'ca.', False))
+        self.__create_and_check_dates(
+            '1484-07-16 - 1499-01-03 (c) (ca.)', self.RegestDate(
+                date(1484, 07, 16), date(1499, 01, 03), 'ca.', 'ca.', False))
+        self.__create_and_check_dates(
+            '1484-07-16 (nach) - 1499-01-03 (vor) (a)', self.RegestDate(
+                date(1484, 07, 16), date(1499, 01, 03), 'nach', 'vor', False))
+
+    def test_elliptical_ranges(self):
+        '''
+        Tests whether or not "elliptical" date ranges are extracted
+        correctly from the title of a given regest.
+
+        Examples:
+        - 1419-05 bis 06
+        - 1419-05-10 bis 20
+        '''
+        self.__create_and_check_dates('1419-05 bis 06', self.RegestDate(
+                date(1419, 05, 01), date(1419, 06, 01), '', '', False))
+        self.__create_and_check_dates(
+            '1419-05-10 bis 20', self.RegestDate(
+                date(1419, 05, 10), date(1419, 05, 20), '', '', False))
+
+    def test_elliptical_ranges_with_offset(self):
+        '''
+        Tests whether or not elliptical date ranges and their offsets
+        are extracted correctly from the title of a given regest.
+
+        Examples:
+        - 1419-05 bis 06 (kurz nach)
+        - 1419-05-10 bis 20 (ca.)
+        '''
+        self.__create_and_check_dates(
+            '1419-05 bis 06 (kurz nach)', self.RegestDate(
+                date(1419, 05, 01), date(1419, 06, 01),
+                'kurz nach', 'kurz nach', False))
+        self.__create_and_check_dates(
+            '1419-05-10 bis 20 (ca.)', self.RegestDate(
+                date(1419, 05, 10), date(1419, 05, 20), 'ca.', 'ca.', False))
+
+    def test_elliptical_ranges_with_offset_and_duplicates(self):
+        '''
+        Tests whether or not elliptical date ranges and their offsets
+        are extracted correctly from regest titles containing
+        duplicates.
+
+        Examples:
+        - 1419-05 bis 06 (a) kurz nach
+        - 1419-05 bis 06 (kurz nach) (b)
+        - 1419-05 bis 06 (c) (kurz nach)
+        - 1419-05-10 bis 20 (a) ca.
+        - 1419-05-10 bis 20 (ca.) (b)
+        - 1419-05-10 bis 20 (c) (ca.)
+        '''
+        self.__create_and_check_dates(
             '1419-05 bis 06 (a) kurz nach', self.RegestDate(
                 date(1419, 05, 01), date(1419, 06, 01),
                 'kurz nach', 'kurz nach', False))
@@ -354,15 +394,6 @@ class RegestTest(TestCase):
                 date(1419, 05, 01), date(1419, 06, 01),
                 'kurz nach', 'kurz nach', False))
         self.__create_and_check_dates(
-            '1484-07-16 - 1499-01-03 (a) ca.', self.RegestDate(
-                date(1484, 07, 16), date(1499, 01, 03), 'ca.', 'ca.', False))
-        self.__create_and_check_dates(
-            '1484-07-16 - 1499-01-03 (ca.) (b)', self.RegestDate(
-                date(1484, 07, 16), date(1499, 01, 03), 'ca.', 'ca.', False))
-        self.__create_and_check_dates(
-            '1484-07-16 - 1499-01-03 (c) (ca.)', self.RegestDate(
-                date(1484, 07, 16), date(1499, 01, 03), 'ca.', 'ca.', False))
-        self.__create_and_check_dates(
             '1419-05-10 bis 20 (a) ca.', self.RegestDate(
                 date(1419, 05, 10), date(1419, 05, 20), 'ca.', 'ca.', False))
         self.__create_and_check_dates(
@@ -371,9 +402,6 @@ class RegestTest(TestCase):
         self.__create_and_check_dates(
             '1419-05-10 bis 20 (c) (ca.)', self.RegestDate(
                 date(1419, 05, 10), date(1419, 05, 20), 'ca.', 'ca.', False))
-        self.__create_and_check_dates(
-            '1484-07-16 (nach) - 1499-01-03 (vor) (a)', self.RegestDate(
-                date(1484, 07, 16), date(1499, 01, 03), 'nach', 'vor', False))
 
     def test_simple_alternatives(self):
         '''
