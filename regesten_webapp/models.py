@@ -196,7 +196,7 @@ class Regest(models.Model):
                 title).group('start', 'end')
             start = self.__extract_date(start)
             end = self.__extract_date(end)
-            start_offset, end_offset = self.__determine_offsets(
+            start_offset, end_offset = self.__determine_final_offsets(
                 start_offset, end_offset, title_type)
         elif title_type == RegestTitleType.ELLIPTICAL_RANGE:
             offset = self.__extract_offset(title_type)
@@ -209,7 +209,7 @@ class Regest(models.Model):
                 end = date(start.year, int(end), DAY_DEFAULT)
             elif re.match('^\d{4}-\d{2}-\d{2} bis \d{2}', self.title):
                 end = date(start.year, start.month, int(end))
-            start_offset, end_offset = self.__determine_offsets(
+            start_offset, end_offset = self.__determine_final_offsets(
                 offset, offset, title_type)
         return [(start, end, start_offset, end_offset, False)]
 
@@ -272,8 +272,7 @@ class Regest(models.Model):
                     dates.append((start, start, offset, offset, alt_date))
         return dates
 
-
-    def __extract_offset(self, title_type):
+    def __extract_offsets(self, title_type):
         if title_type == RegestTitleType.SIMPLE_RANGE:
             match = re.search(
                 '\(?(?P<start_offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
@@ -283,7 +282,8 @@ class Regest(models.Model):
                     '\(?(?P<end_offset>' \
                     'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
                 self.title)
-            return match.group('start_offset', 'end_offset')
+            return match.group('start_offset') or '', \
+                match.group('end_offset') or ''
         else:
             match = re.search(
                 '(?P<offset>ca\.|nach|kurz nach|post|um|vor)', self.title)
@@ -329,17 +329,10 @@ class Regest(models.Model):
         elif year and not month and not day:
             return date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
 
-    def __determine_offsets(self, start_offset, end_offset, title_type):
+    def __determine_final_offsets(self, start_offset, end_offset, title_type):
         '''
         To determine the final values for start_offset and end_offset
         the following combinations of values need to be considered:
-
-        - start_offset and end_offset
-          If a given regest title contains both a start_offset and an
-          end_offset, we don't have to do anything; both values
-          returned by the regex search will be different from the
-          empty string ('') or None so we can simply use these values
-          as is.
 
         - start_offset and not end_offset
           If we do not get a match for end_offset in a regest title,
@@ -357,15 +350,7 @@ class Regest(models.Model):
           period of time that *excludes* the start and end dates given
           in the title. In this case, start_offset needs to be set to
           'nach', and end_offset needs to be set to 'vor'.
-
-        - not start_offset and not end_offset
-          If a regest title contains no offsets at all, the regex
-          search returns None for the start_offset and end_offset
-          variables. In this case, we need to manually set the values
-          of both of these variables to the empty string ('').
         '''
-        start_offset = start_offset or ''
-        end_offset = end_offset or ''
         if start_offset and not end_offset and \
                 title_type == RegestTitleType.REGULAR:
             end_offset = start_offset
