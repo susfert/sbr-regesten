@@ -278,7 +278,7 @@ class Regest(models.Model):
                 start_offset=offset, end_offset=offset, title_type=title_type)
             return [(start, end, start_offset, end_offset, False)]
         elif title_type == RegestTitleType.SIMPLE_ALTERNATIVES:
-            offset = self.__extract_offset()
+            offset = self.__extract_offset(title_type)
             title = self.__remove_non_standard_formatting(title_type)
             main_date, alt_dates = re.search(
                 '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
@@ -295,7 +295,7 @@ class Regest(models.Model):
                 dates.append((start, start, offset, offset, True))
             return dates
         elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES:
-            offset = self.__extract_offset()
+            offset = self.__extract_offset(title_type)
             title = self.__remove_non_standard_formatting(title_type)
             main_date, alt_dates = re.search(
                 '(?P<main_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
@@ -325,7 +325,7 @@ class Regest(models.Model):
                     dates.append((start, start, offset, offset, True))
             return dates
         elif title_type == RegestTitleType.SIMPLE_ADDITIONS:
-            offset = self.__extract_offset()
+            offset = self.__extract_offset(title_type)
             title = self.__remove_non_standard_formatting(title_type)
             main_date, alt_dates = re.search(
                 '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
@@ -342,7 +342,7 @@ class Regest(models.Model):
                 dates.append((start, start, offset, offset, False))
             return dates
         elif title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
-            offset = self.__extract_offset()
+            offset = self.__extract_offset(title_type)
             title = self.__remove_non_standard_formatting(title_type)
             main_date, alt_dates = re.search(
                 '(?P<main_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
@@ -372,10 +372,21 @@ class Regest(models.Model):
                     dates.append((start, start, offset, offset, False))
             return dates
 
-    def __extract_offset(self):
-        match = re.search(
-            '(?P<offset>ca\.|nach|kurz nach|post|um|vor)', self.title)
-        return match.group('offset') if match else ''
+    def __extract_offset(self, title_type):
+        if title_type == RegestTitleType.SIMPLE_RANGE:
+            match = re.search(
+                '\(?(?P<start_offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
+                    ' ?- ?' \
+                    '(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
+                    ' ?(\([a-z]\)|[\w\. ]+)? ?' \
+                    '\(?(?P<end_offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
+                self.title)
+            return match.group('start_offset', 'end_offset')
+        else:
+            match = re.search(
+                '(?P<offset>ca\.|nach|kurz nach|post|um|vor)', self.title)
+            return match.group('offset') if match else ''
 
     def __remove_non_standard_formatting(self, title_type):
         # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
