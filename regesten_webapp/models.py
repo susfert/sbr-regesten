@@ -1,8 +1,5 @@
 """ This module defines the data model of the Sbr Regesten webapp. """
 
-import re
-from datetime import date
-
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -10,7 +7,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from regesten_webapp import AUTHORS, COUNTRIES, OFFSET_TYPES, REGION_TYPES
-from regesten_webapp import DAY_DEFAULT, MONTH_DEFAULT, RegestTitleType
+from regesten_webapp import RegestTitleType
 from regesten_webapp.utils import RegestTitleAnalyzer, RegestTitleParser
 
 class Regest(models.Model):
