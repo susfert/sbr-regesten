@@ -202,12 +202,15 @@ class Regest(models.Model):
 
     def __is_simple_range(self, string):
         '''
-        Checks whether or not string starts with a "simple" date
-        range.
+        Checks whether or not string represents a "simple" date range.
 
-        Simple date ranges are of the form yyyy-yyyy.
+        Simple date ranges are non-elliptical, i.e. they include year,
+        month, and day information for both start and end date.
         '''
-        return re.match('^\d{4}-\d{4}', string)
+        return re.match('(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
+                            '( \(.{2,}\))?' \
+                            ' ?- ?' \
+                            '(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})', string)
 
     def __is_elliptical_range(self, string):
         '''
@@ -230,34 +233,33 @@ class Regest(models.Model):
 
     def __extract_dates(self, title_type):
         if title_type == RegestTitleType.REGULAR:
-            start, start_offset, end, end_offset = re.search(
+            start, offset = re.search(
                 '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
                     ' ?(\([a-z]\)|[\w\. ]+)? ?' \
-                    '\(?(?P<start_offset>' \
+                    '\(?(?P<offset>' \
+                    'ca\.|nach|kurz nach|post|um|vor)?\)?',
+                self.title).group('start', 'offset')
+            start = self.__extract_date(start)
+            start_offset, end_offset = self.__determine_offsets(
+                offset, offset, title_type)
+            return [(start, start, start_offset, end_offset, False)]
+        elif title_type == RegestTitleType.SIMPLE_RANGE:
+            start, start_offset, end, end_offset = re.search(
+                '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
+                    ' ?\(?(?P<start_offset>' \
                     'ca\.|nach|kurz nach|post|um|vor)?\)?' \
-                    ' ?-? ?' \
-                    '(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})?' \
+                    ' ?- ?' \
+                    '(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
                     ' ?(\([a-z]\)|[\w\. ]+)? ?' \
                     '\(?(?P<end_offset>' \
                     'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
                 self.title).group(
                 'start', 'start_offset', 'end', 'end_offset')
             start = self.__extract_date(start)
-            end = self.__extract_date(end) if end else start
-            start_offset, end_offset = self.__determine_offsets(
-                start_offset, end_offset, title_type)
-            return [(start, end, start_offset, end_offset, False)]
-        elif title_type == RegestTitleType.SIMPLE_RANGE:
-            start, end, offset = re.search(
-                '(?P<start>\d{4})-(?P<end>\d{4})' \
-                    ' ?(\([a-z]\))? ?' \
-                    '\(?(?P<offset>' \
-                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
-                self.title).group('start', 'end', 'offset')
-            start = self.__extract_date(start)
             end = self.__extract_date(end)
             start_offset, end_offset = self.__determine_offsets(
-                start_offset=offset, end_offset=offset, title_type=title_type)
+                start_offset=start_offset, end_offset=end_offset,
+                title_type=title_type)
             return [(start, end, start_offset, end_offset, False)]
         elif title_type == RegestTitleType.ELLIPTICAL_RANGE:
             start, end, offset = re.search(
