@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy
 
 from regesten_webapp import AUTHORS, COUNTRIES, OFFSET_TYPES, REGION_TYPES
 from regesten_webapp import DAY_DEFAULT, MONTH_DEFAULT, RegestTitleType
-from regesten_webapp.utils import RegestTitleParser
+from regesten_webapp.utils import RegestTitleAnalyzer, RegestTitleParser
 
 class Regest(models.Model):
     """
@@ -150,166 +150,32 @@ class Regest(models.Model):
         # 1500 (c) (15. Jh., Ende)
         # 1500 (e) (16. Jh., Anfang)
         """
-        if RegestTitleParser.contains_simple_additions(self.title):
-            dates = self.__extract_multiple_dates(
-                RegestTitleType.SIMPLE_ADDITIONS)
-        elif RegestTitleParser.contains_elliptical_additions(self.title):
-            dates = self.__extract_multiple_dates(
-                RegestTitleType.ELLIPTICAL_ADDITIONS)
-        elif RegestTitleParser.contains_simple_alternatives(self.title):
-            dates = self.__extract_multiple_dates(
-                RegestTitleType.SIMPLE_ALTERNATIVES)
-        elif RegestTitleParser.contains_elliptical_alternatives(self.title):
-            dates = self.__extract_multiple_dates(
-                RegestTitleType.ELLIPTICAL_ALTERNATIVES)
-        elif RegestTitleParser.is_simple_range(self.title):
-            dates = self.__extract_dates(
-                RegestTitleType.SIMPLE_RANGE)
-        elif RegestTitleParser.is_elliptical_range(self.title):
-            dates = self.__extract_dates(
-                RegestTitleType.ELLIPTICAL_RANGE)
+        if RegestTitleAnalyzer.contains_simple_additions(self.title):
+            dates = RegestTitleParser.extract_multiple_dates(
+                self.title, RegestTitleType.SIMPLE_ADDITIONS)
+        elif RegestTitleAnalyzer.contains_elliptical_additions(self.title):
+            dates = RegestTitleParser.extract_multiple_dates(
+                self.title, RegestTitleType.ELLIPTICAL_ADDITIONS)
+        elif RegestTitleAnalyzer.contains_simple_alternatives(self.title):
+            dates = RegestTitleParser.extract_multiple_dates(
+                self.title, RegestTitleType.SIMPLE_ALTERNATIVES)
+        elif RegestTitleAnalyzer.contains_elliptical_alternatives(self.title):
+            dates = RegestTitleParser.extract_multiple_dates(
+                self.title, RegestTitleType.ELLIPTICAL_ALTERNATIVES)
+        elif RegestTitleAnalyzer.is_simple_range(self.title):
+            dates = RegestTitleParser.extract_dates(
+                self.title, RegestTitleType.SIMPLE_RANGE)
+        elif RegestTitleAnalyzer.is_elliptical_range(self.title):
+            dates = RegestTitleParser.extract_dates(
+                self.title, RegestTitleType.ELLIPTICAL_RANGE)
         else:
-            dates = self.__extract_dates(
-                RegestTitleType.REGULAR)
+            dates = RegestTitleParser.extract_dates(
+                self.title, RegestTitleType.REGULAR)
         self.__delete_existing_dates()
         for start, end, start_offset, end_offset, alt_date in dates:
             RegestDate.objects.create(
                 regest=self, start=start, end=end, start_offset=start_offset,
                 end_offset=end_offset, alt_date=alt_date)
-
-    def __extract_dates(self, title_type):
-        if title_type == RegestTitleType.REGULAR:
-            offset = self.__extract_offset(title_type)
-            start = re.search(
-                '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})',
-                self.title).group('start')
-            start = self.__extract_date(start)
-            end = start
-            start_offset, end_offset = offset, offset
-        elif title_type == RegestTitleType.SIMPLE_RANGE:
-            start_offset, end_offset = self.__extract_offset(title_type)
-            title = self.__remove_non_standard_formatting(title_type)
-            start, end = re.search(
-                '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
-                    ' ?- ?' \
-                    '(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})',
-                title).group('start', 'end')
-            start = self.__extract_date(start)
-            end = self.__extract_date(end)
-            start_offset, end_offset = self.__determine_final_offsets(
-                start_offset, end_offset, title_type)
-        elif title_type == RegestTitleType.ELLIPTICAL_RANGE:
-            offset = self.__extract_offset(title_type)
-            start, end = re.search(
-                '(?P<start>\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
-                    ' bis (?P<end>\d{2})',
-                self.title).group('start', 'end')
-            start = self.__extract_date(start)
-            if re.match('^\d{4}-\d{2} bis \d{2}', self.title):
-                end = date(start.year, int(end), DAY_DEFAULT)
-            elif re.match('^\d{4}-\d{2}-\d{2} bis \d{2}', self.title):
-                end = date(start.year, start.month, int(end))
-            start_offset, end_offset = self.__determine_final_offsets(
-                offset, offset, title_type)
-        return [(start, end, start_offset, end_offset, False)]
-
-    def __extract_multiple_dates(self, title_type):
-        alt_date = title_type in (RegestTitleType.SIMPLE_ALTERNATIVES,
-                                  RegestTitleType.ELLIPTICAL_ALTERNATIVES)
-        separator = '/' if alt_date else 'und'
-        offset = self.__extract_offset(title_type)
-        title = self.__remove_non_standard_formatting(title_type)
-        if title_type == RegestTitleType.SIMPLE_ALTERNATIVES or \
-                title_type == RegestTitleType.SIMPLE_ADDITIONS:
-            main_date, add_dates = re.search(
-                '(?P<main_date>\d{4}|\d{4}-\d{2}|\d{4}-\d{2}-\d{2})' \
-                    '(?P<add_dates>' \
-                    '( ?' + separator + ' ?\d{4}-\d{2}-\d{2})+|' \
-                    '( ?' + separator + ' ?\d{4}-\d{2})+|' \
-                    '( ?' + separator + ' ?\d{4})+)',
-                title).group('main_date', 'add_dates')
-            start = self.__extract_date(main_date)
-            dates = [(start, start, offset, offset, False)]
-            for add_date in re.findall(
-                ' ?' + separator + ' ?(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})',
-                add_dates):
-                start = self.__extract_date(add_date)
-                dates.append((start, start, offset, offset, alt_date))
-        elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES or \
-                title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
-            main_date, add_dates = re.search(
-                '(?P<main_date>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
-                    '(?P<add_dates>' \
-                    '( ?' + separator + ' ?\d{2}-\d{2})+|' \
-                    '( ?' + separator + ' ?\d{2})+)',
-                title).group('main_date', 'add_dates')
-            start = self.__extract_date(main_date)
-            dates = [(start, start, offset, offset, False)]
-            # month different, no day:
-            if re.match(
-                '\d{4}-\d{2} ?' + separator + ' ?\d{2}([^\d-].*|)$', title):
-                for add_date in re.findall(
-                    ' ?' + separator + ' ?(\d{2})', add_dates):
-                    start = date(start.year, int(add_date), DAY_DEFAULT)
-                    dates.append((start, start, offset, offset, alt_date))
-            # day different:
-            elif re.match(
-                '\d{4}-\d{2}-\d{2} ?' + separator + ' ?\d{2}([^\d-].*|)$',
-                title):
-                for add_date in re.findall(
-                    ' ?' + separator + ' ?(\d{2})', add_dates):
-                    start = date(start.year, start.month, int(add_date))
-                    dates.append((start, start, offset, offset, alt_date))
-            # month *and* day different:
-            elif re.match(
-                '\d{4}-\d{2}-\d{2} ?' + separator + ' ?\d{2}-\d{2}', title):
-                for add_date in re.findall(
-                    ' ?' + separator + ' ?(\d{2}-\d{2})', add_dates):
-                    add_month, add_day = re.search(
-                        '(?P<add_month>\d{2})-(?P<add_day>\d{2})',
-                        add_date).group('add_month', 'add_day')
-                    start = date(start.year, int(add_month), int(add_day))
-                    dates.append((start, start, offset, offset, alt_date))
-        return dates
-
-    def __extract_offsets(self, title_type):
-        if title_type == RegestTitleType.SIMPLE_RANGE:
-            match = re.search(
-                '\(?(?P<start_offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
-                    ' ?- ?' \
-                    '(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
-                    ' ?(\([a-z]\)|[\w\. ]+)? ?' \
-                    '\(?(?P<end_offset>' \
-                    'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
-                self.title)
-            return match.group('start_offset') or '', \
-                match.group('end_offset') or ''
-        else:
-            match = re.search(
-                '(?P<offset>ca\.|nach|kurz nach|post|um|vor)', self.title)
-            return match.group('offset') if match else ''
-
-    def __remove_non_standard_formatting(self, title_type):
-        # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
-        #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
-        # - Remove duplicates and offsets
-        # - Remove ')' and ']'
-        # - Remove locations
-        title = re.sub('[\(\[]?(bzw\.?|oder)', '/', self.title)
-        title = re.sub(' \(\D+\)', '', title)
-        title = re.sub('[\)\]]', '', title)
-        title = re.sub(' \D+$', '', title)
-        if title_type == RegestTitleType.SIMPLE_ALTERNATIVES:
-            # - Replace '(' and '[' with '/ '
-            title = re.sub('[\(\[]', '/ ', title)
-        elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES:
-            # - Replace ' (' and ' [' with '-'
-            title = re.sub(' [\(\[]', '-', title)
-        elif title_type == RegestTitleType.SIMPLE_ADDITIONS or \
-                title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
-            # - Remove '(' and '['
-            title = re.sub('[\(\[]', '', title)
-        return title
 
     def __delete_existing_dates(self):
         # Delete existing dates for current regest to make sure we're
@@ -317,51 +183,6 @@ class Regest(models.Model):
         # interface
         for regest_date in self.regestdate_set.all():
             regest_date.delete()
-
-    def __extract_date(self, string):
-        year, month, day = re.search(
-            '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
-            string).group('year', 'month', 'day')
-        if year and month and day:
-            return date(int(year), int(month), int(day))
-        elif year and month and not day:
-            return date(int(year), int(month), DAY_DEFAULT)
-        elif year and not month and not day:
-            return date(int(year), MONTH_DEFAULT, DAY_DEFAULT)
-
-    def __determine_final_offsets(self, start_offset, end_offset, title_type):
-        '''
-        To determine the final values for start_offset and end_offset
-        the following combinations of values need to be considered:
-
-        - start_offset and not end_offset
-          If we do not get a match for end_offset in a regest title,
-          the regex search returns None for this variable. In this
-          case, we minimally need to set end_offset to the empty
-          string (''). If we are dealing with a non-range, we want to
-          set end_offset to start_offset.
-
-        - not start_offset and end_offset
-          This is the most complex case. If we do not get a match for
-          start_offset and end_offset is one of {nach, kurz nach,
-          post, um, vor}, we want to set start_offset to the same
-          value as end_offset. If end_offset == 'zwischen', this means
-          that the events covered by the regest took place over a
-          period of time that *excludes* the start and end dates given
-          in the title. In this case, start_offset needs to be set to
-          'nach', and end_offset needs to be set to 'vor'.
-        '''
-        if start_offset and not end_offset and \
-                title_type == RegestTitleType.REGULAR:
-            end_offset = start_offset
-        elif not start_offset and end_offset:
-            if end_offset == 'zwischen':
-                start_offset = 'nach'
-                end_offset = 'vor'
-            else:
-                start_offset = end_offset
-        return start_offset, end_offset
-
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
