@@ -1983,3 +1983,28 @@ class RegestTest(TestCase):
             self.RegestDate(
                 date(1270, 05, 28), date(1270, 05, 28),
                 'kurz nach', 'kurz nach', False))
+
+    def test_misc(self):
+        '''
+        Examples:
+        - 1337-12-
+        - 1400 (15. Jh., Anfang)
+        - 1419-10-20 (und oefter)
+        - 1500 (a) (16. Jh., Anfang)
+        - 1500 (e) (15. Jh., Ende) Saarbruecken
+        '''
+        self.__create_and_check_dates(
+            '1337-12-', self.RegestDate(
+                date(1337, 12, 01), date(1337, 12, 01), '', '', False))
+        self.__create_and_check_dates(
+            '1400 (15. Jh., Anfang)', self.RegestDate(
+                date(1400, 01, 01), date(1400, 01, 01), '', '', False))
+        self.__create_and_check_dates(
+            '1419-10-20 (und oefter)', self.RegestDate(
+                date(1419, 10, 20), date(1419, 10, 20), '', '', False))
+        self.__create_and_check_dates(
+            '1500 (a) (16. Jh., Anfang)', self.RegestDate(
+                date(1500, 01, 01), date(1500, 01, 01), '', '', False))
+        self.__create_and_check_dates(
+            '1500 (e) (15. Jh., Ende) Saarbruecken', self.RegestDate(
+                date(1500, 01, 01), date(1500, 01, 01), '', '', False))
