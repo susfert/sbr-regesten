@@ -89,6 +89,7 @@ class RegestTest(TestCase):
         - 1009 (vor)
         - 1009-10 (nach)
         - 1009-10-20 (ca.)
+        - 1009 (ca. Mitte 15. Jh.)
 
         Negative examples:
         - 1009 (?)
@@ -105,6 +106,9 @@ class RegestTest(TestCase):
                 'nach', 'nach', False))
         self.__create_and_check_dates('1009-10-20 (ca.)', self.RegestDate(
                 date(1009, 10, 20), date(1009, 10, 20), 'ca.', 'ca.', False))
+        self.__create_and_check_dates(
+            '1009 (ca. Mitte 15. Jh.)', self.RegestDate(
+                date(1009, 01, 01), date(1009, 01, 01), 'ca.', 'ca.', False))
         self.__create_and_check_dates('1009 (?)', self.RegestDate(
                 date(1009, 01, 01), date(1009, 01, 01), '', '', False))
         self.__create_and_check_dates('1009-10 (?)', self.RegestDate(
@@ -125,6 +129,8 @@ class RegestTest(TestCase):
         - 1009 Diedenhofen (kurz nach)
         - 1009-10 Frankfurt am Main (post)
         - 1009-10-20 St. Arnual (ca.)
+        - 1009-10 St. Arnual (ca. Mitte 15. Jh.)
+        - 1009-10 (ca. Mitte 15. Jh.) St. Arnual
 
         For a complete list of possible offsets see the OFFSET_TYPES
         constant in regesten_webapp.__init__.py.
@@ -150,6 +156,12 @@ class RegestTest(TestCase):
         self.__create_and_check_dates(
             '1009-10-20 St. Arnual (ca.)', self.RegestDate(
                 date(1009, 10, 20), date(1009, 10, 20), 'ca.', 'ca.', False))
+        self.__create_and_check_dates(
+            '1009-10 St. Arnual (ca. Mitte 15. Jh.)', self.RegestDate(
+                date(1009, 10, 01), date(1009, 10, 01), 'ca.', 'ca.', False))
+        self.__create_and_check_dates(
+            '1009-10 (ca. Mitte 15. Jh.) St. Arnual', self.RegestDate(
+                date(1009, 10, 01), date(1009, 10, 01), 'ca.', 'ca.', False))
 
     def test_regular_dates_with_duplicates(self):
         '''
@@ -217,6 +229,8 @@ class RegestTest(TestCase):
         - 1200-03 (b) (kurz nach)
         - 1200-03-12 (ca.) (c)
         - 1200-03-12 (c) (ca.)
+        - 1009-10-20 (ca. Mitte 15. Jh.) (d)'
+        - 1009-10-20 (d) (ca. Mitte 15. Jh.)'
         '''
         self.__create_and_check_dates('1200 (vor) (a)', self.RegestDate(
                 date(1200, 01, 01), date(1200, 01, 01), 'vor', 'vor', False))
@@ -234,6 +248,12 @@ class RegestTest(TestCase):
                 date(1200, 03, 12), date(1200, 03, 12), 'ca.', 'ca.', False))
         self.__create_and_check_dates('1200-03-12 (c) (ca.)', self.RegestDate(
                 date(1200, 03, 12), date(1200, 03, 12), 'ca.', 'ca.', False))
+        self.__create_and_check_dates(
+            '1009-10-20 (ca. Mitte 15. Jh.) (d)', self.RegestDate(
+                date(1009, 10, 20), date(1009, 10, 20), 'ca.', 'ca.', False))
+        self.__create_and_check_dates(
+            '1009-10-20 (d) (ca. Mitte 15. Jh.)', self.RegestDate(
+                date(1009, 10, 20), date(1009, 10, 20), 'ca.', 'ca.', False))
 
     def test_simple_ranges(self):
         '''
