@@ -12,6 +12,11 @@ class RegestTitleType(object):
     SIMPLE_ADDITIONS = 5
     ELLIPTICAL_ADDITIONS = 6
 
+class EllipsisType(object):
+    MONTH_DIFFERENT_NO_DAY = 0
+    DAY_DIFFERENT = 1
+    MONTH_AND_DAY_DIFFERENT = 2
+
 AUTHORS = (
     ('Ed', 'Irmtraut Eder-Stein, Koblenz'),
     ('He', 'Hans-Walter Herrmann, Saarbrücken'),

@@ -6,7 +6,9 @@ Regesten webapp.
 import re
 
 from datetime import date
-from regesten_webapp import DAY_DEFAULT, MONTH_DEFAULT, RegestTitleType
+from regesten_webapp import DAY_DEFAULT, MONTH_DEFAULT
+from regesten_webapp import EllipsisType, RegestTitleType
+
 
 class RegestTitleAnalyzer(object):
     @staticmethod
@@ -72,22 +74,19 @@ class RegestTitleAnalyzer(object):
                             '( \(\D{2,}\))? bis \d{2}(-\d{2})?', string)
 
     @staticmethod
-    def month_different_no_day(elliptical_title, separator):
-        return re.match(
+    def determine_ellipsis_type(elliptical_title, separator):
+        if re.match(
             '\d{4}-\d{2} ?' + separator + ' ?\d{2}([^\d-].*|)$',
-            elliptical_title)
-
-    @staticmethod
-    def day_different(elliptical_title, separator):
-        return re.match(
+            elliptical_title):
+            return EllipsisType.MONTH_DIFFERENT_NO_DAY
+        elif re.match(
             '\d{4}-\d{2}-\d{2} ?' + separator + ' ?\d{2}([^\d-].*|)$',
-            elliptical_title)
-
-    @staticmethod
-    def month_and_day_different(elliptical_title, separator):
-        return re.match(
+            elliptical_title):
+            return EllipsisType.DAY_DIFFERENT
+        elif re.match(
             '\d{4}-\d{2}-\d{2} ?' + separator + ' ?\d{2}-\d{2}',
-            elliptical_title)
+            elliptical_title):
+            return EllipsisType.MONTH_AND_DAY_DIFFERENT
 
 
 class RegestTitleParser(object):
@@ -231,13 +230,13 @@ class RegestTitleParser(object):
         elif title_type == RegestTitleType.ELLIPTICAL_RANGE:
             end = re.search(
                 ' bis (?P<end>\d{2}-\d{2}|\d{2})', title).group('end')
-            separator = 'bis'
-            if RegestTitleAnalyzer.month_different_no_day(title, separator):
+            ellipsis_type = RegestTitleAnalyzer.determine_ellipsis_type(
+                title, separator='bis')
+            if ellipsis_type == EllipsisType.MONTH_DIFFERENT_NO_DAY:
                 end = date(start.year, int(end), DAY_DEFAULT)
-            elif RegestTitleAnalyzer.day_different(title, separator):
+            elif ellipsis_type == EllipsisType.DAY_DIFFERENT:
                 end = date(start.year, start.month, int(end))
-            elif RegestTitleAnalyzer.month_and_day_different(
-                title, separator):
+            elif ellipsis_type == EllipsisType.MONTH_AND_DAY_DIFFERENT:
                 end_month, end_day = re.split('-', end)
                 end = date(start.year, int(end_month), int(end_day))
         else:
@@ -270,17 +269,19 @@ class RegestTitleParser(object):
             '(?P<add_dates>' \
                 '( ?' + separator + ' ?\d{2}-\d{2})+|' \
                 '( ?' + separator + ' ?\d{2})+)', title).group('add_dates')
-        if RegestTitleAnalyzer.month_different_no_day(title, separator):
+        ellipsis_type = RegestTitleAnalyzer.determine_ellipsis_type(
+            title, separator)
+        if ellipsis_type == EllipsisType.MONTH_DIFFERENT_NO_DAY:
             for add_date in re.findall(
                 ' ?' + separator + ' ?(\d{2})', add_dates):
                 start = date(start.year, int(add_date), DAY_DEFAULT)
                 dates.append((start, start, offset, offset, alt_date))
-        elif RegestTitleAnalyzer.day_different(title, separator):
+        elif ellipsis_type == EllipsisType.DAY_DIFFERENT:
             for add_date in re.findall(
                 ' ?' + separator + ' ?(\d{2})', add_dates):
                 start = date(start.year, start.month, int(add_date))
                 dates.append((start, start, offset, offset, alt_date))
-        elif RegestTitleAnalyzer.month_and_day_different(title, separator):
+        elif ellipsis_type == EllipsisType.MONTH_AND_DAY_DIFFERENT:
             for add_date in re.findall(
                 ' ?' + separator + ' ?(\d{2}-\d{2})', add_dates):
                 add_month, add_day = re.search(
