@@ -148,16 +148,16 @@ class Regest(models.Model):
         # 1500 (e) (16. Jh., Anfang)
         """
         if RegestTitleAnalyzer.contains_simple_additions(self.title):
-            dates = RegestTitleParser.extract_multiple_dates(
+            dates = RegestTitleParser.extract_dates(
                 self.title, RegestTitleType.SIMPLE_ADDITIONS)
         elif RegestTitleAnalyzer.contains_elliptical_additions(self.title):
-            dates = RegestTitleParser.extract_multiple_dates(
+            dates = RegestTitleParser.extract_dates(
                 self.title, RegestTitleType.ELLIPTICAL_ADDITIONS)
         elif RegestTitleAnalyzer.contains_simple_alternatives(self.title):
-            dates = RegestTitleParser.extract_multiple_dates(
+            dates = RegestTitleParser.extract_dates(
                 self.title, RegestTitleType.SIMPLE_ALTERNATIVES)
         elif RegestTitleAnalyzer.contains_elliptical_alternatives(self.title):
-            dates = RegestTitleParser.extract_multiple_dates(
+            dates = RegestTitleParser.extract_dates(
                 self.title, RegestTitleType.ELLIPTICAL_ALTERNATIVES)
         elif RegestTitleAnalyzer.is_simple_range(self.title):
             dates = RegestTitleParser.extract_dates(
