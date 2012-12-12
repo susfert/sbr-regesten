@@ -37,7 +37,7 @@ class RegestTitleAnalyzer(object):
         return re.match(
             '\d{4}(-\d{2}){0,2}' \
                 '( ?/ ?| [\(\[]| [\(\[]?bzw\.? | [\(\[]?oder )' \
-                '\d{2}(-\d{2})?', string)
+                '\d{2}(-\d{2})?[\)\]]?([^\.].+|)$', string)
 
     @staticmethod
     def is_simple_range(string):
@@ -185,11 +185,11 @@ class RegestTitleParser(object):
     def remove_non_standard_formatting(cls, title, title_type):
         # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
         #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
-        # - Remove duplicates and offsets
+        # - Remove duplicates and offsets and misc
         # - Remove ')' and ']'
         # - Remove locations
         title = re.sub('[\(\[]?(bzw\.?|oder)', '/', title)
-        title = re.sub(' \(\D+\)', '', title)
+        title = re.sub(' \((\D+|\d{2}\..+)\)', '', title)
         title = re.sub('[\)\]]', '', title)
         title = re.sub(' \D+$', '', title)
         if title_type == RegestTitleType.SIMPLE_ALTERNATIVES:
