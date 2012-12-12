@@ -94,11 +94,11 @@ class RegestTitleParser(object):
         if title_type == RegestTitleType.SIMPLE_ALTERNATIVES or \
                 title_type == RegestTitleType.SIMPLE_ADDITIONS:
             dates = cls.extract_simple_additions(
-                title, title_type, start, offset, dates)
+                title, title_type, offset, start, dates)
         elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES or \
                 title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
             dates = cls.extract_elliptical_additions(
-                title, title_type, start, offset, dates)
+                title, title_type, offset, start, dates)
         return dates
 
     @classmethod
@@ -231,7 +231,7 @@ class RegestTitleParser(object):
 
     @classmethod
     def extract_simple_additions(
-        cls, title, title_type, start, offset, dates):
+        cls, title, title_type, offset, start, dates):
         alt_date = title_type == RegestTitleType.SIMPLE_ALTERNATIVES
         separator = '/' if alt_date else 'und'
         add_dates = re.search(
@@ -248,7 +248,7 @@ class RegestTitleParser(object):
 
     @classmethod
     def extract_elliptical_additions(
-        cls, title, title_type, start, offset, dates):
+        cls, title, title_type, offset, start, dates):
         alt_date = title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES
         separator = '/' if alt_date else 'und'
         add_dates = re.search(
