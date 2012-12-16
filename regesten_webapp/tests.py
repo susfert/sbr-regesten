@@ -15,6 +15,11 @@ from regesten_webapp.models import Regest
 class RegestTest(TestCase):
     class RegestDate(namedtuple('RegestDate',
         ['start', 'end', 'start_offset', 'end_offset', 'alt_date'])):
+        """
+        Helper class that allows grouping and named access of
+        individual components of a date associated with a Regest that
+        need to be checked
+        """
         __slots__ = ()
         def __str__(self):
             return 'Start: {0}\n' \
@@ -26,6 +31,12 @@ class RegestTest(TestCase):
                 self.end_offset or '<none>', self.alt_date)
 
     def __create_and_check_dates(self, regest_title, *dates):
+        """
+        Create Regest object with title regest_title and check whether
+        or not corresponding *dates have been created.
+
+        Each date in *dates is a named tuple of type 'RegestDate'.
+        """
         regest = Regest.objects.create(title=regest_title)
         for regest_date in dates:
             try:
@@ -45,13 +56,13 @@ class RegestTest(TestCase):
                         regest.title, regest_date, e.message))
 
     def test_regular_dates(self):
-        Tests whether or not *regular dates* are extracted correctly
         """
+        Check whether or not 'regular' dates are extracted correctly
         from the title of a given regest.
 
         Regular dates include:
-        - 1009 (year only)
-        - 1009-10 (year and month)
+        - 1009       (year only)
+        - 1009-10    (year and month)
         - 1009-10-20 (year, month, and day)
         """
         self.__create_and_check_dates('1009', self.RegestDate(
@@ -63,8 +74,8 @@ class RegestTest(TestCase):
 
     def test_regular_dates_with_location(self):
         """
-        Tests whether or not regular dates are extracted correctly
-        from titles that include a location.
+        Check whether or not regular dates are extracted correctly
+        from regest titles which include a location.
 
         Examples:
         - 1009 Diedenhofen
@@ -82,8 +93,15 @@ class RegestTest(TestCase):
 
     def test_regular_dates_with_offset(self):
         """
-        Tests whether or not regular dates that include an offset are
-        extracted correctly from regest titles.
+        Check whether or not regular dates that include an 'offset'
+        are extracted correctly from regest titles.
+
+        Offsets are keywords providing additional information about a
+        date; they are usually surrounded by parentheses (but they
+        don't *have* to be; see tests for date ranges for examples
+        usage of offsets without parentheses). Offsets that can be
+        found in the original Sbr Regesten include: ca. / nach / kurz
+        nach / post / um / vor / zwischen (date ranges only)
 
         Positive examples:
         - 1009 (vor)
@@ -95,9 +113,6 @@ class RegestTest(TestCase):
         - 1009 (?)
         - 1009-10 (?)
         - 1009-10-20 (?)
-
-        For a complete list of possible offsets see the OFFSET_TYPES
-        constant in regesten_webapp.__init__.py.
         """
         self.__create_and_check_dates('1009 (vor)', self.RegestDate(
                 date(1009, 01, 01), date(1009, 01, 01), 'vor', 'vor', False))
@@ -118,7 +133,7 @@ class RegestTest(TestCase):
 
     def test_regular_dates_with_offset_and_location(self):
         """
-        Tests whether or not regular dates that include an offset are
+        Check whether or not regular dates and their offsets are
         extracted correctly from regest titles which include a
         location.
 
@@ -133,9 +148,6 @@ class RegestTest(TestCase):
         - 1009-10 (ca. Mitte 15. Jh.) St. Arnual
         - 1507-12-27 (?) Diedenhofen
         - 1507-12-27 Diedenhofen (?)
-
-        For a complete list of possible offsets see the OFFSET_TYPES
-        constant in regesten_webapp.__init__.py.
         """
         self.__create_and_check_dates(
             '1009 (vor) Diedenhofen', self.RegestDate(
@@ -173,8 +185,8 @@ class RegestTest(TestCase):
 
     def test_regular_dates_with_duplicates(self):
         """
-        Tests whether or not regular dates are extracted correctly
-        from regest titles which contain *duplicate markers*.
+        Check whether or not regular dates are extracted correctly
+        from regest titles containing 'duplicate markers'.
 
         A duplicate marker consists of a lowercase letter surrounded
         by parentheses: ([a-z])
@@ -197,12 +209,8 @@ class RegestTest(TestCase):
 
     def test_regular_dates_with_duplicates_and_location(self):
         """
-        Tests whether or not regular dates are extracted correctly
-        from regest titles which contain duplicate markers and
-        locations.
-
-        A duplicate marker consists of a lowercase letter surrounded
-        by parentheses: ([a-z])
+        Check whether or not regular dates are extracted correctly
+        from regest titles containing duplicate markers and locations.
 
         Examples:
         - 1442 (a) Diedenhofen
@@ -223,12 +231,9 @@ class RegestTest(TestCase):
 
     def test_regular_dates_with_duplicates_and_offset(self):
         """
-        Tests whether or not regular dates and their offsets are
-        extracted correctly from regest titles which contain duplicate
+        Check whether or not regular dates and their offsets are
+        extracted correctly from regest titles containing duplicate
         markers.
-
-        A duplicate marker consists of a lowercase letter surrounded
-        by parentheses: ([a-z])
 
         Examples:
         - 1200 (vor) (a)
@@ -265,7 +270,7 @@ class RegestTest(TestCase):
 
     def test_simple_ranges(self):
         """
-        Tests whether or not "simple" date ranges are extracted
+        Check whether or not 'simple' date ranges are extracted
         correctly from the title of a given regest.
 
         Simple date ranges are non-elliptical, i.e. they include year,
@@ -289,7 +294,7 @@ class RegestTest(TestCase):
 
     def test_simple_ranges_with_offset(self):
         """
-        Tests whether or not simple date ranges and their offsets are
+        Check whether or not simple date ranges and their offsets are
         extracted correctly from the title of a given regest.
 
         Examples:
@@ -320,7 +325,7 @@ class RegestTest(TestCase):
 
     def test_simple_ranges_with_offset_and_duplicates(self):
         """
-        Tests whether or not simple date ranges and their offsets are
+        Check whether or not simple date ranges and their offsets are
         extracted correctly from regest titles containing duplicates.
 
         Examples:
@@ -365,12 +370,20 @@ class RegestTest(TestCase):
 
     def test_elliptical_ranges(self):
         """
-        Tests whether or not "elliptical" date ranges are extracted
+        Check whether or not 'elliptical' date ranges are extracted
         correctly from the title of a given regest.
 
+        Elliptical date ranges are used to denote time spans that are
+        shorter than one year. Depending on the level of precision
+        (month or day), they omit year or year and month information
+        in the end date. In the Sbr Regesten, they always use 'bis'
+        instead of '-' to separate start and end date of the range.
+
         Examples:
-        - 1419-05 bis 06
-        - 1419-05-10 bis 20
+        - 1419-05 bis 06 (denotes a time span of one month ranging
+          from May to June of 1419)
+        - 1419-05-10 bis 20 (denotes a time span of ten days ranging
+          from May 10th to May 20th, 1419)
         """
         self.__create_and_check_dates('1419-05 bis 06', self.RegestDate(
                 date(1419, 05, 01), date(1419, 06, 01), '', '', False))
@@ -380,7 +393,7 @@ class RegestTest(TestCase):
 
     def test_elliptical_ranges_with_offset(self):
         """
-        Tests whether or not elliptical date ranges and their offsets
+        Check whether or not elliptical date ranges and their offsets
         are extracted correctly from the title of a given regest.
 
         Examples:
@@ -414,7 +427,7 @@ class RegestTest(TestCase):
 
     def test_elliptical_ranges_with_offset_and_duplicates(self):
         """
-        Tests whether or not elliptical date ranges and their offsets
+        Check whether or not elliptical date ranges and their offsets
         are extracted correctly from regest titles containing
         duplicates.
 
@@ -450,6 +463,13 @@ class RegestTest(TestCase):
 
     def test_simple_alternatives(self):
         """
+        Check whether or not main date associated with a regest and
+        any alternative dates are extracted correctly from regest
+        titles containing 'simple alternatives'.
+
+        Simple alternatives are non-elliptical, i.e. they include
+        year, month, and day information.
+
         Examples:
         - 1524/1525
         - 1524 / 1525
@@ -569,6 +589,10 @@ class RegestTest(TestCase):
 
     def test_simple_alternatives_with_location(self):
         """
+        Check whether or not main date associated with a regest and
+        any alternative dates are extracted correctly from regest
+        titles which include a location.
+
         Examples:
         - 1524/1525 Diedenhofen
         - 1524 / 1525 Frankfurt am Main
@@ -690,6 +714,10 @@ class RegestTest(TestCase):
 
     def test_simple_alternatives_with_duplicates(self):
         """
+        Check whether or not main date associated with a regest and
+        any alternative dates are extracted correctly from regest
+        titles containing duplicate markers.
+
         Examples:
         - 1524/1525 (a)
         - 1524 / 1525 (b)
@@ -809,6 +837,10 @@ class RegestTest(TestCase):
 
     def test_simple_alternatives_with_duplicates_and_location(self):
         """
+        Check whether or not main date associated with a regest and
+        any alternative dates are extracted correctly from regest
+        titles containing duplicate markers and locations.
+
         Examples:
         - 1524/1525 (a) Diedenhofen
         - 1524 / 1525 (b) Frankfurt am Main
@@ -930,6 +962,10 @@ class RegestTest(TestCase):
 
     def test_simple_alternatives_with_offset(self):
         """
+        Check whether or not main date associated with a regest and
+        any alternative dates are extracted correctly from regest
+        titles containing offset information.
+
         Examples:
         - 1524/1525 (vor)
         - 1524 / 1525 (nach)
@@ -1063,30 +1099,39 @@ class RegestTest(TestCase):
 
     def test_elliptical_alternatives(self):
         """
+        Check whether or not main date associated with a regest and
+        any alternative dates are extracted correctly from regest
+        titles containing 'elliptical alternatives'.
+
+        Elliptical alternatives omit year or year and month
+        information. In the original Sbr Regesten, the formatting for
+        elliptical alternatives varies wildly, as can be seen in the
+        examples below.
+
         Examples:
-        - 1270-04/05 (month different, no day)
-        - 1270-04 / 05 (month different, no day)
-        - 1440-11-12/17 (day different)
-        - 1440-11-12 / 17 (day different)
-        - 1270-04-27/05-28 (month *and* day different)
+        - 1270-04/05         (month different, no day)
+        - 1270-04 / 05       (month different, no day)
+        - 1440-11-12/17      (day different)
+        - 1440-11-12 / 17    (day different)
+        - 1270-04-27/05-28   (month *and* day different)
         - 1270-04-27 / 05-28 (month *and* day different)
 
-        - 1466 [04/05] (month different, no day)
-        - 1466 [04 / 05] (month different, no day)
-        - 1466-04 [28/29] (day different)
-        - 1466-04 [28 / 29] (day different)
-        - 1466 [04-28/05-01] (month *and* day different)
+        - 1466 [04/05]         (month different, no day)
+        - 1466 [04 / 05]       (month different, no day)
+        - 1466-04 [28/29]      (day different)
+        - 1466-04 [28 / 29]    (day different)
+        - 1466 [04-28/05-01]   (month *and* day different)
         - 1466 [04-28 / 05-01] (month *and* day different)
 
-        - 1506-05 bzw. 11 (month different, no day)
-        - 1506-05-12 bzw. 10 (day different)
-        - 1506-05-12 bzw. 11-10 (month *and* day different)
-        - 1506-05 bzw. 11 bzw. 12 (month different, no day)
-        - 1506-05-12 bzw. 10 bzw. 01 (day different)
+        - 1506-05 bzw. 11                  (month different, no day)
+        - 1506-05-12 bzw. 10               (day different)
+        - 1506-05-12 bzw. 11-10            (month *and* day different)
+        - 1506-05 bzw. 11 bzw. 12          (month different, no day)
+        - 1506-05-12 bzw. 10 bzw. 01       (day different)
         - 1506-05-12 bzw. 11-10 bzw. 12-01 (month *and* day different)
 
-        - 1343-04 oder 05 (month different, no day)
-        - 1343-04-12 oder 19 (day different)
+        - 1343-04 oder 05       (month different, no day)
+        - 1343-04-12 oder 19    (day different)
         - 1343-04-12 oder 05-19 (month *and* day different)
         """
         self.__create_and_check_dates(
@@ -1203,6 +1248,11 @@ class RegestTest(TestCase):
 
     def test_elliptical_alternatives_with_location(self):
         """
+        Check whether or not main date associated with a regest and
+        any alternative dates, specified in elliptical fashion, are
+        extracted correctly from regest titles which include a
+        location.
+
         Examples:
         - 1270-04/05 Diedenhofen
         - 1270-04 / 05 Frankfurt am Main
@@ -1343,6 +1393,11 @@ class RegestTest(TestCase):
 
     def test_elliptical_alternatives_with_duplicates(self):
         """
+        Check whether or not main date associated with a regest and
+        any alternative dates, specified in elliptical fashion, are
+        extracted correctly from regest titles containing duplicate
+        markers.
+
         Examples:
         - 1270-04/05 (a)
         - 1270-04 / 05 (b)
@@ -1483,6 +1538,11 @@ class RegestTest(TestCase):
 
     def test_elliptical_alternatives_with_duplicates_and_location(self):
         """
+        Check whether or not main date associated with a regest and
+        any alternative dates, specified in elliptical fashion, are
+        extracted correctly from regest titles containing duplicate
+        markers and locations.
+
         Examples:
         - 1270-04/05 (a) Diedenhofen
         - 1270-04 / 05 (b) Frankfurt am Main
@@ -1625,6 +1685,11 @@ class RegestTest(TestCase):
 
     def test_elliptical_alternatives_with_offset(self):
         """
+        Check whether or not main date associated with a regest and
+        any alternative dates, specified in elliptical fashion, are
+        extracted correctly from regest titles containing offset
+        information.
+
         Examples:
         - 1270-04/05 (vor)
         - 1270-04 / 05 (nach)
@@ -1780,6 +1845,13 @@ class RegestTest(TestCase):
 
     def test_simple_additions(self):
         """
+        Check whether or not main date associated with a regest and
+        any additional dates are extracted correctly from regest
+        titles containing 'simple additions'.
+
+        Simple alternatives are non-elliptical, i.e. they include
+        year, month, and day information.
+
         Examples:
         - 1524 und 1525
         - 1419-05 und 1419-06
@@ -1803,6 +1875,10 @@ class RegestTest(TestCase):
 
     def test_simple_additions_with_location(self):
         """
+        Check whether or not main date associated with a regest and
+        any additional dates are extracted correctly from regest
+        titles which include a location.
+
         Examples:
         - 1524 und 1525 Diedenhofen
         - 1419-05 und 1419-06 Frankfurt am Main
@@ -1826,6 +1902,10 @@ class RegestTest(TestCase):
 
     def test_simple_additions_with_duplicates(self):
         """
+        Check whether or not main date associated with a regest and
+        any additional dates are extracted correctly from regest
+        titles containing duplicate markers.
+
         Examples:
         - 1524 und 1525 (a)
         - 1419-05 und 1419-06 (b)
@@ -1849,6 +1929,10 @@ class RegestTest(TestCase):
 
     def test_simple_additions_with_duplicates_and_location(self):
         """
+        Check whether or not main date associated with a regest and
+        any additional dates are extracted correctly from regest
+        titles containing duplicate markers and locations.
+
         Examples:
         - 1524 und 1525 (a) Diedenhofen
         - 1419-05 und 1419-06 (b) Frankfurt am Main
@@ -1872,6 +1956,10 @@ class RegestTest(TestCase):
 
     def test_simple_additions_with_offset(self):
         """
+        Check whether or not main date associated with a regest and
+        any additional dates are extracted correctly from regest
+        titles containing offset information.
+
         Examples:
         - 1524 und 1525 (um)
         - 1419-05 und 1419-06 (ca.)
@@ -1897,9 +1985,15 @@ class RegestTest(TestCase):
 
     def test_elliptical_additions(self):
         """
+        Check whether or not main date associated with a regest and
+        any additional dates are extracted correctly from regest
+        titles containing 'elliptical additions'.
+
+        Elliptical additions omit year or year and month information.
+
         Examples:
-        - 1270-04 und 05 (month different, no day)
-        - 1440-11-12 und 17 (day different)
+        - 1270-04 und 05       (month different, no day)
+        - 1440-11-12 und 17    (day different)
         - 1270-04-27 und 05-28 (month *and* day different)
         """
         self.__create_and_check_dates(
@@ -1920,6 +2014,11 @@ class RegestTest(TestCase):
 
     def test_elliptical_additions_with_location(self):
         """
+        Check whether or not main date associated with a regest and
+        any additional dates, specified in elliptical fashion, are
+        extracted correctly from regest titles which include a
+        location.
+
         Examples:
         - 1270-04 und 05 Diedenhofen
         - 1440-11-12 und 17 Frankfurt am Main
@@ -1943,6 +2042,11 @@ class RegestTest(TestCase):
 
     def test_elliptical_additions_with_duplicates(self):
         """
+        Check whether or not main date associated with a regest and
+        any additional dates, specified in elliptical fashion, are
+        extracted correctly from regest titles containing duplicate
+        markers.
+
         Examples:
         - 1270-04 und 05 (a)
         - 1440-11-12 und 17 (b)
@@ -1966,6 +2070,11 @@ class RegestTest(TestCase):
 
     def test_elliptical_additions_with_duplicates_and_location(self):
         """
+        Check whether or not main date associated with a regest and
+        any additional dates, specified in elliptical fashion, are
+        extracted correctly from regest titles containing duplicate
+        markers and locations.
+
         Examples:
         - 1270-04 und 05 (a) Diedenhofen
         - 1440-11-12 und 17 (b) Frankfurt am Main
@@ -1989,6 +2098,11 @@ class RegestTest(TestCase):
 
     def test_elliptical_additions_with_offset(self):
         """
+        Check whether or not main date associated with a regest and
+        any additional dates, specified in elliptical fashion, are
+        extracted correctly from regest titles containing offset
+        information.
+
         Examples:
         - 1270-04 und 05 (um)
         - 1440-11-12 und 17 (ca.)
@@ -2014,6 +2128,10 @@ class RegestTest(TestCase):
 
     def test_misc(self):
         """
+        Check whether or not date information is extracted correctly
+        from a variety of edge cases not covered by any of the
+        preceding tests.
+
         Examples:
         - 1337-12-
         - 1400 (15. Jh., Anfang)
