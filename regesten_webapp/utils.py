@@ -224,7 +224,7 @@ class RegestDateExtractor(object):
         if title_type == RegestTitleType.SIMPLE_ALTERNATIVES or \
                 title_type == RegestTitleType.SIMPLE_ADDITIONS:
             dates = cls.extract_simple_additions(
-                title, title_type, offset, start, dates)
+                title, title_type, offset, dates)
         elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES or \
                 title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
             dates = cls.extract_elliptical_additions(
@@ -386,7 +386,7 @@ class RegestDateExtractor(object):
 
     @classmethod
     def extract_simple_additions(
-        cls, title, title_type, offset, start, dates):
+        cls, title, title_type, offset, dates):
         """
         Extract any additional dates (alternatives or additions) from
         a given regest title which is non-elliptical.
