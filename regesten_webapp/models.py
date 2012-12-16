@@ -136,6 +136,12 @@ class RegestDate(models.Model):
 
     @property
     def exact(self):
+        """
+        Provides information about whether or not date represented by
+        RegestDate instance can be considered 'exact'.
+
+        Exact dates do not have *any* offsets associated with them.
+        """
         return not self.start_offset and not self.end_offset
 
     def __unicode__(self):
