@@ -87,7 +87,7 @@ class RegestTest(TestCase):
 
         Positive examples:
         - 1009 (vor)
-        - 1009-10 (nach)
+        - 1009-10 (kurz nach)
         - 1009-10-20 (ca.)
         - 1009 (ca. Mitte 15. Jh.)
 
@@ -101,9 +101,9 @@ class RegestTest(TestCase):
         """
         self.__create_and_check_dates('1009 (vor)', self.RegestDate(
                 date(1009, 01, 01), date(1009, 01, 01), 'vor', 'vor', False))
-        self.__create_and_check_dates('1009-10 (nach)', self.RegestDate(
+        self.__create_and_check_dates('1009-10 (kurz nach)', self.RegestDate(
                 date(1009, 10, 01), date(1009, 10, 01),
-                'nach', 'nach', False))
+                'kurz nach', 'kurz nach', False))
         self.__create_and_check_dates('1009-10-20 (ca.)', self.RegestDate(
                 date(1009, 10, 20), date(1009, 10, 20), 'ca.', 'ca.', False))
         self.__create_and_check_dates(
