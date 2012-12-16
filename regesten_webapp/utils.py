@@ -209,14 +209,7 @@ class RegestDateExtractor(object):
         (5) Initialize dates list with main date
         (6) Extract any additional dates
         """
-        if title_type == RegestTitleType.SIMPLE_RANGE or \
-                title_type == RegestTitleType.ELLIPTICAL_RANGE:
-            start_offset, end_offset = cls.extract_offsets(title, title_type)
-            start_offset, end_offset = cls.determine_final_offsets(
-                start_offset, end_offset, title_type)
-        else:
-            offset = cls.extract_offsets(title, title_type)
-            start_offset, end_offset = offset, offset
+        start_offset, end_offset = cls.extract_offsets(title, title_type)
         title = cls.remove_non_standard_formatting(title, title_type)
         start = cls.extract_start(title, title_type)
         end = cls.extract_end(title, title_type, start)
@@ -224,11 +217,11 @@ class RegestDateExtractor(object):
         if title_type == RegestTitleType.SIMPLE_ALTERNATIVES or \
                 title_type == RegestTitleType.SIMPLE_ADDITIONS:
             dates = cls.extract_simple_additions(
-                title, title_type, offset, dates)
+                title, title_type, start_offset, dates)
         elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES or \
                 title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
             dates = cls.extract_elliptical_additions(
-                title, title_type, offset, start, dates)
+                title, title_type, start_offset, start, dates)
         return dates
 
     @classmethod
@@ -246,8 +239,8 @@ class RegestDateExtractor(object):
                     '\(?(?P<end_offset>' \
                     'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
                 title)
-            return match.group('start_offset') or '', \
-                match.group('end_offset') or ''
+            start_offset = match.group('start_offset') or ''
+            end_offset = match.group('end_offset') or ''
         elif title_type == RegestTitleType.ELLIPTICAL_RANGE:
             match = re.search(
                 '\(?(?P<start_offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
@@ -257,12 +250,15 @@ class RegestDateExtractor(object):
                     '\(?(?P<end_offset>' \
                     'ca\.|nach|kurz nach|post|um|vor|zwischen)?\)?',
                 title)
-            return match.group('start_offset') or '', \
-                match.group('end_offset') or ''
+            start_offset = match.group('start_offset') or ''
+            end_offset = match.group('end_offset') or ''
         else:
             match = re.search(
                 '(?P<offset>ca\.|nach|kurz nach|post|um|vor)', title)
-            return match.group('offset') if match else ''
+            start_offset = match.group('offset') if match else ''
+            end_offset = start_offset
+        return cls.determine_final_offsets(
+            start_offset, end_offset, title_type)
 
     @classmethod
     def determine_final_offsets(cls, start_offset, end_offset, title_type):
