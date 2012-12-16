@@ -13,12 +13,15 @@ class FootnoteInline(admin.StackedInline):
     model = Footnote
     extra = 2
 
+
 class QuoteInline(GenericStackedInline):
     model = Quote
     extra = 2
 
+
 class MetaInfoInline(admin.StackedInline):
     model = MetaInfo
+
 
 class RegestAdmin(admin.ModelAdmin):
     fieldsets = (
@@ -36,16 +39,15 @@ class RegestAdmin(admin.ModelAdmin):
                 'translation', 'original', 'author')
             })
         )
-
     inlines = [
         FootnoteInline,
         QuoteInline,
         MetaInfoInline,
         ]
-
     list_display = ['title', 'location', 'regest_type']
     radio_fields = { 'author': admin.VERTICAL }
     search_fields = ['title', 'content']
+
 
 class ConceptAdmin(admin.ModelAdmin):
     fieldsets = (
@@ -59,13 +61,12 @@ class ConceptAdmin(admin.ModelAdmin):
             }
          ),
         )
-
     inlines = [
         QuoteInline,
         ]
-
     list_display = ['name', 'description']
     search_fields = ['name', 'description']
+
 
 class LandmarkAdmin(ConceptAdmin):
     fieldsets = (
@@ -85,9 +86,9 @@ class LandmarkAdmin(ConceptAdmin):
             }
          ),
         )
-
     list_display = ['name', 'landmark_type']
     search_fields = ['name', 'landmark_type']
+
 
 class LocationAdmin(ConceptAdmin):
     fieldsets = (
@@ -111,9 +112,9 @@ class LocationAdmin(ConceptAdmin):
             }
          ),
         )
-
     list_display = ['name', 'location_type']
     search_fields = ['name', 'location_type']
+
 
 class PersonAdmin(ConceptAdmin):
     fieldsets = (
@@ -138,9 +139,9 @@ class PersonAdmin(ConceptAdmin):
             }
          ),
         )
-
     list_display = ['name', 'profession', 'resident_of']
     search_fields = ['name', 'profession']
+
 
 class PersonGroupAdmin(ConceptAdmin):
     fieldsets = (
@@ -163,6 +164,7 @@ class PersonGroupAdmin(ConceptAdmin):
     list_display = ['name']
     search_fields = ['name']
 
+
 class FamilyAdmin(ConceptAdmin):
     fieldsets = (
         (None, {
@@ -180,13 +182,14 @@ class FamilyAdmin(ConceptAdmin):
             }
          ),
         )
-
     list_display = ['name']
     search_fields = ['name']
+
 
 class RegionAdmin(admin.ModelAdmin):
     list_display = ['name', 'region_type']
     search_fields = ['name', 'region_type']
+
 
 admin.site.unregister(Site)
 
