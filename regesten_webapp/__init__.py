@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+""" This module provides constants for the Sbr Regesten webapp. """
 
 DAY_DEFAULT = 1
 MONTH_DEFAULT = 1
