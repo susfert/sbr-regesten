@@ -186,9 +186,29 @@ class RegestTitleAnalyzer(object):
 
 
 class RegestDateExtractor(object):
+    """
+    The RegestDateExtractor class groups functionalities for
+    extracting dates from regest titles.
+    """
     @classmethod
     def extract_dates(cls, title, title_type):
-        # Offset(s)
+        """
+        Based on its type, extract all dates from a given regest
+        title.
+
+        This method serves as an entry point for extracting dates from
+        regest titles. It controls the extraction process from start
+        to finish and operates as follows:
+
+        (1) Extract offset(s)
+        (2) Remove non-standard formatting
+            This is done to ease further processing and includes
+            offset(s).
+        (3) Extract start date
+        (4) Extract end date
+        (5) Initialize dates list with main date
+        (6) Extract any additional dates
+        """
         if title_type == RegestTitleType.SIMPLE_RANGE or \
                 title_type == RegestTitleType.ELLIPTICAL_RANGE:
             start_offset, end_offset = cls.extract_offsets(title, title_type)
@@ -198,12 +218,9 @@ class RegestDateExtractor(object):
             offset = cls.extract_offsets(title, title_type)
             start_offset, end_offset = offset, offset
         title = cls.remove_non_standard_formatting(title, title_type)
-        # Start date
         start = cls.extract_start(title, title_type)
-        # End date
         end = cls.extract_end(title, title_type, start)
         dates = [(start, end, start_offset, end_offset, False)]
-        # Extract alternatives/additions
         if title_type == RegestTitleType.SIMPLE_ALTERNATIVES or \
                 title_type == RegestTitleType.SIMPLE_ADDITIONS:
             dates = cls.extract_simple_additions(
@@ -216,6 +233,10 @@ class RegestDateExtractor(object):
 
     @classmethod
     def extract_offsets(cls, title, title_type):
+        """
+        Based on its type, extract offset(s) from a given regest
+        title.
+        """
         if title_type == RegestTitleType.SIMPLE_RANGE:
             match = re.search(
                 '\(?(?P<start_offset>ca\.|nach|kurz nach|post|um|vor)?\)?' \
@@ -246,6 +267,10 @@ class RegestDateExtractor(object):
     @classmethod
     def determine_final_offsets(cls, start_offset, end_offset, title_type):
         """
+        Determine the final values for start_offset and end_offset of
+        a given regest title, taking into account the type of the
+        title.
+
         To determine the final values for start_offset and end_offset
         the following combinations of values need to be considered:
 
@@ -279,6 +304,10 @@ class RegestDateExtractor(object):
 
     @classmethod
     def remove_non_standard_formatting(cls, title, title_type):
+        """
+        Based on its type, remove all non-standard formatting from a
+        given regest title (including offsets).
+        """
         # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
         #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
         # - Remove duplicates and offsets and misc
@@ -289,19 +318,22 @@ class RegestDateExtractor(object):
         title = re.sub('[\)\]]', '', title)
         title = re.sub(' \D+$', '', title)
         if title_type == RegestTitleType.SIMPLE_ALTERNATIVES:
-            # - Replace '(' and '[' with '/ '
+            # Replace '(' and '[' with '/ '
             title = re.sub('[\(\[]', '/ ', title)
         elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES:
-            # - Replace ' (' and ' [' with '-'
+            # Replace ' (' and ' [' with '-'
             title = re.sub(' [\(\[]', '-', title)
         elif title_type == RegestTitleType.SIMPLE_ADDITIONS or \
                 title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
-            # - Remove '(' and '['
+            # Remove '(' and '['
             title = re.sub('[\(\[]', '', title)
         return title
 
     @classmethod
     def extract_start(cls, title, title_type):
+        """
+        Based on its type, extract start date from a given regest title.
+        """
         if title_type == RegestTitleType.ELLIPTICAL_RANGE:
             start = re.search(
                 '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2})', title).group(
@@ -318,6 +350,9 @@ class RegestDateExtractor(object):
 
     @classmethod
     def extract_end(cls, title, title_type, start):
+        """
+        Based on its type, extract end date from a given regest title.
+        """
         if title_type == RegestTitleType.SIMPLE_RANGE:
             end = re.search(
                 ' ?- ?(?P<end>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})',
@@ -342,6 +377,10 @@ class RegestDateExtractor(object):
     @classmethod
     def extract_simple_additions(
         cls, title, title_type, offset, start, dates):
+        """
+        Extract any additional dates (alternatives or additions) from
+        a given regest title which is non-elliptical.
+        """
         alt_date = title_type == RegestTitleType.SIMPLE_ALTERNATIVES
         separator = '/' if alt_date else 'und'
         add_dates = re.search(
@@ -359,6 +398,10 @@ class RegestDateExtractor(object):
     @classmethod
     def extract_elliptical_additions(
         cls, title, title_type, offset, start, dates):
+        """
+        Extract any additional dates (alternatives or additions) from
+        a given regest title which is elliptical.
+        """
         alt_date = title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES
         separator = '/' if alt_date else 'und'
         add_dates = re.search(
@@ -389,6 +432,23 @@ class RegestDateExtractor(object):
 
     @classmethod
     def extract_date(cls, string):
+        """
+        Extract year, month, and day from string and use the values to
+        return a datetime.date object.
+
+        The string parameter is of the form
+
+            yyyy(-mm-dd)
+
+        If string includes year, month, and day information, the
+        extracted values can be used as they are to create the
+        datetime.date object. If string is missing day information,
+        day defaults to the value of the DAY_DEFAULT constant; if it
+        is missing month *and* day information, month and day default
+        to MONTH_DEFAULT and DAY_DEFAULT, respectively. The
+        MONTH_DEFAULT and DAY_DEFAULT constants are defined in
+        __init__.py.
+        """
         year, month, day = re.search(
             '(?P<year>\d{4})-?(?P<month>\d{2})?-?(?P<day>\d{2})?',
             string).group('year', 'month', 'day')
