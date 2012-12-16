@@ -217,11 +217,11 @@ class RegestDateExtractor(object):
         if title_type == RegestTitleType.SIMPLE_ALTERNATIVES or \
                 title_type == RegestTitleType.SIMPLE_ADDITIONS:
             dates = cls.extract_simple_additions(
-                title, title_type, start_offset, dates)
+                title, title_type, dates, start_offset, end_offset)
         elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES or \
                 title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
             dates = cls.extract_elliptical_additions(
-                title, title_type, start_offset, start, dates)
+                title, title_type, dates, start_offset, end_offset, start)
         return dates
 
     @classmethod
@@ -381,7 +381,7 @@ class RegestDateExtractor(object):
 
     @classmethod
     def extract_simple_additions(
-        cls, title, title_type, offset, dates):
+        cls, title, title_type, dates, start_offset, end_offset):
         """
         Extract any additional dates (alternatives or additions) from
         a given regest title which is non-elliptical.
@@ -397,12 +397,12 @@ class RegestDateExtractor(object):
             ' ?' + separator + ' ?(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})',
             add_dates):
             start = cls.extract_date(add_date)
-            dates.append((start, start, offset, offset, alt_date))
+            dates.append((start, start, start_offset, end_offset, alt_date))
         return dates
 
     @classmethod
     def extract_elliptical_additions(
-        cls, title, title_type, offset, start, dates):
+        cls, title, title_type, dates, start_offset, end_offset, start):
         """
         Extract any additional dates (alternatives or additions) from
         a given regest title which is elliptical.
@@ -419,12 +419,14 @@ class RegestDateExtractor(object):
             for add_date in re.findall(
                 ' ?' + separator + ' ?(\d{2})', add_dates):
                 start = date(start.year, int(add_date), DAY_DEFAULT)
-                dates.append((start, start, offset, offset, alt_date))
+                dates.append(
+                    (start, start, start_offset, end_offset, alt_date))
         elif ellipsis_type == EllipsisType.DAY_DIFFERENT:
             for add_date in re.findall(
                 ' ?' + separator + ' ?(\d{2})', add_dates):
                 start = date(start.year, start.month, int(add_date))
-                dates.append((start, start, offset, offset, alt_date))
+                dates.append(
+                    (start, start, start_offset, end_offset, alt_date))
         elif ellipsis_type == EllipsisType.MONTH_AND_DAY_DIFFERENT:
             for add_date in re.findall(
                 ' ?' + separator + ' ?(\d{2}-\d{2})', add_dates):
@@ -432,7 +434,8 @@ class RegestDateExtractor(object):
                     '(?P<add_month>\d{2})-(?P<add_day>\d{2})',
                     add_date).group('add_month', 'add_day')
                 start = date(start.year, int(add_month), int(add_day))
-                dates.append((start, start, offset, offset, alt_date))
+                dates.append(
+                    (start, start, start_offset, end_offset, alt_date))
         return dates
 
     @classmethod
