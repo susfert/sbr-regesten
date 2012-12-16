@@ -27,7 +27,13 @@ AUTHORS = (
 COUNTRIES = (
     ('Frankreich', 'Frankreich'),
     ('Deutschland', 'Deutschland'),
-    ('Belgien', 'Belgien'))
+    ('Belgien', 'Belgien'),
+    ('Niederlande', 'Niederlande'),
+    ('Luxemburg', 'Luxemburg'),
+    ('Schweiz', 'Schweiz'),
+    ('Italien', 'Italien'),
+    ('Spanien', 'Spanien'),
+    ('Türkei', 'Türkei'))
 
 OFFSET_TYPES = (
     ('vor', 'vor'),
