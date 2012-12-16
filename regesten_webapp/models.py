@@ -40,9 +40,9 @@ class Regest(models.Model):
 
     def save(self, *args, **kwargs):
         super(Regest, self).save(*args, **kwargs)
-        self._generate_date()
+        self._generate_dates()
 
-    def _generate_date(self):
+    def _generate_dates(self):
         """
         """
         if RegestTitleAnalyzer.contains_simple_additions(self.title):
