@@ -185,7 +185,7 @@ class RegestTitleAnalyzer(object):
             return EllipsisType.MONTH_AND_DAY_DIFFERENT
 
 
-class RegestTitleParser(object):
+class RegestDateExtractor(object):
     @classmethod
     def extract_dates(cls, title, title_type):
         # Offset(s)

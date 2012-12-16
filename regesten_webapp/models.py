@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy
 
 from regesten_webapp import AUTHORS, COUNTRIES, OFFSET_TYPES, REGION_TYPES
 from regesten_webapp import RegestTitleType
-from regesten_webapp.utils import RegestTitleAnalyzer, RegestTitleParser
+from regesten_webapp.utils import RegestTitleAnalyzer, RegestDateExtractor
 
 
 class Regest(models.Model):
@@ -54,7 +54,7 @@ class Regest(models.Model):
         Generate RegestDate objects for Regest instance based on value
         of title attribute.
 
-        With the help of RegestTitleAnalyzer and RegestTitleParser
+        With the help of RegestTitleAnalyzer and RegestDateExtractor
         (defined in utils.py), this method generates RegestDate
         objects based on the title of the Regest instance and saves
         them to the database. To make sure that any outdated
@@ -63,25 +63,25 @@ class Regest(models.Model):
         objects associated with the Regest instance.
         """
         if RegestTitleAnalyzer.contains_simple_additions(self.title):
-            dates = RegestTitleParser.extract_dates(
+            dates = RegestDateExtractor.extract_dates(
                 self.title, RegestTitleType.SIMPLE_ADDITIONS)
         elif RegestTitleAnalyzer.contains_elliptical_additions(self.title):
-            dates = RegestTitleParser.extract_dates(
+            dates = RegestDateExtractor.extract_dates(
                 self.title, RegestTitleType.ELLIPTICAL_ADDITIONS)
         elif RegestTitleAnalyzer.contains_simple_alternatives(self.title):
-            dates = RegestTitleParser.extract_dates(
+            dates = RegestDateExtractor.extract_dates(
                 self.title, RegestTitleType.SIMPLE_ALTERNATIVES)
         elif RegestTitleAnalyzer.contains_elliptical_alternatives(self.title):
-            dates = RegestTitleParser.extract_dates(
+            dates = RegestDateExtractor.extract_dates(
                 self.title, RegestTitleType.ELLIPTICAL_ALTERNATIVES)
         elif RegestTitleAnalyzer.is_simple_range(self.title):
-            dates = RegestTitleParser.extract_dates(
+            dates = RegestDateExtractor.extract_dates(
                 self.title, RegestTitleType.SIMPLE_RANGE)
         elif RegestTitleAnalyzer.is_elliptical_range(self.title):
-            dates = RegestTitleParser.extract_dates(
+            dates = RegestDateExtractor.extract_dates(
                 self.title, RegestTitleType.ELLIPTICAL_RANGE)
         else:
-            dates = RegestTitleParser.extract_dates(
+            dates = RegestDateExtractor.extract_dates(
                 self.title, RegestTitleType.REGULAR)
         self.__delete_existing_dates()
         for start, end, start_offset, end_offset, alt_date in dates:
