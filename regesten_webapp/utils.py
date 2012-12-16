@@ -41,8 +41,8 @@ class RegestTitleAnalyzer(object):
 
     @staticmethod
     def is_simple_range(string):
-        Checks whether or not string represents a "simple" date range.
         """
+        Check whether or not string represents a 'simple' date range.
 
         Simple date ranges are non-elliptical, i.e. they include year,
         month, and day information for both start and end date.
@@ -54,8 +54,8 @@ class RegestTitleAnalyzer(object):
 
     @staticmethod
     def is_elliptical_range(string):
-        Checks whether or not string starts with an "elliptical" date
         """
+        Check whether or not string represents an 'elliptical' date
         range.
 
         Elliptical date ranges are used to denote time spans that are
