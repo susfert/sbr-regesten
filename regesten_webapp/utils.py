@@ -275,21 +275,20 @@ class RegestDateExtractor(object):
         the following combinations of values need to be considered:
 
         - start_offset and not end_offset
-          If we do not get a match for end_offset in a regest title,
-          the regex search returns None for this variable. In this
-          case, we minimally need to set end_offset to the empty
-          string (''). If we are dealing with a non-range, we want to
-          set end_offset to start_offset.
+          In this case, if the title is a non-range, end_offset is set
+          to start_offset.
 
         - not start_offset and end_offset
-          This is the most complex case. If we do not get a match for
-          start_offset and end_offset is one of {nach, kurz nach,
-          post, um, vor}, we want to set start_offset to the same
-          value as end_offset. If end_offset == 'zwischen', this means
-          that the events covered by the regest took place over a
-          period of time that *excludes* the start and end dates given
-          in the title. In this case, start_offset needs to be set to
-          'nach', and end_offset needs to be set to 'vor'.
+          This is the most complex case. If end_offset is one of
+          {nach, kurz nach, post, um, vor}, start_offset is set to the
+          same value as end_offset. If end_offset == 'zwischen', this
+          means that the events covered by the regest took place over
+          a period of time that *excludes* the start and end dates
+          given in the title. In this case, start_offset needs to be
+          set to 'nach', and end_offset needs to be set to 'vor'.
+
+        In all other cases, the values that were passed in for
+        start_offset and end_offset are simply returned.
         """
         if start_offset and not end_offset and \
                 title_type == RegestTitleType.REGULAR:
