@@ -348,11 +348,7 @@ class RegestDateExtractor(object):
         """
         Based on its type, extract start date from a given regest title.
         """
-        if title_type == RegestTitleType.ELLIPTICAL_RANGE:
-            start = re.search(
-                '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2})', title).group(
-                'start')
-        elif title_type == RegestTitleType.SIMPLE_RANGE:
+        if title_type == RegestTitleType.SIMPLE_RANGE:
             start = re.search(
                 '(?P<start>\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4}) ?- ?',
                 title).group('start')
