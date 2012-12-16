@@ -307,25 +307,39 @@ class RegestDateExtractor(object):
         """
         Based on its type, remove all non-standard formatting from a
         given regest title (including offsets).
+
+        Non-standard formatting includes locations, duplicates, and
+        miscellaneous information, as well as offsets and non-standard
+        separators for additional dates (the standard separator being
+        '/' for alternatives and 'und' for additions). The order in
+        which the formatting is removed matters; the method operates
+        as follows:
+
+        Irrespective of the type of the regest title, the following
+        steps are performed first:
+
+        (1) Replace 'bzw.', '(bzw.', '[bzw.', 'oder', '(oder', '[oder'
+            with '/'
+        (2) Remove duplicates, offsets, and misc
+        (3) Remove ')' and ']'
+        (4) Remove locations
+
+        Then, depending on the type of the regest title, do one of the
+        following:
+        - Replace '(' and '[' with '/ ' (simple alternatives)
+        - Replace ' (' and ' [' with '-' (elliptical alternatives)
+        - Remove '(' and '[' (simple and elliptical additions)
         """
-        # - Replace 'bzw.' and '(bzw.' and '[bzw.' and 'oder' and
-        #   '(oder' and '[oder' with '/' (dot optional after 'bzw')
-        # - Remove duplicates and offsets and misc
-        # - Remove ')' and ']'
-        # - Remove locations
         title = re.sub('[\(\[]?(bzw\.?|oder)', '/', title)
         title = re.sub(' \((\D+|\d{2}\..+)\)', '', title)
         title = re.sub('[\)\]]', '', title)
         title = re.sub(' \D+$', '', title)
         if title_type == RegestTitleType.SIMPLE_ALTERNATIVES:
-            # Replace '(' and '[' with '/ '
             title = re.sub('[\(\[]', '/ ', title)
         elif title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES:
-            # Replace ' (' and ' [' with '-'
             title = re.sub(' [\(\[]', '-', title)
         elif title_type == RegestTitleType.SIMPLE_ADDITIONS or \
                 title_type == RegestTitleType.ELLIPTICAL_ADDITIONS:
-            # Remove '(' and '['
             title = re.sub('[\(\[]', '', title)
         return title
 
