@@ -11,8 +11,24 @@ from regesten_webapp import EllipsisType, RegestTitleType
 
 
 class RegestTitleAnalyzer(object):
+    """
+    The RegestTitleAnalyzer class groups functionalities for analyzing
+    regest titles in various ways.
+    """
     @staticmethod
     def contains_simple_additions(string):
+        """
+        Check if string contains 'simple additions'.
+
+        Simple additions are of the form
+
+            yyyy(-mm-dd) und yyyy(-mm-dd)
+
+        Examples:
+        - 1524 und 1525
+        - 1419-05 und 1419-06
+        - 1421-10-05 und 1422-10-04
+        """
         return re.match(
             '\d{4}(-\d{2}){0,2}' \
                 ' [\(\[]?und ' \
@@ -20,6 +36,19 @@ class RegestTitleAnalyzer(object):
 
     @staticmethod
     def contains_elliptical_additions(string):
+        """
+        Check if string contains 'elliptical additions'.
+
+        Elliptical additions omit year or year and month information
+        and are of the form
+
+            yyyy-mm(-dd) und (mm-)dd
+
+        Examples:
+        - 1270-04 und 05
+        - 1440-11-12 und 17
+        - 1270-04-27 und 05-28
+        """
         return re.match(
             '\d{4}(-\d{2}){0,2}' \
                 ' [\(\[]?und ' \
@@ -27,6 +56,26 @@ class RegestTitleAnalyzer(object):
 
     @staticmethod
     def contains_simple_alternatives(string):
+        """
+        Check if string contains 'simple alternatives'.
+
+        Examples for simple alternatives include:
+        - 1524/1525
+        - 1524 / 1525
+        - 1419-05/1419-06
+        - 1419-05 / 1419-06
+        - 1421-10-05/1422-10-04
+        - 1421-10-05 / 1422-10-04
+        - 1502 (1503)
+        - 1502-11 (1503-02)
+        - 1502-11-22 (1503-02-07)
+        - 1520 [bzw. 1519]
+        - 1520-02 [bzw. 1519-03]
+        - 1520-02-18 [bzw. 1519-03-06]
+        - 1520 bzw. 1519
+        - 1520-02 bzw. 1519-03
+        - 1520-02-18 bzw. 1519-03-06
+        """
         return re.match(
             '\d{4}(-\d{2}){0,2}' \
                 '( ?/ ?| [\(\[]| [\(\[]?bzw\.? | [\(\[]?oder )' \
@@ -34,6 +83,29 @@ class RegestTitleAnalyzer(object):
 
     @staticmethod
     def contains_elliptical_alternatives(string):
+        """
+        Check if string contains 'elliptical alternatives'.
+
+        Examples for elliptical alternatives include:
+        - 1270-04/05
+        - 1270-04 / 05
+        - 1440-11-12/17
+        - 1440-11-12 / 17
+        - 1270-04-27/05-28
+        - 1270-04-27 / 05-28
+        - 1466 [04/05]
+        - 1466 [04 / 05]
+        - 1466-04 [28/29]
+        - 1466-04 [28 / 29]
+        - 1466 [04-28/05-01]
+        - 1466 [04-28 / 05-01]
+        - 1506-05 bzw. 11
+        - 1506-05-12 bzw. 10
+        - 1506-05-12 bzw. 11-10
+        - 1343-04 oder 05
+        - 1343-04-12 oder 19
+        - 1343-04-12 oder 05-19
+        """
         return re.match(
             '\d{4}(-\d{2}){0,2}' \
                 '( ?/ ?| [\(\[]| [\(\[]?bzw\.? | [\(\[]?oder )' \
@@ -75,6 +147,30 @@ class RegestTitleAnalyzer(object):
 
     @staticmethod
     def determine_ellipsis_type(elliptical_title, separator):
+        """
+        Return type of ellipsis for a given elliptical title.
+
+        Elliptical regest titles differ in the amount and type of
+        information they omit. This needs to be taken into
+        consideration when generating RegestDate objects based on the
+        title of a given regest. There are three different
+        types of ellipses in total, each of which is represented by a
+        dedicated constant (defined in __init__.py):
+
+        1270-04 / 05       month different, no day
+        1440-11-12 / 17    day different
+        1270-04-27 / 05-28 month *and* day different
+
+        | Title                        | Type of Ellipsis          |
+        |------------------------------+---------------------------|
+        | 1270-04 <separator> 05       | month different, no day   |
+        | 1440-11-12 <separator> 17    | day different             |
+        | 1270-04-27 <separator> 05-28 | month *and* day different |
+        |------------------------------+---------------------------|
+
+        N.B.: This method should be called *after* removing any
+        non-standard formatting from the elliptical title in question.
+        """
         if re.match(
             '\d{4}-\d{2} ?' + separator + ' ?\d{2}([^\d-].*|)$',
             elliptical_title):
