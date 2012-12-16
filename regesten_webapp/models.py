@@ -101,6 +101,9 @@ class Regest(models.Model):
         return u'Regest {0}: {1}'.format(self.id, self.title)
 
     class Meta:
+        """
+        Specifies metadata for the Regest model.
+        """
         verbose_name = 'Regest'
         verbose_name_plural = 'Regesten'
 
@@ -116,6 +119,9 @@ class Archive(models.Model):
         return u'{0}'.format(self.info)
 
     class Meta:
+        """
+        Specifies metadata for the Archive model.
+        """
         verbose_name = ugettext_lazy('archive')
         verbose_name_plural = ugettext_lazy('archives')
 
@@ -150,6 +156,9 @@ class RegestDate(models.Model):
                (ugettext_lazy('ends on') + u' {0}'.format(self.end))
 
     class Meta:
+        """
+        Specifies metadata for the RegestDate model.
+        """
         verbose_name = ugettext_lazy('regest date')
         verbose_name_plural = ugettext_lazy('regest dates')
 
@@ -167,6 +176,9 @@ class Footnote(models.Model):
         return u'Footnote {0}:\n{1}'.format(self.id, self.content)
 
     class Meta:
+        """
+        Specifies metadata for the Footnote model.
+        """
         verbose_name = ugettext_lazy('Footnote')
         verbose_name_plural = ugettext_lazy('Footnotes')
 
@@ -188,6 +200,9 @@ class MetaInfo(models.Model):
             self.regest.id, self.tags, self.comments)
 
     class Meta:
+        """
+        Specifies metadata for the MetaInfo model.
+        """
         verbose_name = ugettext_lazy('meta information')
         verbose_name_plural = ugettext_lazy('meta information')
 
@@ -209,6 +224,9 @@ class Quote(models.Model):
         return u'{0}'.format(self.content)
 
     class Meta:
+        """
+        Specifies metadata for the Quote model.
+        """
         verbose_name = ugettext_lazy('quote')
         verbose_name_plural = ugettext_lazy('quotes')
 
@@ -248,6 +266,9 @@ class Concept(models.Model):
             self.id, self.name)
 
     class Meta:
+        """
+        Specifies metadata for the Concept model.
+        """
         verbose_name = ugettext_lazy('Concept')
         verbose_name_plural = ugettext_lazy('Concepts')
 
@@ -268,6 +289,9 @@ class Landmark(IndexEntry, Concept):
         return landmark
 
     class Meta:
+        """
+        Specifies metadata for the Landmark model.
+        """
         verbose_name = ugettext_lazy('Landmark')
         verbose_name_plural = ugettext_lazy('Landmarks')
 
@@ -298,6 +322,9 @@ class Location(IndexEntry, Concept):
         return location
 
     class Meta:
+        """
+        Specifies metadata for the Location model.
+        """
         verbose_name = ugettext_lazy('Location')
         verbose_name_plural = ugettext_lazy('Locations')
 
@@ -327,6 +354,9 @@ class Person(IndexEntry, Concept):
         return u'Person {0}: {1}'.format(self.id, self.name)
 
     class Meta:
+        """
+        Specifies metadata for the Person model.
+        """
         verbose_name = ugettext_lazy('Person')
         verbose_name_plural = ugettext_lazy('Persons')
 
@@ -343,6 +373,9 @@ class PersonGroup(IndexEntry, Concept):
         return u'PersonGroup {0}: {1}'.format(self.id, self.name)
 
     class Meta:
+        """
+        Specifies metadata for the PersonGroup model.
+        """
         verbose_name = ugettext_lazy('Person group')
         verbose_name_plural = ugettext_lazy('Person groups')
 
@@ -360,7 +393,7 @@ class Family(PersonGroup):
 
     class Meta:
         """
-        Specifies metadata and options for the Family model.
+        Specifies metadata for the Family model.
         """
         verbose_name = ugettext_lazy('Family')
         verbose_name_plural = ugettext_lazy('Families')
@@ -380,5 +413,8 @@ class Region(models.Model):
         return u'{0}: ({1})'.format(self.name, self.region_type)
 
     class Meta:
+        """
+        Specifies metadata for the Region model.
+        """
         verbose_name = ugettext_lazy('Region')
         verbose_name_plural = ugettext_lazy('Regions')
