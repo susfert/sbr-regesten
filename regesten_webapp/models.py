@@ -10,6 +10,7 @@ from regesten_webapp import AUTHORS, COUNTRIES, OFFSET_TYPES, REGION_TYPES
 from regesten_webapp import RegestTitleType
 from regesten_webapp.utils import RegestTitleAnalyzer, RegestTitleParser
 
+
 class Regest(models.Model):
     """
     The Regest model represents a single regest.
@@ -361,7 +362,6 @@ class Family(PersonGroup):
         """
         Specifies metadata and options for the Family model.
         """
-
         verbose_name = ugettext_lazy('Family')
         verbose_name_plural = ugettext_lazy('Families')
 
