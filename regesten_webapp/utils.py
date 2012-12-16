@@ -357,6 +357,21 @@ class RegestDateExtractor(object):
     def extract_end(cls, title, title_type, start):
         """
         Based on its type, extract end date from a given regest title.
+
+        Month and day values for elliptical end dates are constrained
+        by the type of ellipsis used in the regest title:
+
+        If the title contains no day information for the start date,
+        the two digit value extracted from the end date portion
+        represents month information; day defaults to DAY_DEFAULT. If
+        the title provides day information for the start date, the two
+        digit value extracted from the end date portion represents day
+        information. If the title provides day information and the
+        string representing the end date contains two two-digit
+        sequences separated by a hyphen, the first two-digit sequence
+        represents month information, and the second two digit
+        sequence represents day information. For a list of examples
+        see docstring of RegestTitleAnalyzer.determine_ellipsis_type.
         """
         if title_type == RegestTitleType.SIMPLE_RANGE:
             end = re.search(
@@ -385,6 +400,10 @@ class RegestDateExtractor(object):
         """
         Extract any additional dates (alternatives or additions) from
         a given regest title which is non-elliptical.
+
+        N.B.: This method assumes that title has already been
+        preprocessed using
+        RegestDateExtractor.remove_non_standard_formatting.
         """
         alt_date = title_type == RegestTitleType.SIMPLE_ALTERNATIVES
         separator = '/' if alt_date else 'und'
@@ -406,6 +425,25 @@ class RegestDateExtractor(object):
         """
         Extract any additional dates (alternatives or additions) from
         a given regest title which is elliptical.
+
+        Month and day values for additional dates are constrained by
+        the type of ellipsis used in the regest title:
+
+        If the title contains no day information for the main date,
+        the two digit value extracted from a single addition
+        represents month information; day defaults to DAY_DEFAULT. If
+        the title provides day information for the main date, the two
+        digit value extracted from a single addition represents day
+        information. If the title provides day information and the
+        string representing a single addition contains two two-digit
+        sequences separated by a hyphen, the first two-digit sequence
+        represents month information, and the second two digit
+        sequence represents day information. For a list of examples
+        see docstring of RegestTitleAnalyzer.determine_ellipsis_type.
+
+        N.B.: This method assumes that title has already been
+        preprocessed using
+        RegestDateExtractor.remove_non_standard_formatting.
         """
         alt_date = title_type == RegestTitleType.ELLIPTICAL_ALTERNATIVES
         separator = '/' if alt_date else 'und'
