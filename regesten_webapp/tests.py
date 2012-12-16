@@ -45,15 +45,15 @@ class RegestTest(TestCase):
                         regest.title, regest_date, e.message))
 
     def test_regular_dates(self):
-        '''
         Tests whether or not *regular dates* are extracted correctly
+        """
         from the title of a given regest.
 
         Regular dates include:
         - 1009 (year only)
         - 1009-10 (year and month)
         - 1009-10-20 (year, month, and day)
-        '''
+        """
         self.__create_and_check_dates('1009', self.RegestDate(
                 date(1009, 01, 01), date(1009, 01, 01), '', '', False))
         self.__create_and_check_dates('1009-10', self.RegestDate(
@@ -62,7 +62,7 @@ class RegestTest(TestCase):
                 date(1009, 10, 20), date(1009, 10, 20), '', '', False))
 
     def test_regular_dates_with_location(self):
-        '''
+        """
         Tests whether or not regular dates are extracted correctly
         from titles that include a location.
 
@@ -70,7 +70,7 @@ class RegestTest(TestCase):
         - 1009 Diedenhofen
         - 1009-10 Frankfurt am Main
         - 1009-10-20 St. Arnual
-        '''
+        """
         self.__create_and_check_dates('1009 Diedenhofen', self.RegestDate(
                 date(1009, 01, 01), date(1009, 01, 01), '', '', False))
         self.__create_and_check_dates(
@@ -81,7 +81,7 @@ class RegestTest(TestCase):
                 date(1009, 10, 20), date(1009, 10, 20), '', '', False))
 
     def test_regular_dates_with_offset(self):
-        '''
+        """
         Tests whether or not regular dates that include an offset are
         extracted correctly from regest titles.
 
@@ -98,7 +98,7 @@ class RegestTest(TestCase):
 
         For a complete list of possible offsets see the OFFSET_TYPES
         constant in regesten_webapp.__init__.py.
-        '''
+        """
         self.__create_and_check_dates('1009 (vor)', self.RegestDate(
                 date(1009, 01, 01), date(1009, 01, 01), 'vor', 'vor', False))
         self.__create_and_check_dates('1009-10 (nach)', self.RegestDate(
@@ -117,7 +117,7 @@ class RegestTest(TestCase):
                 date(1009, 10, 20), date(1009, 10, 20), '', '', False))
 
     def test_regular_dates_with_offset_and_location(self):
-        '''
+        """
         Tests whether or not regular dates that include an offset are
         extracted correctly from regest titles which include a
         location.
@@ -136,7 +136,7 @@ class RegestTest(TestCase):
 
         For a complete list of possible offsets see the OFFSET_TYPES
         constant in regesten_webapp.__init__.py.
-        '''
+        """
         self.__create_and_check_dates(
             '1009 (vor) Diedenhofen', self.RegestDate(
                 date(1009, 01, 01), date(1009, 01, 01), 'vor', 'vor', False))
@@ -172,7 +172,7 @@ class RegestTest(TestCase):
                 date(1507, 12, 27), date(1507, 12, 27), '', '', False))
 
     def test_regular_dates_with_duplicates(self):
-        '''
+        """
         Tests whether or not regular dates are extracted correctly
         from regest titles which contain *duplicate markers*.
 
@@ -184,7 +184,7 @@ class RegestTest(TestCase):
         - 1270-07 (b)
         - 1377-03-05 (c)
         - 1424-06-03 (a) und (b)
-        '''
+        """
         self.__create_and_check_dates('1273 (a)', self.RegestDate(
                 date(1273, 01, 01), date(1273, 01, 01), '', '', False))
         self.__create_and_check_dates('1270-07 (b)', self.RegestDate(
@@ -196,7 +196,7 @@ class RegestTest(TestCase):
                 date(1424, 06, 03), date(1424, 06, 03), '', '', False))
 
     def test_regular_dates_with_duplicates_and_location(self):
-        '''
+        """
         Tests whether or not regular dates are extracted correctly
         from regest titles which contain duplicate markers and
         locations.
@@ -209,7 +209,7 @@ class RegestTest(TestCase):
         - 1270-07 (b) Frankfurt am Main
         - 1354-04-01 (c) St. Arnual
         - 1424-06-03 (a) und (b) Tull
-        '''
+        """
         self.__create_and_check_dates('1442 (a) Diedenhofen', self.RegestDate(
                 date(1442, 01, 01), date(1442, 01, 01), '', '', False))
         self.__create_and_check_dates(
@@ -222,7 +222,7 @@ class RegestTest(TestCase):
                 date(1424, 06, 03), date(1424, 06, 03), '', '', False))
 
     def test_regular_dates_with_duplicates_and_offset(self):
-        '''
+        """
         Tests whether or not regular dates and their offsets are
         extracted correctly from regest titles which contain duplicate
         markers.
@@ -239,7 +239,7 @@ class RegestTest(TestCase):
         - 1200-03-12 (c) (ca.)
         - 1009-10-20 (ca. Mitte 15. Jh.) (d)'
         - 1009-10-20 (d) (ca. Mitte 15. Jh.)'
-        '''
+        """
         self.__create_and_check_dates('1200 (vor) (a)', self.RegestDate(
                 date(1200, 01, 01), date(1200, 01, 01), 'vor', 'vor', False))
         self.__create_and_check_dates('1200 (a) (vor)', self.RegestDate(
@@ -264,7 +264,7 @@ class RegestTest(TestCase):
                 date(1009, 10, 20), date(1009, 10, 20), 'ca.', 'ca.', False))
 
     def test_simple_ranges(self):
-        '''
+        """
         Tests whether or not "simple" date ranges are extracted
         correctly from the title of a given regest.
 
@@ -276,7 +276,7 @@ class RegestTest(TestCase):
         - 1024 - 1030
         - 1419-05 - 1419-06
         - 1482-07-16 - 1499-01-03
-        '''
+        """
         self.__create_and_check_dates('1024-1030', self.RegestDate(
                 date(1024, 01, 01), date(1030, 01, 01), '', '', False))
         self.__create_and_check_dates('1024 - 1030', self.RegestDate(
@@ -288,7 +288,7 @@ class RegestTest(TestCase):
                 date(1484, 07, 16), date(1499, 01, 03), '', '', False))
 
     def test_simple_ranges_with_offset(self):
-        '''
+        """
         Tests whether or not simple date ranges and their offsets are
         extracted correctly from the title of a given regest.
 
@@ -299,7 +299,7 @@ class RegestTest(TestCase):
         - 1419-05 (nach) - 1419-06 (vor)
         - 1482-07-16 - 1499-01-08 (ca.)
         - 1482-07-16 (nach) - 1499-01-08 (vor)
-        '''
+        """
         self.__create_and_check_dates('0935-1000 (ca.)', self.RegestDate(
                 date(935, 01, 01), date(1000, 01, 01), 'ca.', 'ca.', False))
         self.__create_and_check_dates(
@@ -319,7 +319,7 @@ class RegestTest(TestCase):
                 date(1484, 07, 16), date(1499, 01, 03), 'nach', 'vor', False))
 
     def test_simple_ranges_with_offset_and_duplicates(self):
-        '''
+        """
         Tests whether or not simple date ranges and their offsets are
         extracted correctly from regest titles containing duplicates.
 
@@ -334,7 +334,7 @@ class RegestTest(TestCase):
         - 1482-07-16 - 1499-01-08 (ca.) (b)
         - 1482-07-16 - 1499-01-08 (c) (ca.)
         - 1482-07-16 (nach) - 1499-01-08 (vor) (a)
-        '''
+        """
         self.__create_and_check_dates('1460-1466 (a) ca.', self.RegestDate(
                 date(1460, 01, 01), date(1466, 01, 01), 'ca.', 'ca.', False))
         self.__create_and_check_dates('1460-1466 (ca.) (b)', self.RegestDate(
@@ -364,14 +364,14 @@ class RegestTest(TestCase):
                 date(1484, 07, 16), date(1499, 01, 03), 'nach', 'vor', False))
 
     def test_elliptical_ranges(self):
-        '''
+        """
         Tests whether or not "elliptical" date ranges are extracted
         correctly from the title of a given regest.
 
         Examples:
         - 1419-05 bis 06
         - 1419-05-10 bis 20
-        '''
+        """
         self.__create_and_check_dates('1419-05 bis 06', self.RegestDate(
                 date(1419, 05, 01), date(1419, 06, 01), '', '', False))
         self.__create_and_check_dates(
@@ -379,7 +379,7 @@ class RegestTest(TestCase):
                 date(1419, 05, 10), date(1419, 05, 20), '', '', False))
 
     def test_elliptical_ranges_with_offset(self):
-        '''
+        """
         Tests whether or not elliptical date ranges and their offsets
         are extracted correctly from the title of a given regest.
 
@@ -390,7 +390,7 @@ class RegestTest(TestCase):
         - 1419-05 (nach) bis 06 (vor)
         - 1419-05-10 (nach) bis 20 (vor)
         - 1419-05-10 (nach) bis 06-20 (vor)
-        '''
+        """
         self.__create_and_check_dates(
             '1419-05 bis 06 (kurz nach)', self.RegestDate(
                 date(1419, 05, 01), date(1419, 06, 01),
@@ -413,7 +413,7 @@ class RegestTest(TestCase):
                 date(1419, 05, 10), date(1419, 06, 20), 'nach', 'vor', False))
 
     def test_elliptical_ranges_with_offset_and_duplicates(self):
-        '''
+        """
         Tests whether or not elliptical date ranges and their offsets
         are extracted correctly from regest titles containing
         duplicates.
@@ -425,7 +425,7 @@ class RegestTest(TestCase):
         - 1419-05-10 bis 20 (a) ca.
         - 1419-05-10 bis 20 (ca.) (b)
         - 1419-05-10 bis 20 (c) (ca.)
-        '''
+        """
         self.__create_and_check_dates(
             '1419-05 bis 06 (a) kurz nach', self.RegestDate(
                 date(1419, 05, 01), date(1419, 06, 01),
@@ -449,7 +449,7 @@ class RegestTest(TestCase):
                 date(1419, 05, 10), date(1419, 05, 20), 'ca.', 'ca.', False))
 
     def test_simple_alternatives(self):
-        '''
+        """
         Examples:
         - 1524/1525
         - 1524 / 1525
@@ -469,7 +469,7 @@ class RegestTest(TestCase):
         - 1520 bzw. 1519 bzw. 1518
         - 1520-02 bzw. 1519-03 bzw. 1518-04
         - 1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23
-        '''
+        """
         self.__create_and_check_dates(
             '1524/1525', self.RegestDate(
                 date(1524, 01, 01), date(1524, 01, 01), '', '', False),
@@ -568,7 +568,7 @@ class RegestTest(TestCase):
                 date(1518, 04, 23), date(1518, 04, 23), '', '', True))
 
     def test_simple_alternatives_with_location(self):
-        '''
+        """
         Examples:
         - 1524/1525 Diedenhofen
         - 1524 / 1525 Frankfurt am Main
@@ -588,7 +588,7 @@ class RegestTest(TestCase):
         - 1520 bzw. 1519 bzw. 1518 Diedenhofen
         - 1520-02 bzw. 1519-03 bzw. 1518-04 Frankfurt am Main
         - 1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 St. Arnual
-        '''
+        """
         self.__create_and_check_dates(
             '1524/1525 Diedenhofen', self.RegestDate(
                 date(1524, 01, 01), date(1524, 01, 01), '', '', False),
@@ -689,7 +689,7 @@ class RegestTest(TestCase):
                 date(1518, 04, 23), date(1518, 04, 23), '', '', True))
 
     def test_simple_alternatives_with_duplicates(self):
-        '''
+        """
         Examples:
         - 1524/1525 (a)
         - 1524 / 1525 (b)
@@ -709,7 +709,7 @@ class RegestTest(TestCase):
         - 1520 bzw. 1519 bzw. 1518 (a)
         - 1520-02 bzw. 1519-03 bzw. 1518-04 (b)
         - 1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 (c)
-        '''
+        """
         self.__create_and_check_dates(
             '1524/1525 (a)', self.RegestDate(
                 date(1524, 01, 01), date(1524, 01, 01), '', '', False),
@@ -808,7 +808,7 @@ class RegestTest(TestCase):
                 date(1518, 04, 23), date(1518, 04, 23), '', '', True))
 
     def test_simple_alternatives_with_duplicates_and_location(self):
-        '''
+        """
         Examples:
         - 1524/1525 (a) Diedenhofen
         - 1524 / 1525 (b) Frankfurt am Main
@@ -828,7 +828,7 @@ class RegestTest(TestCase):
         - 1520 bzw. 1519 bzw. 1518 (a) Diedenhofen
         - 1520-02 bzw. 1519-03 bzw. 1518-04 (b) Frankfurt am Main
         - 1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 (c) St. Arnual
-        '''
+        """
         self.__create_and_check_dates(
             '1524/1525 (a) Diedenhofen', self.RegestDate(
                 date(1524, 01, 01), date(1524, 01, 01), '', '', False),
@@ -929,7 +929,7 @@ class RegestTest(TestCase):
                 date(1518, 04, 23), date(1518, 04, 23), '', '', True))
 
     def test_simple_alternatives_with_offset(self):
-        '''
+        """
         Examples:
         - 1524/1525 (vor)
         - 1524 / 1525 (nach)
@@ -949,7 +949,7 @@ class RegestTest(TestCase):
         - 1520 bzw. 1519 bzw. 1518 (um)
         - 1520-02 bzw. 1519-03 bzw. 1518-04 (ca.)
         - 1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 (kurz nach)
-        '''
+        """
         self.__create_and_check_dates(
             '1524/1525 (vor)', self.RegestDate(
                 date(1524, 01, 01), date(1524, 01, 01), 'vor', 'vor', False),
@@ -1062,7 +1062,7 @@ class RegestTest(TestCase):
                 'kurz nach', 'kurz nach', True))
 
     def test_elliptical_alternatives(self):
-        '''
+        """
         Examples:
         - 1270-04/05 (month different, no day)
         - 1270-04 / 05 (month different, no day)
@@ -1088,7 +1088,7 @@ class RegestTest(TestCase):
         - 1343-04 oder 05 (month different, no day)
         - 1343-04-12 oder 19 (day different)
         - 1343-04-12 oder 05-19 (month *and* day different)
-        '''
+        """
         self.__create_and_check_dates(
             '1270-04/05', self.RegestDate(
                 date(1270, 04, 01), date(1270, 04, 01), '', '', False),
@@ -1202,7 +1202,7 @@ class RegestTest(TestCase):
                 date(1343, 05, 19), date(1343, 05, 19), '', '', True))
 
     def test_elliptical_alternatives_with_location(self):
-        '''
+        """
         Examples:
         - 1270-04/05 Diedenhofen
         - 1270-04 / 05 Frankfurt am Main
@@ -1228,7 +1228,7 @@ class RegestTest(TestCase):
         - 1343-04 oder 05 Diedenhofen
         - 1343-04-12 oder 19 Frankfurt am Main
         - 1343-04-12 oder 05-19 St. Arnual
-        '''
+        """
         self.__create_and_check_dates(
             '1270-04/05 Diedenhofen', self.RegestDate(
                 date(1270, 04, 01), date(1270, 04, 01), '', '', False),
@@ -1342,7 +1342,7 @@ class RegestTest(TestCase):
                 date(1343, 05, 19), date(1343, 05, 19), '', '', True))
 
     def test_elliptical_alternatives_with_duplicates(self):
-        '''
+        """
         Examples:
         - 1270-04/05 (a)
         - 1270-04 / 05 (b)
@@ -1368,7 +1368,7 @@ class RegestTest(TestCase):
         - 1343-04 oder 05 (a)
         - 1343-04-12 oder 19 (b)
         - 1343-04-12 oder 05-19 (c)
-        '''
+        """
         self.__create_and_check_dates(
             '1270-04/05 (a)', self.RegestDate(
                 date(1270, 04, 01), date(1270, 04, 01), '', '', False),
@@ -1482,7 +1482,7 @@ class RegestTest(TestCase):
                 date(1343, 05, 19), date(1343, 05, 19), '', '', True))
 
     def test_elliptical_alternatives_with_duplicates_and_location(self):
-        '''
+        """
         Examples:
         - 1270-04/05 (a) Diedenhofen
         - 1270-04 / 05 (b) Frankfurt am Main
@@ -1508,7 +1508,7 @@ class RegestTest(TestCase):
         - 1343-04 oder 05 (a) Diedenhofen
         - 1343-04-12 oder 19 (b) Frankfurt am Main
         - 1343-04-12 oder 05-19 (c) St. Arnual
-        '''
+        """
         self.__create_and_check_dates(
             '1270-04/05 (a) Diedenhofen', self.RegestDate(
                 date(1270, 04, 01), date(1270, 04, 01), '', '', False),
@@ -1624,7 +1624,7 @@ class RegestTest(TestCase):
                 date(1343, 05, 19), date(1343, 05, 19), '', '', True))
 
     def test_elliptical_alternatives_with_offset(self):
-        '''
+        """
         Examples:
         - 1270-04/05 (vor)
         - 1270-04 / 05 (nach)
@@ -1650,7 +1650,7 @@ class RegestTest(TestCase):
         - 1343-04 oder 05 (um)
         - 1343-04-12 oder 19 (ca.)
         - 1343-04-12 oder 05-19 (kurz nach)
-        '''
+        """
         self.__create_and_check_dates(
             '1270-04/05 (vor)', self.RegestDate(
                 date(1270, 04, 01), date(1270, 04, 01), 'vor', 'vor', False),
@@ -1779,12 +1779,12 @@ class RegestTest(TestCase):
                 'kurz nach', 'kurz nach', True))
 
     def test_simple_additions(self):
-        '''
+        """
         Examples:
         - 1524 und 1525
         - 1419-05 und 1419-06
         - 1421-10-05 und 1422-10-04
-        '''
+        """
         self.__create_and_check_dates(
             '1524 und 1525', self.RegestDate(
                 date(1524, 01, 01), date(1524, 01, 01), '', '', False),
@@ -1802,12 +1802,12 @@ class RegestTest(TestCase):
                 date(1422, 10, 04), date(1422, 10, 04), '', '', False))
 
     def test_simple_additions_with_location(self):
-        '''
+        """
         Examples:
         - 1524 und 1525 Diedenhofen
         - 1419-05 und 1419-06 Frankfurt am Main
         - 1421-10-05 und 1422-10-04 St. Arnual
-        '''
+        """
         self.__create_and_check_dates(
             '1524 und 1525 Diedenhofen', self.RegestDate(
                 date(1524, 01, 01), date(1524, 01, 01), '', '', False),
@@ -1825,12 +1825,12 @@ class RegestTest(TestCase):
                 date(1422, 10, 04), date(1422, 10, 04), '', '', False))
 
     def test_simple_additions_with_duplicates(self):
-        '''
+        """
         Examples:
         - 1524 und 1525 (a)
         - 1419-05 und 1419-06 (b)
         - 1421-10-05 und 1422-10-04 (c)
-        '''
+        """
         self.__create_and_check_dates(
             '1524 und 1525 (a)', self.RegestDate(
                 date(1524, 01, 01), date(1524, 01, 01), '', '', False),
@@ -1848,12 +1848,12 @@ class RegestTest(TestCase):
                 date(1422, 10, 04), date(1422, 10, 04), '', '', False))
 
     def test_simple_additions_with_duplicates_and_location(self):
-        '''
+        """
         Examples:
         - 1524 und 1525 (a) Diedenhofen
         - 1419-05 und 1419-06 (b) Frankfurt am Main
         - 1421-10-05 und 1422-10-04 (c) St. Arnual
-        '''
+        """
         self.__create_and_check_dates(
             '1524 und 1525 (a) Diedenhofen', self.RegestDate(
                 date(1524, 01, 01), date(1524, 01, 01), '', '', False),
@@ -1871,12 +1871,12 @@ class RegestTest(TestCase):
                 date(1422, 10, 04), date(1422, 10, 04), '', '', False))
 
     def test_simple_additions_with_offset(self):
-        '''
+        """
         Examples:
         - 1524 und 1525 (um)
         - 1419-05 und 1419-06 (ca.)
         - 1421-10-05 und 1422-10-04 (kurz nach)
-        '''
+        """
         self.__create_and_check_dates(
             '1524 und 1525 (um)', self.RegestDate(
                 date(1524, 01, 01), date(1524, 01, 01), 'um', 'um', False),
@@ -1896,12 +1896,12 @@ class RegestTest(TestCase):
                 'kurz nach', 'kurz nach', False))
 
     def test_elliptical_additions(self):
-        '''
+        """
         Examples:
         - 1270-04 und 05 (month different, no day)
         - 1440-11-12 und 17 (day different)
         - 1270-04-27 und 05-28 (month *and* day different)
-        '''
+        """
         self.__create_and_check_dates(
             '1270-04 und 05', self.RegestDate(
                 date(1270, 04, 01), date(1270, 04, 01), '', '', False),
@@ -1919,12 +1919,12 @@ class RegestTest(TestCase):
                 date(1270, 05, 28), date(1270, 05, 28), '', '', False))
 
     def test_elliptical_additions_with_location(self):
-        '''
+        """
         Examples:
         - 1270-04 und 05 Diedenhofen
         - 1440-11-12 und 17 Frankfurt am Main
         - 1270-04-27 und 05-28 St. Arnual
-        '''
+        """
         self.__create_and_check_dates(
             '1270-04 und 05 Diedenhofen', self.RegestDate(
                 date(1270, 04, 01), date(1270, 04, 01), '', '', False),
@@ -1942,12 +1942,12 @@ class RegestTest(TestCase):
                 date(1270, 05, 28), date(1270, 05, 28), '', '', False))
 
     def test_elliptical_additions_with_duplicates(self):
-        '''
+        """
         Examples:
         - 1270-04 und 05 (a)
         - 1440-11-12 und 17 (b)
         - 1270-04-27 und 05-28 (c)
-        '''
+        """
         self.__create_and_check_dates(
             '1270-04 und 05 (a)', self.RegestDate(
                 date(1270, 04, 01), date(1270, 04, 01), '', '', False),
@@ -1965,12 +1965,12 @@ class RegestTest(TestCase):
                 date(1270, 05, 28), date(1270, 05, 28), '', '', False))
 
     def test_elliptical_additions_with_duplicates_and_location(self):
-        '''
+        """
         Examples:
         - 1270-04 und 05 (a) Diedenhofen
         - 1440-11-12 und 17 (b) Frankfurt am Main
         - 1270-04-27 und 05-28 (c) St. Arnual
-        '''
+        """
         self.__create_and_check_dates(
             '1270-04 und 05 (a) Diedenhofen', self.RegestDate(
                 date(1270, 04, 01), date(1270, 04, 01), '', '', False),
@@ -1988,12 +1988,12 @@ class RegestTest(TestCase):
                 date(1270, 05, 28), date(1270, 05, 28), '', '', False))
 
     def test_elliptical_additions_with_offset(self):
-        '''
+        """
         Examples:
         - 1270-04 und 05 (um)
         - 1440-11-12 und 17 (ca.)
         - 1270-04-27 und 05-28 (kurz nach)
-        '''
+        """
         self.__create_and_check_dates(
             '1270-04 und 05 (um)', self.RegestDate(
                 date(1270, 04, 01), date(1270, 04, 01), 'um', 'um', False),
@@ -2013,7 +2013,7 @@ class RegestTest(TestCase):
                 'kurz nach', 'kurz nach', False))
 
     def test_misc(self):
-        '''
+        """
         Examples:
         - 1337-12-
         - 1400 (15. Jh., Anfang)
@@ -2022,7 +2022,7 @@ class RegestTest(TestCase):
         - 1500 (e) (15. Jh., Ende) Saarbruecken
         - 1419-05 bis 06 (Mai bis Juli)
         - 1024-1030 (ohne Datum)
-        '''
+        """
         self.__create_and_check_dates(
             '1337-12-', self.RegestDate(
                 date(1337, 12, 01), date(1337, 12, 01), '', '', False))
