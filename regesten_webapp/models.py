@@ -43,7 +43,7 @@ class Regest(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Saves Regest instance to database and triggers generation of
+        Save Regest instance to database and trigger generation of
         RegestDate objects to associate with it.
         """
         super(Regest, self).save(*args, **kwargs)
@@ -51,8 +51,8 @@ class Regest(models.Model):
 
     def _generate_dates(self):
         """
-        Generates RegestDate objects for Regest instance based on
-        value of title attribute.
+        Generate RegestDate objects for Regest instance based on value
+        of title attribute.
 
         With the help of RegestTitleAnalyzer and RegestTitleParser
         (defined in utils.py), this method generates RegestDate
@@ -91,7 +91,7 @@ class Regest(models.Model):
 
     def __delete_existing_dates(self):
         """
-        Deletes all existing RegestDate objects associated with Regest
+        Delete all existing RegestDate objects associated with Regest
         instance.
         """
         for regest_date in self.regestdate_set.all():
@@ -144,7 +144,7 @@ class RegestDate(models.Model):
     @property
     def exact(self):
         """
-        Provides information about whether or not date represented by
+        Provide information about whether or not date represented by
         RegestDate instance can be considered 'exact'.
 
         Exact dates do not have *any* offsets associated with them.
