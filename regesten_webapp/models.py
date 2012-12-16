@@ -104,7 +104,6 @@ class Regest(models.Model):
         verbose_name_plural = 'Regesten'
 
 
-# TODO
 class Archive(models.Model):
     """
     The Archive model represents information about a single archive.
