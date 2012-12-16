@@ -131,6 +131,8 @@ class RegestTest(TestCase):
         - 1009-10-20 St. Arnual (ca.)
         - 1009-10 St. Arnual (ca. Mitte 15. Jh.)
         - 1009-10 (ca. Mitte 15. Jh.) St. Arnual
+        - 1507-12-27 (?) Diedenhofen
+        - 1507-12-27 Diedenhofen (?)
 
         For a complete list of possible offsets see the OFFSET_TYPES
         constant in regesten_webapp.__init__.py.
@@ -162,6 +164,12 @@ class RegestTest(TestCase):
         self.__create_and_check_dates(
             '1009-10 (ca. Mitte 15. Jh.) St. Arnual', self.RegestDate(
                 date(1009, 10, 01), date(1009, 10, 01), 'ca.', 'ca.', False))
+        self.__create_and_check_dates(
+            '1507-12-27 (?) Diedenhofen', self.RegestDate(
+                date(1507, 12, 27), date(1507, 12, 27), '', '', False))
+        self.__create_and_check_dates(
+            '1507-12-27 Diedenhofen (?)', self.RegestDate(
+                date(1507, 12, 27), date(1507, 12, 27), '', '', False))
 
     def test_regular_dates_with_duplicates(self):
         '''
@@ -2012,6 +2020,8 @@ class RegestTest(TestCase):
         - 1419-10-20 (und oefter)
         - 1500 (a) (16. Jh., Anfang)
         - 1500 (e) (15. Jh., Ende) Saarbruecken
+        - 1419-05 bis 06 (Mai bis Juli)
+        - 1024-1030 (ohne Datum)
         '''
         self.__create_and_check_dates(
             '1337-12-', self.RegestDate(
@@ -2028,3 +2038,9 @@ class RegestTest(TestCase):
         self.__create_and_check_dates(
             '1500 (e) (15. Jh., Ende) Saarbruecken', self.RegestDate(
                 date(1500, 01, 01), date(1500, 01, 01), '', '', False))
+        self.__create_and_check_dates(
+            '1024-1030 (ohne Datum)', self.RegestDate(
+                date(1024, 01, 01), date(1030, 01, 01), '', '', False))
+        self.__create_and_check_dates(
+            '1419-05 bis 06 (Mai bis Juli)', self.RegestDate(
+                date(1419, 05, 01), date(1419, 06, 01), '', '', False))
