@@ -41,12 +41,12 @@ class RegestTitleAnalyzer(object):
 
     @staticmethod
     def is_simple_range(string):
-        '''
         Checks whether or not string represents a "simple" date range.
+        """
 
         Simple date ranges are non-elliptical, i.e. they include year,
         month, and day information for both start and end date.
-        '''
+        """
         return re.match('(\d{4}-\d{2}-\d{2}|\d{4}-\d{2}|\d{4})' \
                             '( \(.{2,}\))?' \
                             ' ?- ?' \
@@ -54,8 +54,8 @@ class RegestTitleAnalyzer(object):
 
     @staticmethod
     def is_elliptical_range(string):
-        '''
         Checks whether or not string starts with an "elliptical" date
+        """
         range.
 
         Elliptical date ranges are used to denote time spans that are
@@ -69,7 +69,7 @@ class RegestTitleAnalyzer(object):
           from May to June of 1419)
         - 1419-05-10 bis 20 (denotes a time span of ten days ranging
           from May 10th to May 20th, 1419).
-        '''
+        """
         return re.match('^\d{4}-\d{2}(-\d{2})?' \
                             '( \(\D{2,}\))? bis \d{2}(-\d{2})?', string)
 
@@ -149,7 +149,7 @@ class RegestTitleParser(object):
 
     @classmethod
     def determine_final_offsets(cls, start_offset, end_offset, title_type):
-        '''
+        """
         To determine the final values for start_offset and end_offset
         the following combinations of values need to be considered:
 
@@ -169,7 +169,7 @@ class RegestTitleParser(object):
           period of time that *excludes* the start and end dates given
           in the title. In this case, start_offset needs to be set to
           'nach', and end_offset needs to be set to 'vor'.
-        '''
+        """
         if start_offset and not end_offset and \
                 title_type == RegestTitleType.REGULAR:
             end_offset = start_offset
