@@ -104,10 +104,8 @@ class Regest(models.Model):
 
 class Archive(models.Model):
     """
-    The Archive model represents information about a specific archive
-    associated with one or more regests.
-
-    TODO: Add examples
+    The Archive model represents information about a single archive
+    associated with one or more Regests.
     """
 
     regest = models.ForeignKey('Regest')
@@ -123,9 +121,8 @@ class Archive(models.Model):
 
 class RegestDate(models.Model):
     """
-    The RegestDate model represents the date of a single regest.
-
-    TODO: Add examples
+    The RegestDate model represents a date or a date range associated
+    with a specific Regest.
     """
 
     regest = models.ForeignKey('Regest')
@@ -152,8 +149,8 @@ class RegestDate(models.Model):
 
 class Footnote(models.Model):
     """
-    The footnote model represents footnotes referenced e.g. in the
-    content of a regest.
+    The footnote model represents a single footnote referenced in any
+    part of a specific Regest.
     """
 
     regest = models.ForeignKey('Regest')
@@ -169,7 +166,8 @@ class Footnote(models.Model):
 
 class MetaInfo(models.Model):
     """
-    The MetaInfo model holds meta information about regests.
+    The MetaInfo model holds meta information (at this stage: comments
+    and tags) about a specific Regest.
     """
 
     regest = models.OneToOneField('Regest')
@@ -189,8 +187,8 @@ class MetaInfo(models.Model):
 
 class Quote(models.Model):
     """
-    The Quote model represents quotes embedded e.g. in the content of
-    a regest.
+    The Quote model represents a single quote embedded e.g. in the
+    content of a regest.
     """
 
     content = models.TextField(_('content'))
@@ -225,7 +223,8 @@ class IndexEntry(models.Model):
 class Concept(models.Model):
     """
     The Concept model groups attributes common to all types of
-    concepts listed in the index of the Sbr Regesten.
+    concepts listed (not necessarily as a top-level entry) in the
+    index of the Sbr Regesten.
     """
 
     name = models.CharField(_('name'), max_length=70)
@@ -363,8 +362,8 @@ class Family(PersonGroup):
 
 class Region(models.Model):
     """
-    The Region model represents regions mentioned in the (index of
-    the) Sbr Regesten.
+    The Region model represents a single region mentioned in the
+    (index of the) Sbr Regesten.
     """
 
     name = models.CharField(_('name'), max_length=70)
