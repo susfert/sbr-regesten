@@ -1,3 +1,5 @@
+""" This module configures the behavior of the admin interface. """
+
 from django.contrib import admin
 from django.contrib.contenttypes.generic import GenericStackedInline
 from django.contrib.sites.models import Site
