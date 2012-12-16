@@ -29,6 +29,8 @@ class Regest(models.Model):
 
     original_date = models.TextField(_('original date'), blank=True)
     seal = models.TextField(_('seal'))
+    archives = models.ManyToManyField(
+        'Archive', related_name='in_archives', verbose_name=_('archives'))
     print_info = models.TextField(_('print info'))
     translation = models.TextField(_('translation'), blank=True)
     original = models.TextField()
@@ -102,13 +104,12 @@ class Regest(models.Model):
         verbose_name_plural = 'Regesten'
 
 
+# TODO
 class Archive(models.Model):
     """
-    The Archive model represents information about a single archive
-    associated with one or more Regests.
+    The Archive model represents information about a single archive.
     """
 
-    regest = models.ForeignKey('Regest')
     info = models.TextField()
 
     def __unicode__(self):

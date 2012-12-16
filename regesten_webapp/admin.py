@@ -9,10 +9,6 @@ from regesten_webapp.models import MetaInfo, Person, PersonGroup
 from regesten_webapp.models import Quote, Regest, Region
 
 
-class ArchiveInline(admin.StackedInline):
-    model = Archive
-    extra = 2
-
 class FootnoteInline(admin.StackedInline):
     model = Footnote
     extra = 2
@@ -36,13 +32,12 @@ class RegestAdmin(admin.ModelAdmin):
          ),
         (_('Additional information'), {
             'fields': (
-                'original_date', 'seal', 'print_info',
+                'original_date', 'seal', 'archives', 'print_info',
                 'translation', 'original', 'author')
             })
         )
 
     inlines = [
-        ArchiveInline,
         FootnoteInline,
         QuoteInline,
         MetaInfoInline,
@@ -196,6 +191,7 @@ class RegionAdmin(admin.ModelAdmin):
 admin.site.unregister(Site)
 
 admin.site.register(Regest, RegestAdmin)
+admin.site.register(Archive)
 admin.site.register(Concept, ConceptAdmin)
 admin.site.register(Landmark, LandmarkAdmin)
 admin.site.register(Location, LocationAdmin)
