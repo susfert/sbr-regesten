@@ -39,11 +39,25 @@ class Regest(models.Model):
     xml_repr = models.TextField(_('XML representation'))
 
     def save(self, *args, **kwargs):
+        """
+        Saves Regest instance to database and triggers generation of
+        RegestDate objects to associate with it.
+        """
         super(Regest, self).save(*args, **kwargs)
         self._generate_dates()
 
     def _generate_dates(self):
         """
+        Generates RegestDate objects for Regest instance based on
+        value of title attribute.
+
+        With the help of RegestTitleAnalyzer and RegestTitleParser
+        (defined in utils.py), this method generates RegestDate
+        objects based on the title of the Regest instance and saves
+        them to the database. To make sure that any outdated
+        information is removed when updating a specific Regest from
+        the Admin Interface it also deletes all existing RegestDate
+        objects associated with the Regest instance.
         """
         if RegestTitleAnalyzer.contains_simple_additions(self.title):
             dates = RegestTitleParser.extract_dates(
@@ -73,9 +87,10 @@ class Regest(models.Model):
                 end_offset=end_offset, alt_date=alt_date)
 
     def __delete_existing_dates(self):
-        # Delete existing dates for current regest to make sure we're
-        # not keeping old ones when updating regests in the admin
-        # interface
+        """
+        Deletes all existing RegestDate objects associated with Regest
+        instance.
+        """
         for regest_date in self.regestdate_set.all():
             regest_date.delete()
 
