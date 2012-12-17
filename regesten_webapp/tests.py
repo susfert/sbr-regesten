@@ -3,7 +3,7 @@ This module provides tests for non-trivial methods of the model layer.
 
 They can be run via
 
-python manage.py test regesten_webapp
+    python manage.py test regesten_webapp
 """
 
 from collections import namedtuple
