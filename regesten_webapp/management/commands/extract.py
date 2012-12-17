@@ -1,3 +1,8 @@
+"""
+This module makes extraction pipeline available as a Django management
+command.
+"""
+
 from django.core.management.base import NoArgsCommand
 from extraction import regest_extractor, index_extractor
 
