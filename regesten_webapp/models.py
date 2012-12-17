@@ -243,7 +243,7 @@ class IndexEntry(models.Model):
 
     related_entries = models.ManyToManyField(
         'self', verbose_name=_('related entries'), null=True, blank=True)
-    xml_repr = models.TextField(_('XML representation'))
+    xml_repr = models.TextField(_('XML representation'), blank=True)
 
     def __unicode__(self):
         return ugettext_lazy('Index entry') + ' {0}'.format(self.id)
