@@ -1,6 +1,8 @@
 """
 This module contains utility classes and functions for the Sbr
 Regesten webapp.
+
+Author: Tim Krones <tkrones@coli.uni-saarland.de>
 """
 
 import re

@@ -4,6 +4,9 @@ This module provides tests for non-trivial methods of the model layer.
 They can be run via
 
     python manage.py test regesten_webapp
+
+
+Author: Tim Krones <tkrones@coli.uni-saarland.de>
 """
 
 from collections import namedtuple

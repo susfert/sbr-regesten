@@ -1,4 +1,8 @@
-""" This module defines the data model of the Sbr Regesten webapp. """
+"""
+This module defines the data model of the Sbr Regesten webapp.
+
+Author: Tim Krones <tkrones@coli.uni-saarland.de>
+"""
 
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType

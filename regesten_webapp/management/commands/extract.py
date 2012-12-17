@@ -1,6 +1,8 @@
 """
 This module makes extraction pipeline available as a Django management
 command.
+
+Author: Tim Krones <tkrones@coli.uni-saarland.de>
 """
 
 from django.core.management.base import NoArgsCommand

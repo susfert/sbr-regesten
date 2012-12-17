@@ -1,4 +1,8 @@
-""" This module configures the behavior of the admin interface. """
+"""
+This module configures the behavior of the admin interface.
+
+Author: Tim Krones <tkrones@coli.uni-saarland.de>
+"""
 
 from django.contrib import admin
 from django.contrib.contenttypes.generic import GenericStackedInline

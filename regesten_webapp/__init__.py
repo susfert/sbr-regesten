@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-""" This module provides constants for the Sbr Regesten webapp. """
+"""
+This module provides constants for the Sbr Regesten webapp.
+
+Author: Tim Krones <tkrones@coli.uni-saarland.de>
+"""
 
 DAY_DEFAULT = 1
 MONTH_DEFAULT = 1
