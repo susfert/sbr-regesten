@@ -22,7 +22,8 @@ class Regest(models.Model):
 
     title = models.CharField(_('title'), max_length=70)
     location = models.CharField(_('location'), max_length=70, blank=True)
-    regest_type = models.CharField(_('type'), max_length=70, blank=True)
+    regest_type = models.CharField(_('type'), max_length=70, blank=True,
+        help_text=ugettext_lazy('e.g. "deed"'))
     content = models.TextField(_('content'))
 
     issuer = models.ForeignKey(
@@ -117,7 +118,9 @@ class Archive(models.Model):
     The Archive model represents information about a single archive.
     """
 
-    info = models.TextField()
+    info = models.TextField(
+        help_text=ugettext_lazy(
+            'Name of the archive plus any additional information'))
 
     def __unicode__(self):
         return u'{0}'.format(self.info)
@@ -284,7 +287,8 @@ class Landmark(IndexEntry, Concept):
     """
 
     landmark_type = models.CharField(
-        _('landmark type'), max_length=30)
+        _('landmark type'), max_length=30, help_text=ugettext_lazy(
+            'e.g. "mountain", "river", or "fortress"'))
 
     def __unicode__(self):
         landmark =  u'Landmark {0}: {1}'.format(self.id, self.name)
@@ -307,13 +311,22 @@ class Location(IndexEntry, Concept):
     """
 
     location_type = models.CharField(
-        _('location type'), max_length=30)
-    abandoned_village = models.NullBooleanField(_('abandoned village'))
+        _('location type'), max_length=30, help_text=ugettext_lazy(
+            'e.g. "town" or "village"'))
+    abandoned_village = models.NullBooleanField(
+        _('abandoned village'),
+        help_text=ugettext_lazy('Is this location an abandoned village?'))
     av_ref = models.CharField(
-        _('abandoned village reference'), max_length=100, blank=True)
+        _('abandoned village reference'), max_length=100, blank=True,
+        help_text=ugettext_lazy(
+            'Source of additional information about abandoned village,' \
+                'e.g. "Staerk, Wuestungen Nr. 8"'))
     reference_point = models.CharField(
-        _('reference point'), max_length=100, blank=True)
-    district = models.CharField(_('district'), max_length=70, blank=True)
+        _('reference point'), max_length=100, blank=True,
+        help_text=ugettext_lazy('e.g. "bei Diedenhofen" or "im Koellertal"'))
+    district = models.CharField(
+        _('district'), max_length=70, blank=True, help_text=ugettext_lazy(
+            'e.g. "Stadtverband Saarbruecken"'))
     region = models.ForeignKey(
         'Region', verbose_name=_('region'), null=True, blank=True)
     country = models.CharField(
@@ -344,11 +357,13 @@ class Person(IndexEntry, Concept):
     surname = models.CharField(
         _('surname'), max_length=70)
     genname = models.CharField(
-        _('generational name'), max_length=30, blank=True)
+        _('generational name'), max_length=30, blank=True,
+        help_text=ugettext_lazy('e.g. "II." or "the Third"'))
     maidenname = models.CharField(
         _('maiden name'), max_length=70, blank=True)
     rolename = models.CharField(
-        _('role name'), max_length=70, blank=True)
+        _('role name'), max_length=70, blank=True,
+        help_text=ugettext_lazy('e.g. "Duke", "Count", or "Colonel"'))
     profession = models.CharField(
         _('profession'), max_length=30, blank=True)
     resident_of = models.ForeignKey(
@@ -390,7 +405,9 @@ class Family(PersonGroup):
     """
 
     location = models.ForeignKey(
-        'Location', verbose_name=_('location'), null=True)
+        'Location', verbose_name=_('location'), null=True,
+        help_text=ugettext_lazy(
+            'Location associated with this family'))
 
     def __unicode__(self):
         return u'Family {0}: {1}'.format(self.id, self.name)
