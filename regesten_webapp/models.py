@@ -36,7 +36,7 @@ class Regest(models.Model):
     original_date = models.TextField(_('original date'), blank=True)
     seal = models.TextField(_('seal'))
     archives = models.ManyToManyField(
-        'Archive', related_name='in_archives', verbose_name=_('archives'))
+        'Archive', related_name='regesten', verbose_name=_('archives'))
     print_info = models.TextField(_('print info'))
     translation = models.TextField(_('translation'), blank=True)
     original = models.TextField()
