@@ -1,6 +1,9 @@
 """
 This module configures the behavior of the admin interface.
 
+Consult https://docs.djangoproject.com/en/dev/ref/contrib/admin/ for
+in-depth descriptions of all possible configuration options.
+
 Author: Tim Krones <tkrones@coli.uni-saarland.de>
 """
 
