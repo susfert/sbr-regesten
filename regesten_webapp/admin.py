@@ -1,34 +1,212 @@
-from regesten_webapp.models import *
+"""
+This module configures the behavior of the admin interface.
+
+Consult https://docs.djangoproject.com/en/dev/ref/contrib/admin/ for
+in-depth descriptions of all possible configuration options.
+
+Author: Tim Krones <tkrones@coli.uni-saarland.de>
+"""
+
 from django.contrib import admin
+from django.contrib.contenttypes.generic import GenericStackedInline
 from django.contrib.sites.models import Site
+from django.utils.translation import ugettext as _
+
+from regesten_webapp.models import Archive, Concept, Family
+from regesten_webapp.models import Footnote, Landmark, Location
+from regesten_webapp.models import MetaInfo, Person, PersonGroup
+from regesten_webapp.models import Quote, Regest, Region
+
+
+class FootnoteInline(admin.StackedInline):
+    model = Footnote
+    extra = 2
+
+
+class QuoteInline(GenericStackedInline):
+    model = Quote
+    extra = 2
+
+
+class MetaInfoInline(admin.StackedInline):
+    model = MetaInfo
+
+
+class RegestAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'fields': (('title', 'location', 'regest_type'),)
+            }
+         ),
+        (_('Content'), {
+            'fields': ('issuer', 'content', 'mentions')
+            },
+         ),
+        (_('Additional information'), {
+            'fields': (
+                'original_date', 'seal', 'archives', 'print_info',
+                'translation', 'original', 'author')
+            })
+        )
+    inlines = [
+        FootnoteInline,
+        QuoteInline,
+        MetaInfoInline,
+        ]
+    list_display = ['title', 'location', 'regest_type']
+    radio_fields = { 'author': admin.VERTICAL }
+    search_fields = ['title', 'content']
+
+
+class ConceptAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'description')
+            }
+         ),
+        (_('Additional information'), {
+            'fields': (
+                'additional_names', 'related_concepts')
+            }
+         ),
+        )
+    inlines = [
+        QuoteInline,
+        ]
+    list_display = ['name', 'description']
+    search_fields = ['name', 'description']
+
+
+class LandmarkAdmin(ConceptAdmin):
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'landmark_type'),
+            'classes': ['wide']
+            }
+         ),
+        (_('Additional information'), {
+            'fields': (
+                'additional_names', 'related_concepts')
+            }
+         ),
+        (_('Index entry'), {
+            'fields': ('related_entries', 'xml_repr'),
+            'classes': ['wide']
+            }
+         ),
+        )
+    list_display = ['name', 'landmark_type']
+    search_fields = ['name', 'landmark_type']
+
+
+class LocationAdmin(ConceptAdmin):
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'location_type', 'abandoned_village')
+            }
+         ),
+        (_('Details'), {
+            'fields': (
+                'reference_point', 'district', 'region', 'country', 'av_ref')
+            }
+         ),
+        (_('Additional information'), {
+            'fields': (
+                'additional_names', 'related_concepts')
+            }
+         ),
+        (_('Index entry'), {
+            'fields': ('related_entries', 'xml_repr'),
+            'classes': ['wide']
+            }
+         ),
+        )
+    list_display = ['name', 'location_type']
+    search_fields = ['name', 'location_type']
+
+
+class PersonAdmin(ConceptAdmin):
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'description')
+            }
+         ),
+        (_('Details'), {
+            'fields': (
+                'forename', 'surname', 'genname', 'maidenname', 'rolename',
+                'profession', 'resident_of')
+            }
+         ),
+        (_('Additional information'), {
+            'fields': (
+                'additional_names', 'related_concepts')
+            }
+         ),
+        (_('Index entry'), {
+            'fields': ('related_entries', 'xml_repr'),
+            'classes': ['wide']
+            }
+         ),
+        )
+    list_display = ['name', 'profession', 'resident_of']
+    search_fields = ['name', 'profession']
+
+
+class PersonGroupAdmin(ConceptAdmin):
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'members')
+            }
+         ),
+        (_('Additional information'), {
+            'fields': (
+                'additional_names', 'related_concepts')
+            }
+         ),
+        (_('Index entry'), {
+            'fields': ('related_entries', 'xml_repr'),
+            'classes': ['wide']
+            }
+         ),
+        )
+    list_display = ['name']
+    search_fields = ['name']
+
+
+class FamilyAdmin(ConceptAdmin):
+    fieldsets = (
+        (None, {
+            'fields': (('name', 'location'), 'members')
+            }
+         ),
+        (_('Additional information'), {
+            'fields': (
+                'additional_names', 'related_concepts')
+            }
+         ),
+        (_('Index entry'), {
+            'fields': ('related_entries', 'xml_repr'),
+            'classes': ['wide']
+            }
+         ),
+        )
+    list_display = ['name']
+    search_fields = ['name']
+
+
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'region_type']
+    search_fields = ['name', 'region_type']
+
 
 admin.site.unregister(Site)
 
-admin.site.register(Regest)
-admin.site.register(RegestTitle)
-admin.site.register(RegestLocation)
-admin.site.register(RegestType)
-admin.site.register(OriginalDateInfo)
-admin.site.register(SealInfo)
-admin.site.register(ArchiveInfo)
-admin.site.register(PrintInfo)
-admin.site.register(TranslationInfo)
-admin.site.register(OriginalInfo)
-admin.site.register(RegestDate)
-admin.site.register(StartDate)
-admin.site.register(EndDate)
-admin.site.register(Content)
-admin.site.register(RegestContent)
-admin.site.register(Footnote)
-admin.site.register(Quote)
-admin.site.register(Concept)
-admin.site.register(SpecificConcept)
-admin.site.register(Landmark)
-admin.site.register(Location)
-admin.site.register(Person)
-admin.site.register(PersonGroup)
-admin.site.register(Family)
-admin.site.register(IndexEntry)
-admin.site.register(Region)
-admin.site.register(Country)
-
+admin.site.register(Regest, RegestAdmin)
+admin.site.register(Archive)
+admin.site.register(Concept, ConceptAdmin)
+admin.site.register(Landmark, LandmarkAdmin)
+admin.site.register(Location, LocationAdmin)
+admin.site.register(Person, PersonAdmin)
+admin.site.register(PersonGroup, PersonGroupAdmin)
+admin.site.register(Family, FamilyAdmin)
+admin.site.register(Region, RegionAdmin)

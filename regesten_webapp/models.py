@@ -1,8 +1,18 @@
-""" This module defines the data model of the Sbr Regesten webapp. """
+"""
+This module defines the data model of the Sbr Regesten webapp.
 
-from django.db import models
+Author: Tim Krones <tkrones@coli.uni-saarland.de>
+"""
+
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
+
+from regesten_webapp import AUTHORS, COUNTRIES, OFFSET_TYPES, REGION_TYPES
+from regesten_webapp import RegestTitleType
+from regesten_webapp.utils import RegestTitleAnalyzer, RegestDateExtractor
 
 
 class Regest(models.Model):
@@ -10,400 +20,222 @@ class Regest(models.Model):
     The Regest model represents a single regest.
     """
 
-    title = models.OneToOneField("RegestTitle")
-    date = models.OneToOneField("RegestDate")
-    location = models.OneToOneField("RegestLocation", null=True)
-    regest_type = models.OneToOneField("RegestType", null=True)
-    content = models.OneToOneField("RegestContent")
-    original_date = models.OneToOneField("OriginalDateInfo", null=True)
-    seal = models.OneToOneField("SealInfo")
-    archives = models.OneToOneField("ArchiveInfo")
-    regest_print = models.OneToOneField("PrintInfo")
-    translation = models.OneToOneField("TranslationInfo", null=True)
-    original = models.OneToOneField("OriginalInfo")
-    xml_repr = models.TextField()
+    title = models.CharField(_('title'), max_length=70)
+    location = models.CharField(_('location'), max_length=70, blank=True)
+    regest_type = models.CharField(_('type'), max_length=70, blank=True,
+        help_text=ugettext_lazy('e.g. "deed"'))
+    content = models.TextField(_('content'))
+
+    issuer = models.ForeignKey(
+        'Person', related_name='regests_issued', verbose_name=_('issuer'),
+        null=True)
+    mentions = models.ManyToManyField(
+        'Concept', related_name='mentioned_in', verbose_name=_('mentions'),
+        null=True, blank=True)
+
+    original_date = models.TextField(_('original date'), blank=True)
+    seal = models.TextField(_('seal'))
+    archives = models.ManyToManyField(
+        'Archive', related_name='regesten', verbose_name=_('archives'))
+    print_info = models.TextField(_('print info'))
+    translation = models.TextField(_('translation'), blank=True)
+    original = models.TextField()
+    author = models.CharField(_('author'), max_length=3, choices=AUTHORS)
+
+    quotes = generic.GenericRelation('Quote')
+
+    xml_repr = models.TextField(_('XML representation'))
+
+    def save(self, *args, **kwargs):
+        """
+        Save Regest instance to database and trigger generation of
+        RegestDate objects to associate with it.
+        """
+        super(Regest, self).save(*args, **kwargs)
+        self._generate_dates()
+
+    def _generate_dates(self):
+        """
+        Generate RegestDate objects for Regest instance based on value
+        of title attribute.
+
+        With the help of RegestTitleAnalyzer and RegestDateExtractor
+        (defined in utils.py), this method generates RegestDate
+        objects based on the title of the Regest instance and saves
+        them to the database. To make sure that any outdated
+        information is removed when updating a specific Regest from
+        the Admin Interface it also deletes all existing RegestDate
+        objects associated with the Regest instance.
+        """
+        if RegestTitleAnalyzer.contains_simple_additions(self.title):
+            dates = RegestDateExtractor.extract_dates(
+                self.title, RegestTitleType.SIMPLE_ADDITIONS)
+        elif RegestTitleAnalyzer.contains_elliptical_additions(self.title):
+            dates = RegestDateExtractor.extract_dates(
+                self.title, RegestTitleType.ELLIPTICAL_ADDITIONS)
+        elif RegestTitleAnalyzer.contains_simple_alternatives(self.title):
+            dates = RegestDateExtractor.extract_dates(
+                self.title, RegestTitleType.SIMPLE_ALTERNATIVES)
+        elif RegestTitleAnalyzer.contains_elliptical_alternatives(self.title):
+            dates = RegestDateExtractor.extract_dates(
+                self.title, RegestTitleType.ELLIPTICAL_ALTERNATIVES)
+        elif RegestTitleAnalyzer.is_simple_range(self.title):
+            dates = RegestDateExtractor.extract_dates(
+                self.title, RegestTitleType.SIMPLE_RANGE)
+        elif RegestTitleAnalyzer.is_elliptical_range(self.title):
+            dates = RegestDateExtractor.extract_dates(
+                self.title, RegestTitleType.ELLIPTICAL_RANGE)
+        else:
+            dates = RegestDateExtractor.extract_dates(
+                self.title, RegestTitleType.REGULAR)
+        self.__delete_existing_dates()
+        for start, end, start_offset, end_offset, alt_date in dates:
+            RegestDate.objects.create(
+                regest=self, start=start, end=end, start_offset=start_offset,
+                end_offset=end_offset, alt_date=alt_date)
+
+    def __delete_existing_dates(self):
+        """
+        Delete all existing RegestDate objects associated with Regest
+        instance.
+        """
+        for regest_date in self.regestdate_set.all():
+            regest_date.delete()
 
     def __unicode__(self):
         return u'Regest {0}: {1}'.format(self.id, self.title)
 
+    class Meta:
+        """
+        Specifies metadata for the Regest model.
+        """
+        verbose_name = 'Regest'
+        verbose_name_plural = 'Regesten'
 
-class GenericInfo(models.Model):
+
+class Archive(models.Model):
     """
-    Superclass for content types that contain plain text and footnotes
-    only.
-
-    TODO: Add examples
+    The Archive model represents information about a single archive.
     """
 
-    footnotes = generic.GenericRelation("Footnote")
+    info = models.TextField(
+        help_text=ugettext_lazy(
+            'Name of the archive plus any additional information'))
+
+    def __unicode__(self):
+        return u'{0}'.format(self.info)
 
     class Meta:
         """
-        Specifies metadata and options for the GenericInfo model.
+        Specifies metadata for the Archive model.
         """
-
-        abstract = True
-
-
-class RegestTitle(GenericInfo):
-    """
-    The RegestTitle model represents regest titles.
-
-    TODO: Add examples
-    """
-
-    title = models.CharField(max_length=70)
-
-    def __unicode__(self):
-        return u'{0}'.format(self.title)
-
-
-class RegestLocation(GenericInfo):
-    """
-    The RegestLocation model represents locations associated with
-    regests.
-
-    TODO: Add examples
-    """
-
-    name = models.CharField(max_length=70)
-
-    def __unicode__(self):
-        return u'{0}'.format(self.name)
-
-
-class RegestType(GenericInfo):
-    """
-    The RegestType model represents regest types.
-
-    TODO: Add examples
-    """
-
-    name = models.CharField(max_length=70)
-
-    def __unicode__(self):
-        return u'{0}'.format(self.name)
-
-
-class ContentInfo(GenericInfo):
-    """
-    Superclass for content types that contain plain text, footnotes,
-    and quotes.
-
-    TODO: Add examples
-    """
-
-    content = models.OneToOneField("Content")
-
-    class Meta:
-        """
-        Specifies metadata and options for the ContentInfo model.
-        """
-
-        abstract = True
-
-
-class OriginalDateInfo(ContentInfo):
-    """
-    The OriginalDateInfo model represents information about regest
-    dates as originally provided.
-
-    TODO: Add examples
-    """
-
-    def __unicode__(self):
-        return u'{0}'.format(self.content)
-
-
-class SealInfo(ContentInfo):
-    """
-    The SealInfo model represents information about regest seals (such
-    as the sealer).
-
-    TODO: Add examples
-    """
-
-    sealers = models.ManyToManyField("Person", null=True)
-
-    def __unicode__(self):
-        return u'{0}'.format(self.content)
-
-
-class ArchiveInfo(ContentInfo):
-    """
-    The ArchiveInfo model represents information about archives
-    associated with regests.
-
-    TODO: Add examples
-    """
-
-    def __unicode__(self):
-        return u'{0}'.format(self.content)
-
-
-class PrintInfo(ContentInfo):
-    """
-    The PrintInfo model represents print information for regests.
-
-    TODO: Add examples
-    """
-
-    def __unicode__(self):
-        return u'{0}'.format(self.content)
-
-
-class TranslationInfo(ContentInfo):
-    """
-    The TranslationInfo model represents translation information for
-    regests.
-
-    TODO: Add examples
-    """
-
-    def __unicode__(self):
-        return u'{0}'.format(self.content)
-
-
-class OriginalInfo(ContentInfo):
-    """
-    The OriginalInfo model represents information about original
-    regests.
-
-    TODO: Add examples
-    """
-
-    def __unicode__(self):
-        return u'{0}'.format(self.content)
+        verbose_name = ugettext_lazy('archive')
+        verbose_name_plural = ugettext_lazy('archives')
 
 
 class RegestDate(models.Model):
     """
-    The RegestDate model represents the date of a single regest.
-
-    TODO: Add examples
+    The RegestDate model represents a date or a date range associated
+    with a specific Regest.
     """
 
-    start = models.OneToOneField("StartDate")
-    end = models.OneToOneField("EndDate")
-    alt_date = models.DateField(null=True)
+    regest = models.ForeignKey('Regest')
+    start = models.DateField(_('from'))
+    start_offset = models.CharField(
+        _('start offset'), max_length=20, choices=OFFSET_TYPES)
+    end = models.DateField(_('to'))
+    end_offset = models.CharField(
+        _('end offset'), max_length=20, choices=OFFSET_TYPES)
+    alt_date = models.BooleanField(_('alternative date'))
 
     @property
     def exact(self):
-        return not self.start.offset and not self.end.offset
+        """
+        Provide information about whether or not date represented by
+        RegestDate instance can be considered 'exact'.
+
+        Exact dates do not have *any* offsets associated with them.
+        """
+        return not self.start_offset and not self.end_offset
 
     def __unicode__(self):
-        return u'\nStarts on {0}\nEnds on {1}\n\n---> ({2})'.format(
-            self.start, self.end, 'exact' if self.exact else 'not exact')
+        return ugettext_lazy('Starts on') + u' {0}, '.format(self.start) + \
+               (ugettext_lazy('ends on') + u' {0}'.format(self.end))
 
-
-class StartDate(models.Model):
-    """
-    The StartDate model represents the start date of the period of
-    time covered by a regest.
-
-    TODO: Add examples
-    """
-
-    date = models.DateField()
-    offset = models.CharField(max_length=30, null=True)
-
-    def __unicode__(self):
-        startdate = u'{0}'.format(self.date)
-        if self.offset:
-            startdate += u' [{0}]'.format(self.offset)
-        return startdate
-
-
-class EndDate(models.Model):
-    """
-    The EndDate model represents the end date of the period of time
-    covered by a regest.
-
-    TODO: Add examples
-    """
-
-    date = models.DateField()
-    offset = models.CharField(max_length=30, null=True)
-
-    def __unicode__(self):
-        enddate = u'{0}'.format(self.date)
-        if self.offset:
-            enddate += u' [{0}]'.format(self.offset)
-        return enddate
-
-
-class Content(models.Model):
-    """
-    The Content model represents any type of textual content
-    containing one or more quotes.
-    """
-
-    content = models.TextField()
-
-    def __unicode__(self):
-        return u'{0}'.format(self.content)
-
-
-class RegestContent(GenericInfo, Content):
-    """
-    The RegestContent model represents the content of a single regest.
-    """
-
-    issuer = models.OneToOneField("Person")
-    mentions = models.ManyToManyField("Concept", null=True)
-
-    def __unicode__(self):
-        return u'{0}'.format(self.content)
+    class Meta:
+        """
+        Specifies metadata for the RegestDate model.
+        """
+        verbose_name = ugettext_lazy('regest date')
+        verbose_name_plural = ugettext_lazy('regest dates')
 
 
 class Footnote(models.Model):
     """
-    The footnote model represents footnotes referenced e.g. in the
+    The footnote model represents a single footnote referenced in any
+    part of a specific Regest.
+    """
+
+    regest = models.ForeignKey('Regest')
+    content = models.TextField(_('content'))
+
+    def __unicode__(self):
+        return u'Footnote {0}:\n{1}'.format(self.id, self.content)
+
+    class Meta:
+        """
+        Specifies metadata for the Footnote model.
+        """
+        verbose_name = ugettext_lazy('Footnote')
+        verbose_name_plural = ugettext_lazy('Footnotes')
+
+
+class MetaInfo(models.Model):
+    """
+    The MetaInfo model holds meta information (at this stage: comments
+    and tags) about a specific Regest.
+    """
+
+    regest = models.OneToOneField('Regest')
+    comments = models.TextField(_('comments'))
+    tags = models.TextField(_('tags'))
+
+    def __unicode__(self):
+        return u'Meta information for regest {0}\n\n' \
+               'Tags: {1}\n\n' \
+               'Comments: {2}\n'.format(
+            self.regest.id, self.tags, self.comments)
+
+    class Meta:
+        """
+        Specifies metadata for the MetaInfo model.
+        """
+        verbose_name = ugettext_lazy('meta information')
+        verbose_name_plural = ugettext_lazy('meta information')
+
+
+class Quote(models.Model):
+    """
+    The Quote model represents a single quote embedded e.g. in the
     content of a regest.
     """
 
-    content = models.OneToOneField("Content")
-    __limit = models.Q(app_label='regesten_webapp', model='regesttitle') | \
-              models.Q(app_label='regesten_webapp', model='regestlocation') | \
-              models.Q(app_label='regesten_webapp', model='regesttype') | \
-              models.Q(app_label='regesten_webapp', model='originaldateinfo') | \
-              models.Q(app_label='regesten_webapp', model='sealinfo') | \
-              models.Q(app_label='regesten_webapp', model='archiveinfo') | \
-              models.Q(app_label='regesten_webapp', model='printinfo') | \
-              models.Q(app_label='regesten_webapp', model='translationinfo') | \
-              models.Q(app_label='regesten_webapp', model='originalinfo') | \
-              models.Q(app_label='regesten_webapp', model='regestcontent') | \
-              models.Q(app_label='regesten_webapp', model='quote')
+    content = models.TextField(_('content'))
+    __limit = models.Q(app_label='regesten_webapp', model='regest') | \
+              models.Q(app_label='regesten_webapp', model='concept')
     content_type = models.ForeignKey(ContentType, limit_choices_to=__limit)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
-        return u'Footnote {0}:\n{1}\n\nReferenced in:\n{2}'.format(
-            self.id, self.content, self.referenced_in)
-
-
-class Quote(GenericInfo):
-    """
-    The Quote model represents quotes embedded in e.g. the content of
-    a regest.
-    """
-
-    cited_in = models.ForeignKey("Content")
-    content = models.TextField()
-    mentions = models.ManyToManyField("Concept", null=True)
-
-    def __unicode__(self):
         return u'{0}'.format(self.content)
-
-
-class Concept(models.Model):
-    """
-    The Concept model represents any type of (underspecified) concept
-    introduced in the index of the Sbr Regesten.
-    """
-
-    name = models.OneToOneField("Content")
-    related_concepts = models.ManyToManyField("self", null=True)
-
-    def __unicode__(self):
-        return u'Concept {0}: {1}'.format(self.id, self.name)
-
-
-class SpecificConcept(Concept):
-    """
-    Superclass that defines attributes common to all types of specific
-    concepts introduced in the index of the Sbr Regesten.
-    """
-
-    add_names = models.TextField(null=True)
-
-    def __unicode__(self):
-        return u'SpecificConcept {0}: {1}'.format(self.id, self.name)
-
-
-class Landmark(SpecificConcept):
-    """
-    The landmark model represents a single landmark listed or
-    mentioned in the index of the Sbr Regesten.
-    """
-
-    landmark_type = models.CharField(max_length=30, null=True)
-
-    def __unicode__(self):
-        landmark =  u'Landmark {0}: {1}'.format(self.id, self.name)
-        if self.landmark_type:
-            landmark += u' [{0}]'.format(self.landmark_type)
-        return landmark
-
-
-class Location(SpecificConcept):
-    """
-    The Location model represents a single location listed or
-    mentioned in the index of the Sbr Regesten.
-    """
-
-    location_type = models.CharField(max_length=30, null=True)
-    w = models.NullBooleanField()
-    w_ref = models.CharField(max_length=100, null=True)
-    reference_point = models.CharField(max_length=100, null=True)
-    district = models.CharField(max_length=70, null=True)
-    region = models.ForeignKey("Region", null=True)
-    country = models.ForeignKey("Country", null=True)
-
-    def __unicode__(self):
-        location = u'Location {0}: {1}'.format(self.id, self.name)
-        if self.location_type:
-            location += u' [{0}]'.format(self.location_type)
-        return location
-
-
-class Person(SpecificConcept):
-    """
-    The Person model represents a single individual listed or
-    mentioned in the index of the Sbr Regesten.
-    """
-
-    forename = models.CharField(max_length=70, null=True)
-    surname = models.CharField(max_length=70, null=True)
-    genname = models.CharField(max_length=30, null=True)
-    maidenname = models.CharField(max_length=70, null=True)
-    info = models.OneToOneField("Content", null=True)
-    profession = models.CharField(max_length=30, null=True)
-    resident_of = models.ForeignKey("Location", null=True)
-
-    def __unicode__(self):
-        return u'Person {0}: {1}'.format(self.id, self.name)
-
-
-class PersonGroup(SpecificConcept):
-    """
-    The PersonGroup model represents a single group of people related
-    e.g. by their profession.
-    """
-
-    members = models.ManyToManyField("Person")
-
-    def __unicode__(self):
-        return u'PersonGroup {0}: {1}'.format(self.id, self.name)
-
-
-class Family(PersonGroup):
-    """
-    The family model represents a single family.
-    """
-
-    location = models.ForeignKey("Location", null=True)
-
-    def __unicode__(self):
-        return u'Family {0}: {1}'.format(self.id, self.name)
 
     class Meta:
         """
-        Specifies metadata and options for the Family model.
+        Specifies metadata for the Quote model.
         """
-
-        verbose_name_plural = "families"
+        verbose_name = ugettext_lazy('quote')
+        verbose_name_plural = ugettext_lazy('quotes')
 
 
 class IndexEntry(models.Model):
@@ -412,53 +244,198 @@ class IndexEntry(models.Model):
     Sbr Regesten.
     """
 
-    defines = models.OneToOneField("SpecificConcept")
-    related_entries = models.ManyToManyField("self", null=True)
-    xml_repr = models.TextField()
+    related_entries = models.ManyToManyField(
+        'self', verbose_name=_('related entries'), null=True, blank=True)
+    xml_repr = models.TextField(_('XML representation'), blank=True)
 
     def __unicode__(self):
-        return u'IndexEntry {0}\n\n{1}'.format(self.id, self.defines)
+        return ugettext_lazy('Index entry') + ' {0}'.format(self.id)
+
+
+class Concept(models.Model):
+    """
+    The Concept model groups attributes common to all types of
+    concepts listed (not necessarily as a top-level entry) in the
+    index of the Sbr Regesten.
+    """
+
+    name = models.CharField(_('name'), max_length=70)
+    description = models.TextField(_('description'), blank=True)
+    additional_names = models.TextField(
+        _('additional names'), blank=True)
+    related_concepts = models.ManyToManyField(
+        'self', verbose_name=_('related concepts'), null=True, blank=True)
+
+    quotes = generic.GenericRelation('Quote')
+
+    def __unicode__(self):
+        return ugettext_lazy('Concept') + u' {0}: {1}'.format(
+            self.id, self.name)
 
     class Meta:
         """
-        Specifies metadata and options for the IndexEntry model.
+        Specifies metadata for the Concept model.
         """
+        verbose_name = ugettext_lazy('Concept')
+        verbose_name_plural = ugettext_lazy('Concepts')
 
-        verbose_name_plural = "index entries"
+
+class Landmark(IndexEntry, Concept):
+    """
+    The landmark model represents a single landmark listed or
+    mentioned in the index of the Sbr Regesten.
+    """
+
+    landmark_type = models.CharField(
+        _('landmark type'), max_length=30, help_text=ugettext_lazy(
+            'e.g. "mountain", "river", or "fortress"'))
+
+    def __unicode__(self):
+        landmark =  u'Landmark {0}: {1}'.format(self.id, self.name)
+        if self.landmark_type:
+            landmark += u' [{0}]'.format(self.landmark_type)
+        return landmark
+
+    class Meta:
+        """
+        Specifies metadata for the Landmark model.
+        """
+        verbose_name = ugettext_lazy('Landmark')
+        verbose_name_plural = ugettext_lazy('Landmarks')
+
+
+class Location(IndexEntry, Concept):
+    """
+    The Location model represents a single location listed or
+    mentioned in the index of the Sbr Regesten.
+    """
+
+    location_type = models.CharField(
+        _('location type'), max_length=30, help_text=ugettext_lazy(
+            'e.g. "town" or "village"'))
+    abandoned_village = models.NullBooleanField(
+        _('abandoned village'),
+        help_text=ugettext_lazy('Is this location an abandoned village?'))
+    av_ref = models.CharField(
+        _('abandoned village reference'), max_length=100, blank=True,
+        help_text=ugettext_lazy(
+            'Source of additional information about abandoned village,' \
+                'e.g. "Staerk, Wuestungen Nr. 8"'))
+    reference_point = models.CharField(
+        _('reference point'), max_length=100, blank=True,
+        help_text=ugettext_lazy('e.g. "bei Diedenhofen" or "im Koellertal"'))
+    district = models.CharField(
+        _('district'), max_length=70, blank=True, help_text=ugettext_lazy(
+            'e.g. "Stadtverband Saarbruecken"'))
+    region = models.ForeignKey(
+        'Region', verbose_name=_('region'), null=True, blank=True)
+    country = models.CharField(
+        _('country'), max_length=20, choices=COUNTRIES, blank=True)
+
+    def __unicode__(self):
+        location = u'Location {0}: {1}'.format(self.id, self.name)
+        if self.location_type:
+            location += u' [{0}]'.format(self.location_type)
+        return location
+
+    class Meta:
+        """
+        Specifies metadata for the Location model.
+        """
+        verbose_name = ugettext_lazy('Location')
+        verbose_name_plural = ugettext_lazy('Locations')
+
+
+class Person(IndexEntry, Concept):
+    """
+    The Person model represents a single individual listed or
+    mentioned in the index of the Sbr Regesten.
+    """
+
+    forename = models.CharField(
+        _('forename'), max_length=70)
+    surname = models.CharField(
+        _('surname'), max_length=70)
+    genname = models.CharField(
+        _('generational name'), max_length=30, blank=True,
+        help_text=ugettext_lazy('e.g. "II." or "the Third"'))
+    maidenname = models.CharField(
+        _('maiden name'), max_length=70, blank=True)
+    rolename = models.CharField(
+        _('role name'), max_length=70, blank=True,
+        help_text=ugettext_lazy('e.g. "Duke", "Count", or "Colonel"'))
+    profession = models.CharField(
+        _('profession'), max_length=30, blank=True)
+    resident_of = models.ForeignKey(
+        'Location', verbose_name=_('resident of'), null=True, blank=True)
+
+    def __unicode__(self):
+        return u'Person {0}: {1}'.format(self.id, self.name)
+
+    class Meta:
+        """
+        Specifies metadata for the Person model.
+        """
+        verbose_name = ugettext_lazy('Person')
+        verbose_name_plural = ugettext_lazy('Persons')
+
+
+class PersonGroup(IndexEntry, Concept):
+    """
+    The PersonGroup model represents a single group of people related
+    e.g. by their profession.
+    """
+
+    members = models.ManyToManyField('Person', verbose_name=_('members'))
+
+    def __unicode__(self):
+        return u'PersonGroup {0}: {1}'.format(self.id, self.name)
+
+    class Meta:
+        """
+        Specifies metadata for the PersonGroup model.
+        """
+        verbose_name = ugettext_lazy('Person group')
+        verbose_name_plural = ugettext_lazy('Person groups')
+
+
+class Family(PersonGroup):
+    """
+    The family model represents a single family.
+    """
+
+    location = models.ForeignKey(
+        'Location', verbose_name=_('location'), null=True,
+        help_text=ugettext_lazy(
+            'Location associated with this family'))
+
+    def __unicode__(self):
+        return u'Family {0}: {1}'.format(self.id, self.name)
+
+    class Meta:
+        """
+        Specifies metadata for the Family model.
+        """
+        verbose_name = ugettext_lazy('Family')
+        verbose_name_plural = ugettext_lazy('Families')
 
 
 class Region(models.Model):
     """
-    The Region model represents regions mentioned in the (index of
-    the) Sbr Regesten.
+    The Region model represents a single region mentioned in the
+    (index of the) Sbr Regesten.
     """
 
-    REGION_TYPES = (
-        ('Bundesland', 'A state / province of Germany'),
-        ('Departement', 'A state / province of France'),
-        ('Provinz', 'A state / province of Belgium'))
-
-    name = models.CharField(max_length=70)
-    region_type = models.CharField(max_length=30, choices=REGION_TYPES)
+    name = models.CharField(_('name'), max_length=70)
+    region_type = models.CharField(
+        _('region type'), max_length=30, choices=REGION_TYPES)
 
     def __unicode__(self):
         return u'{0}: ({1})'.format(self.name, self.region_type)
 
-
-class Country(models.Model):
-    """
-    The Country model represents countries mentioned in the (index of
-    the) Sbr Regesten.
-    """
-
-    name = models.CharField(max_length=30)
-
-    def __unicode__(self):
-        return u'{0}'.format(self.name)
-
     class Meta:
         """
-        Specifies metadata and options for the Country model.
+        Specifies metadata for the Region model.
         """
-
-        verbose_name_plural = "countries"
+        verbose_name = ugettext_lazy('Region')
+        verbose_name_plural = ugettext_lazy('Regions')
