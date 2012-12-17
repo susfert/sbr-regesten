@@ -166,7 +166,6 @@ class PersonGroupAdmin(ConceptAdmin):
             }
          ),
         )
-
     list_display = ['name']
     search_fields = ['name']
 
