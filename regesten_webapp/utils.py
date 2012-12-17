@@ -9,7 +9,8 @@ import re
 
 from datetime import date
 from regesten_webapp import DAY_DEFAULT, MONTH_DEFAULT
-from regesten_webapp import EllipsisType, RegestTitleType
+from regesten_webapp import RegestTitleType, RANGE_TYPES, NON_RANGE_TYPES
+from regesten_webapp import EllipsisType
 
 
 class RegestTitleAnalyzer(object):
@@ -258,7 +259,7 @@ class RegestDateExtractor(object):
             match = re.search(
                 '(?P<offset>ca\.|nach|kurz nach|post|um|vor)', title)
             start_offset = match.group('offset') if match else ''
-            end_offset = start_offset
+            end_offset = ''
         return cls.determine_final_offsets(
             start_offset, end_offset, title_type)
 
@@ -289,9 +290,9 @@ class RegestDateExtractor(object):
         start_offset and end_offset are simply returned.
         """
         if start_offset and not end_offset and \
-                title_type == RegestTitleType.REGULAR:
+                title_type in NON_RANGE_TYPES:
             end_offset = start_offset
-        elif not start_offset and end_offset:
+        elif not start_offset and end_offset and title_type in RANGE_TYPES:
             if end_offset == 'zwischen':
                 start_offset = 'nach'
                 end_offset = 'vor'

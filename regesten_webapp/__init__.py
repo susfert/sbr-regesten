@@ -17,6 +17,18 @@ class RegestTitleType(object):
     SIMPLE_ADDITIONS = 5
     ELLIPTICAL_ADDITIONS = 6
 
+RANGE_TYPES = (
+    RegestTitleType.SIMPLE_RANGE,
+    RegestTitleType.ELLIPTICAL_RANGE
+    )
+NON_RANGE_TYPES = (
+    RegestTitleType.REGULAR,
+    RegestTitleType.SIMPLE_ALTERNATIVES,
+    RegestTitleType.ELLIPTICAL_ALTERNATIVES,
+    RegestTitleType.SIMPLE_ADDITIONS,
+    RegestTitleType.ELLIPTICAL_ADDITIONS
+    )
+
 class EllipsisType(object):
     MONTH_DIFFERENT_NO_DAY = 0
     DAY_DIFFERENT = 1
