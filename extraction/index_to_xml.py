@@ -813,44 +813,82 @@ def writeHeaders():
 
 
 def index_to_xml():
-  
+
   text=""
   t=""
-
-  with codecs.open("index_n_mod_kurz.htm", "r", "utf-8") as f:
+  # cp1252
+  #
+  #with codecs.open("index_n_mod_kurz.htm", "r", "cp1252") as f:
+  with codecs.open("html/sbr-regesten2.html", "r", "cp1252") as f:
     text=f.read()
-    t=text.replace("\n"," ")
+    text=unicode(text)
+    t2=text.replace("\n"," ")
+    t=t2.replace("\r","")
+    #\n\c oder \cr
+    #t=t2.encode('utf-8')
 
   soup = BeautifulSoup(t)
   soup=preprocess(soup)
   print('preprocessing done!')
 
+  indexTag=soup.new_tag('index')
+  indexInfoTag= soup.new_tag('index-info')
+  indexTag.append('Index \n')
+  indexTag.append(indexInfoTag)
+
   items=[]  # list of all items
 
   # header-body
   htmlItems=soup.findAll('p')
+  
+  
+  foundIndex=False
+  nextIndexInfo=False
+  emptyCount=0
   for htmlItem in htmlItems:
-    s=str(htmlItem)
-    pMatch=re.search('<p.*?>(.*)<.p.*?>', s)
-    s=pMatch.group(1)
-    brMatch=re.search('(.*?)<br>(.*)', s)
-    if brMatch:
-      h=brMatch.group(1)
-      b=brMatch.group(2)
+    if emptyCount>=10 and foundIndex:
+      break
+    elif htmlItem.get_text().strip()=='' and foundIndex:
+      emptyCount+=1
     else:
-      h=s
-      b=""
-    h='<itemHeader>'+h+'</itemHeader>'
-    b='<itemBody>'+b+'</itemBody>'
-    header=BeautifulSoup(h)
-    body=BeautifulSoup(b)
-    item=IndexItem(header, body)
-    items.append(item)
+      emptyCount=0
+      #print(htmlItem.get_text())
+      if htmlItem.get_text().strip() == 'Index':
+        foundIndex=True
+        nextIndexInfo=True
+        print('Index gefunden')
+       
+      elif nextIndexInfo:
+        print('found index-info')
+        indexInfoTag.append(htmlItem.get_text())
+        indexInfoTag.append('\n')
+        nextIndexInfo=False
+        continue
+
+      if foundIndex:
+        s2=unicode(htmlItem)
+        #print (s2)
+        s=s2#.replace("\n"," ")
+        pMatch=re.search('<p.*?>(.*)<.p.*?>', s)
+        s=pMatch.group(1)
+        brMatch=re.search('(.*?)<br>(.*)', s)
+        if brMatch:
+          h=brMatch.group(1)
+          b=brMatch.group(2)
+        else:
+          h=s
+          b=""
+        h='<itemHeader>'+h+'</itemHeader>'
+        b='<itemBody>'+b+'</itemBody>'
+        header=BeautifulSoup(h)
+        body=BeautifulSoup(b)
+        item=IndexItem(header, body)
+        items.append(item)
 
   print("ItemClassifier and ItemExtractor is processing..")
 
   xmlItems=[]
-  id=0
+  id=-1
 
   for item in items:
     header=item.header.get_text()
@@ -964,7 +1002,7 @@ def index_to_xml():
   print("Locations: " + str(len(locations)))
   print("Siehe: " + str(len(siehe)))
 
-  with open ('extractedFamilies.txt', 'w') as file:
+  '''with open ('extractedFamilies.txt', 'w') as file:
     for family in families:
       file.write(str(family))
   with open ('extractedPersons.txt', 'w') as file:
@@ -980,7 +1018,7 @@ def index_to_xml():
       file.write(str(location))
 
   with open ('extractedFamilies.txt', 'w') as file:
-    file.write(str(families))
+    file.write(str(families))'''
 
 
   '''with open ('extractedSieheRead4.txt', 'w') as file:
@@ -989,11 +1027,18 @@ def index_to_xml():
       
 
 
-  with open ('allXmlItems.xml', 'w') as file:
+  '''with open ('allXmlItems2.xml', 'w') as file:
     for item in xmlItemsComplete:
       file.write(item.encode('utf-8') + "\n")
-  print ("allXmlItems.xml ausgegeben")
-      
+  print ("allXmlItems.xml ausgegeben")'''
+ 
+  with open ('index2.xml', 'w') as file:
+    for item in xmlItemsComplete:
+      indexTag.append(item)
+      indexTag.append('\n')
+    file.write(indexTag.encode('utf-8'))
+  print ("index.xml ausgegeben")
+     
   with open ('prettyXmlItems.xml', 'w') as file:
     for item in xmlItemsComplete:
       file.write(item.prettify().encode('utf-8') + "\n")
@@ -1005,12 +1050,12 @@ def index_to_xml():
   writeHeaderTexts()
   print('Itmes extracted')
 
-  with open ('famBodyXML.xml', 'w') as file:
+  '''with open ('famBodyXML.xml', 'w') as file:
     for family in families:
       x= listingBodyToXML(family.body)
       #print(x)
       file.write(str(x))
-      file.write("\n")
+      file.write("\n")'''
 
   # legt mit forenames.txt eine Datei mit Vornamen an
   with codecs.open ('forenames2.txt', 'w', "utf-8") as file:
@@ -1019,6 +1064,10 @@ def index_to_xml():
   print ('Forenames.txt angelegt. Anzahl der Vornamen: '+str(len(forenames)))
 
 
+'''if __name__=='main':
+  index_to_xml()'''
+ 
+index_to_xml()
 
 
 ####################### 7. TODO ##############################################
