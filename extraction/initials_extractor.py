@@ -4,7 +4,7 @@
 import codecs, re
 from bs4 import BeautifulSoup
 
-text = codecs.open('../html/sbr-regesten.html', 'r', 'cp1252').read()
+text = codecs.open('html/sbr-regesten.html', 'r', 'cp1252').read()
 soup = BeautifulSoup(text)
 
 initials = []
@@ -29,16 +29,17 @@ def write_with_indent(file, string, indent_level):
     file.write(spaces+string)
 
 
-with codecs.open('../sbr-regesten.xml', 'a', 'utf-8') as xmlfile:
-    write_with_indent(xmlfile, '<initials-list>\n', 2)
-    for number, line in enumerate(initials):
-        if number % 2 == 0:
-            if number == 0:
-                write_with_indent(xmlfile, line+'\n', 4)
-            else:
-                write_with_indent(xmlfile, '<expan>'+line+'</expan>\n', 0)
-                write_with_indent(xmlfile, '</entry>\n', 4)
-        elif not number % 2 == 0:
-            write_with_indent(xmlfile, '<entry>\n', 4)
-            write_with_indent(xmlfile, '<abbr>'+line+'</abbr>', 6)
-    write_with_indent(xmlfile, '</initials-list>\n', 2)
+def extract_initials():
+    with codecs.open('sbr-regesten.xml', 'a', 'utf-8') as xmlfile:
+        write_with_indent(xmlfile, '<initials-list>\n', 2)
+        for number, line in enumerate(initials):
+            if number % 2 == 0:
+                if number == 0:
+                    write_with_indent(xmlfile, line+'\n', 4)
+                else:
+                    write_with_indent(xmlfile, '<expan>'+line+'</expan>\n', 0)
+                    write_with_indent(xmlfile, '</entry>\n', 4)
+            elif not number % 2 == 0:
+                write_with_indent(xmlfile, '<entry>\n', 4)
+                write_with_indent(xmlfile, '<abbr>'+line+'</abbr>', 6)
+        write_with_indent(xmlfile, '</initials-list>\n', 2)
