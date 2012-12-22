@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" This module extracts the list of abbreviations of the Sbr Regesten. """
+""" This module extracts the list of abbreviations from the Sbr Regesten. """
 
 import codecs, re
 from bs4 import BeautifulSoup
