@@ -7,6 +7,7 @@ Author: Tim Krones <tkrones@coli.uni-saarland.de>
 
 from django.core.management.base import NoArgsCommand
 from extraction import frontmatter_extractor, toc_extractor
+from extraction import abbrev_extractor
 from extraction import regest_extractor, index_extractor
 
 class Command(NoArgsCommand):
@@ -15,5 +16,6 @@ class Command(NoArgsCommand):
     def handle_noargs(self, **options):
         frontmatter_extractor.extract_frontmatter()
         toc_extractor.extract_toc()
+        abbrev_extractor.extract_abbrevs()
         regest_extractor.extract_regests()
         index_extractor.extract_index()

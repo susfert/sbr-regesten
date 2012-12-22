@@ -4,7 +4,7 @@
 import codecs, re
 from bs4 import BeautifulSoup
 
-text = codecs.open('../html/sbr-regesten.html', 'r', 'cp1252').read()
+text = codecs.open('html/sbr-regesten.html', 'r', 'cp1252').read()
 soup = BeautifulSoup(text)
 
 abbrevs = []
@@ -29,19 +29,21 @@ def write_with_indent(file, string, indent_level):
     file.write(spaces+string)
 
 
-with codecs.open('../sbr-regesten.xml', 'a', 'utf-8') as xmlfile:
-    write_with_indent(xmlfile, '<abbrev-list>\n', 2)
-    for number, line in enumerate(abbrevs):
-        if number % 2 == 0:
-            if number == 0:
-                write_with_indent(xmlfile, line+'\n', 4)
-            else:
-                write_with_indent(xmlfile, '<entry>\n', 4)
-                write_with_indent(xmlfile, '<abbr>'+line+'</abbr>', 6)
-        elif not number % 2 == 0:
-            if number == 1:
-                write_with_indent(xmlfile, '<list-info>'+line+'</list-info>\n', 4)
-            else:
-                write_with_indent(xmlfile, '<expan>'+line+'</expan>\n', 0)
-                write_with_indent(xmlfile, '</entry>\n', 4)
-    write_with_indent(xmlfile, '</abbrev-list>\n', 2)
+def extract_abbrevs():
+    with codecs.open('sbr-regesten.xml', 'a', 'utf-8') as xmlfile:
+        write_with_indent(xmlfile, '<abbrev-list>\n', 2)
+        for number, line in enumerate(abbrevs):
+            if number % 2 == 0:
+                if number == 0:
+                    write_with_indent(xmlfile, line+'\n', 4)
+                else:
+                    write_with_indent(xmlfile, '<entry>\n', 4)
+                    write_with_indent(xmlfile, '<abbr>'+line+'</abbr>', 6)
+            elif not number % 2 == 0:
+                if number == 1:
+                    write_with_indent(
+                        xmlfile, '<list-info>'+line+'</list-info>\n', 4)
+                else:
+                    write_with_indent(xmlfile, '<expan>'+line+'</expan>\n', 0)
+                    write_with_indent(xmlfile, '</entry>\n', 4)
+        write_with_indent(xmlfile, '</abbrev-list>\n', 2)
