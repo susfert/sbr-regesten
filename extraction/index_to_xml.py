@@ -19,20 +19,24 @@ siehe=[] # to collect items that will be classified later through their referenc
 
 ########################## 1. Preprocessing ########################
 
+# deletes all span-tags
 def delSpan(s):
   s=re.sub('\</?span.*?\>','',s)
   return s
-  
+
+#joins to b-tags if there is nothing in between or only a ,
 def joinb (s):
   s=re.sub('(?u)(\</b\>)([(:?\<.*?\>), ]*)(\<b\>)','\g<2>', s)
   return s
-  
+
+#joins to i-tags if there is nothing in between or only a ,  
 def joini (s):
   s=re.sub('(?u)(\</i\>)([(:?\<.*?\>), ]*)(\<i\>)','\g<2>', s)
   return s
-  
+
+#preprocesses the soup  
 def preprocess(soup):
-  print("preprocessing..")
+  print("Preprocessor is working..")
   s=unicode(soup)
   s=delSpan(s)
   s=joinb(s)
@@ -85,7 +89,7 @@ def parseMentionings(soup, t):
       mentioningsTag.append(reg_refTag)
   return (text, mentioningsTag)
 
-
+# parses additional names (which appear between parenthesis and are written in italics.)
 def addNamesToXML(parentTag, text):
   #print('\n')
   #print('addNames erreicht: '+ text)
@@ -103,7 +107,6 @@ def addNamesToXML(parentTag, text):
     addNamesTag.append(BeautifulSoup(altNMatch.group(1)).get_text())
 
     parentTag.append(addNamesTag)
-    #addNamesTag.append(' (')
     notFirstEl=False
     for altName in altNames:
       if notFirstEl:
@@ -120,7 +123,7 @@ def addNamesToXML(parentTag, text):
   #print (r)
   return (parentTag, r)
 
-
+# parses a person name
 def parsePersName (nameTag, personName):
   foreTag=soup.new_tag("forename")
   
@@ -288,12 +291,10 @@ def locHeaderToXML(header):
   if ment:
     headerTag.append(ment)
   
-  #print (headerTag)
-
-  
-  '''
-  mentionings=re.findall('[1][0-9][0-9][0-9]\-[01][0-9]\-[0-3][0-9] ?\(?[a-d]?n?a?c?h?v?o?r?\)?|[1][0-9][0-9][0-9] ?\(?[a-d]?n?a?c?h?v?o?r?\)?', header.get_text())
-  '''
+  if header.get_text().strip() != headerTag.get_text().strip():
+    print(header.get_text())
+    print(headerTag.get_text())
+    print('\n')
 
   return name.rstrip(', '), headerTag
 
@@ -339,13 +340,12 @@ def famHeaderToXML(header):
   headerTag.append(r)
   if ment:
     headerTag.append(ment)
-
-  '''if headerTag.get_text().strip() != header.get_text().strip():
+    
+  if header.get_text().strip() != headerTag.get_text().strip():
     print(header.get_text())
     print(headerTag.get_text())
-    #print(rest.get_text())
-    print(headerTag)
-    print('\n')'''
+    print('\n')
+
   return name.rstrip(', '), headerTag
 
 
@@ -367,27 +367,32 @@ def landHeaderToXML(header):
   ohneB= BeautifulSoup(str(header))
   ohneB.b.decompose()
   
-  ohneMent, ment = parseMentionings(soup, ohneB.get_text())
-  #print(ohneMent)
-  
-  headerTag, ohneAddN=addNamesToXML(headerTag, unicode(ohneMent))
+
+  geogTag, ohneAddN=addNamesToXML(geogTag, unicode(ohneB))
   if ohneAddN:
-    #print(ohneAddN)
     t=BeautifulSoup(ohneAddN).get_text()
   else:
-    t=ohneMent
+    t=ohneB.get_text()
 
-  landkey='Fluss|Berg|gau[ ,]|Gau|Bach|Talschaft|Tal|Landschaft|Au|Wald|Waldung|Gemeindewald'
-  landMatch= re.search('('+landkey+')(.*)', t)
+  headerTag.append(geogTag)
+
+  ohneMent, ment = parseMentionings(soup, t)
+  #print(ohneMent)
+  t=ohneMent
+
   
+  landkey='Fluss|Berg|gau[ ,]|Gau|Bach|Talschaft|Tal|Landschaft|Au|Waldung|Wald|Gemeindewald'
+  landMatch= re.match('(.*)('+landkey+')(.*)', t)
+  
+  # oder gehoert goegFeat in goeogname??
   if landMatch:
-    landtype =landMatch.group(1)
+    headerTag.append(landMatch.group(1))
+    landtype =landMatch.group(2)
     geogTag["type"]=landtype
     geogFTag=soup.new_tag('geogFeat')
-    headerTag.append(', ')
     headerTag.append(geogFTag)
     geogFTag.append(landtype)
-    rest= landMatch.group(2)
+    rest= landMatch.group(3)
   else:
     landkey+="|furt|berg"
     landNameMatch= re.search('(.*)('+landkey+')(.*)', name)
@@ -398,18 +403,18 @@ def landHeaderToXML(header):
     else:
       geogTag["type"]='unknown'
     rest=t
+
   
   headerTag.append(rest)
 
   if ment:
     headerTag.append(ment)
   
-  '''if itemHeader.get_text().strip() != header.get_text().strip():
+  if header.get_text().strip() != headerTag.get_text().strip():
     print(header.get_text())
-    print(itemHeader.get_text())
-    #print(rest.get_text())
-    print(itemHeader)
-    print('\n')'''
+    print(headerTag.get_text())
+    print('\n')
+    
   return name.rstrip(', '), headerTag
 
 
@@ -430,11 +435,11 @@ def persGrHeaderToXML(header):
   if ment:
     headerTag.append(ment)
   
-  '''if headerTag.get_text().strip() != header.get_text().strip():
+  if header.get_text().strip() != headerTag.get_text().strip():
     print(header.get_text())
     print(headerTag.get_text())
-    print(headerTag)
-    print('\n')'''
+    print('\n')
+
   return value.rstrip(', '), headerTag
 
 
@@ -496,12 +501,12 @@ def persHeaderToXML(header):
   if ment:
     headerTag.append(ment)
     
-  '''if itemHeader.get_text().strip() != header.get_text().strip():
+  if header.get_text().strip() != headerTag.get_text().strip():
     print(header.get_text())
-    print(itemHeader.get_text())
-    print(itemHeader)
-    print('\n')'''
-  return name.rstrip(' ,'), headerTag
+    print(headerTag.get_text())
+    print('\n')
+    
+  return name.rstrip(', '), headerTag
 
 
 ############################## 3.2 Bodies ###########################
@@ -610,65 +615,66 @@ def listingBodyToXML(body):
     if ment:
       personTag.append(ment)
  
-  '''if listBodyTag.get_text().strip() != body.get_text().strip():
+  if body.get_text().strip() != listBodyTag.get_text().strip():
     print(body.get_text())
     print(listBodyTag.get_text())
     #print(rest.get_text())
-    print(listBodyTag)
-    print('\n')'''
+    #print(listBodyTag)
+    print('\n')
+    
   return listBodyTag
 
 
 ############################ 3.2.2 RelatedConceptsBody (rest) ##############
-# TODO: Namen anpassen
 
 def relConcBodyToXML(body):
   listBodyTag = soup.new_tag("concept-body")
-  personList=str(body).split("<br>") # personlist kann auch concepts enthalten
+  bodyList=str(body).split("<br>")
 
   if not body.get_text():
     return listBodyTag
   
-  membersTag = soup.new_tag("related_concepts")
-  listBodyTag.append(membersTag)
+  relTag = soup.new_tag("related_concepts")
+  listBodyTag.append(relTag)
   concList=[]
-  personTag=None
-  for personHTML in personList:
-    person = BeautifulSoup(personHTML)
+  conceptTag=None
+  for conceptHTML in bodyList:
+    concept = BeautifulSoup(conceptHTML)
     
-    einrueckMatch=re.match('( *\-)(.*)', person.get_text())
+    einrueckMatch=re.match('( *-)(.*)', concept.get_text())
     if einrueckMatch:
       concList.append(einrueckMatch.group(2))
       continue
       
     elif concList:
       relConcTag=relConcToXML(concList, ' -')
-      personTag.append(relConcTag)
+      conceptTag.append(relConcTag)
       concList=[]
   
-    rest, ment = parseMentionings(soup, person.get_text())
-    personTag=soup.new_tag('concept')
-    membersTag.append(personTag)
+    rest, ment = parseMentionings(soup, concept.get_text())
+    conceptTag=soup.new_tag('concept')
+    relTag.append(conceptTag)
     nameTag = soup.new_tag('name')
-    personTag.append(nameTag)
+    conceptTag.append(nameTag)
     nameTag.append(rest)
   
     if ment:
-      personTag.append(ment)
+      conceptTag.append(ment)
  
   if concList:
       #print (concList)
       relConcTag=relConcToXML(concList, ' -')
-      if personTag:
-        personTag.append(relConcTag)
+      if conceptTag:
+        conceptTag.append(relConcTag)
   
  
-  '''if listBodyTag.get_text().strip() != body.get_text().strip():
+  if body.get_text().strip() != listBodyTag.get_text().strip():
     print(body.get_text())
     print(listBodyTag.get_text())
     #print(rest.get_text())
-    print(listBodyTag)
-    print('\n')'''
+    #print(listBodyTag)
+    print('\n')
+    
   return listBodyTag
 
 
@@ -741,6 +747,7 @@ def persToXML(person, id):
 ################## 4.4 LocationParser #############
 
 def locToXML(location, id):
+  pass
   itemTag = soup.new_tag("indexItem")
   value, itemHeader=locHeaderToXML(location.header)
   itemTag['id']='item_'+str(id)
@@ -813,7 +820,7 @@ def writeHeaders():
 
 
 def index_to_xml():
-
+  print('Item Extractor is working ..')
   text=""
   t=""
   # cp1252
@@ -913,6 +920,7 @@ def index_to_xml():
       families.append(item)
 
     elif locMatch:
+      pass
       x=locToXML(item, id)
       xmlItems.append(x)
       locations.append(item)
@@ -1085,3 +1093,6 @@ index_to_xml()
 # Franken, Hergesheim, Kigelat/Kuechelar
 
 # <listing-body><members><person><persName><forename>
+
+
+# Wolfstein, Walpershofen
