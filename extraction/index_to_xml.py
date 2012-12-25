@@ -210,7 +210,7 @@ def locHeaderToXML(header):
     w=True      
     w_ref=wuestMatch.group(0)
     settleTag["w-ref"]=w_ref
-  settleTag["w"]=w
+  settleTag["w"]=str(w).lower()
  
   # Settlement name 
   name = header.b.get_text()
@@ -683,7 +683,7 @@ def relConcBodyToXML(body):
 ############################ 4.1 Familiy Parser  #####################
 
 def famToXML(family, id):
-  itemTag = soup.new_tag("indexItem")
+  itemTag = soup.new_tag("item")
   value, itemHeader=famHeaderToXML(family.header)
   itemTag['id']='item_'+str(id)
   itemTag['type']='family'
@@ -704,7 +704,7 @@ def famToXML(family, id):
 ################## 4.2 PersongroupParser #############
 
 def persGrToXML(persongroup, id):
-  itemTag = soup.new_tag("indexItem")
+  itemTag = soup.new_tag("item")
   value, itemHeader=persGrHeaderToXML(persongroup.header)
   itemTag['id']='item_'+str(id)
   itemTag['type']='persongroup'
@@ -725,7 +725,7 @@ def persGrToXML(persongroup, id):
 ################## 4.3 PersonParser #############
 
 def persToXML(person, id):
-  itemTag = soup.new_tag("indexItem")
+  itemTag = soup.new_tag("item")
   value, itemHeader=persHeaderToXML(person.header)
   itemTag['id']='item_'+str(id)
   itemTag['type']='person'
@@ -748,7 +748,7 @@ def persToXML(person, id):
 
 def locToXML(location, id):
   pass
-  itemTag = soup.new_tag("indexItem")
+  itemTag = soup.new_tag("item")
   value, itemHeader=locHeaderToXML(location.header)
   itemTag['id']='item_'+str(id)
   itemTag['type']='location'
@@ -770,7 +770,7 @@ def locToXML(location, id):
 ################## 4.5 LandmarkParser #############
 
 def landToXML(landmark, id):
-  itemTag = soup.new_tag("indexItem")
+  itemTag = soup.new_tag("item")
   value, itemHeader=landHeaderToXML(landmark.header)
   itemTag.append(itemHeader)
   itemTag['id']='item_'+str(id)
@@ -961,7 +961,7 @@ def index_to_xml():
       sieheMatch=re.search('siehe (.*)',line)
       if sieheMatch:
         n=sieheMatch.group(1).strip()
-        itemTag = soup.new_tag("indexItem")
+        itemTag = soup.new_tag("item")
         for i in xmlItems:
           if not isinstance(i, IndexItem):
             #print(i['value'])
@@ -1040,7 +1040,7 @@ def index_to_xml():
       file.write(item.encode('utf-8') + "\n")
   print ("allXmlItems.xml ausgegeben")'''
  
-  with open ('index2.xml', 'w') as file:
+  with open ('index3.xml', 'w') as file:
     for item in xmlItemsComplete:
       indexTag.append(item)
       indexTag.append('\n')
