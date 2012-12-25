@@ -17,6 +17,8 @@ unclassified=[]
 families=[]
 siehe=[] # to collect items that will be classified later through their reference with "siehe"
 
+person_id=0
+
 ########################## 1. Preprocessing ########################
 
 # deletes all span-tags
@@ -450,6 +452,9 @@ def persHeaderToXML(header):
   headerTag = soup.new_tag("person-header")
   persTag= soup.new_tag("person")
   headerTag.append(persTag)
+  global person_id
+  persTag['id']='person_'+str(person_id)
+  person_id+=1
 
   # Name
   name = header.b.get_text()
@@ -582,6 +587,9 @@ def listingBodyToXML(body):
     personAttrList=rest.split(",")
     personName=personAttrList[0]
     personTag=soup.new_tag('person')
+    global person_id
+    personTag['id']='person_'+str(person_id)
+    person_id+=1
     membersTag.append(personTag)
     nameTag=soup.new_tag("persName")
     personTag.append(nameTag)
@@ -1040,7 +1048,7 @@ def index_to_xml():
       file.write(item.encode('utf-8') + "\n")
   print ("allXmlItems.xml ausgegeben")'''
  
-  with open ('index3.xml', 'w') as file:
+  with open ('index4.xml', 'w') as file:
     for item in xmlItemsComplete:
       indexTag.append(item)
       indexTag.append('\n')
