@@ -26,18 +26,22 @@ def delSpan(s):
   s=re.sub('\</?span.*?\>','',s)
   return s
 
-#joins to b-tags if there is nothing in between or only a ,
+
 def joinb (s):
+  ''' Joins b-tags in a string if there is nothing in between or only a comma. '''
   s=re.sub('(?u)(\</b\>)([(:?\<.*?\>), ]*)(\<b\>)','\g<2>', s)
   return s
 
-#joins to i-tags if there is nothing in between or only a ,  
+
+  
 def joini (s):
+  ''' Joins i-tags in a string if there is nothing in between or only a comma. '''
   s=re.sub('(?u)(\</i\>)([(:?\<.*?\>), ]*)(\<i\>)','\g<2>', s)
   return s
 
-#preprocesses the soup  
+  
 def preprocess(soup):
+  ''' Preprocesses the soup. '''
   print("Preprocessor is working..")
   s=unicode(soup)
   s=delSpan(s)
@@ -61,6 +65,32 @@ class IndexItem:
 #########################################################################################################################
 ###############################################   3. ITEMPARSER   #######################################################
 #########################################################################################################################
+
+
+def getRegID(reg_ref):
+  id="regest_1"
+  #for reg in soup.regest.findall(regest):
+    #if str(reg_id) in
+
+  return id
+  
+  
+'''def mentToDB(xmlNode, concept):
+  if hasattr(xmlNode, 'mentioned-in') and xmlNode.find('mentioned-in'):
+    for reg_ref in xmlNode.find('mentioned-in'):
+      if isinstance(reg_ref, NavigableString):
+        continue
+      else:
+        titleList=RegestTitle.objects.filter(title__startswith=reg_ref.get_text().strip())
+        if not len(titleList)==1:
+          #print('Keine eindeutige Zuweisung von Regest moeglich.')
+          continue
+        else:
+          print('Regest gefunden!')
+          regestList=Regest.objects.filter(title=titleList[0])
+          regest=regestList[0]
+          con=regest.content
+          concept.regestcontent_set.add(con)'''
 
 
 # to parse (find and tag) the mentionings in the headers
@@ -88,6 +118,9 @@ def parseMentionings(soup, t):
         notFirstEl=True
       reg_refTag = soup.new_tag("reg-ref")
       reg_refTag.append(reg_ref)
+      id=getRegID(reg_ref)
+      reg_refTag['regest']=id
+      
       mentioningsTag.append(reg_refTag)
   return (text, mentioningsTag)
 
@@ -185,6 +218,8 @@ def getMatchLabel(match,i):
 def annotateGrNames(m, nameTag):
   for i in range(1,len(m.groups())+1):
     label=getMatchLabel(m,i)
+    if label:
+      label=label.replace('_','-')
     if label and m.group(i):
       labelTag= soup.new_tag(label)
       nameTag.append(labelTag)
@@ -198,9 +233,8 @@ def annotateGrNames(m, nameTag):
 
 ####################### 3.1.1 LocationHeader ####################################
 
-def locHeaderToXML(header):
-  headerTag = soup.new_tag("location-header")
-  placeNameTag = soup.new_tag("placeName")
+def parsePlaceName (header, placeNameTag):
+  #placeNameTag = soup.new_tag("placeName")
 
   # Wuestungen
   settleTag = soup.new_tag("settlement")
@@ -215,34 +249,41 @@ def locHeaderToXML(header):
   settleTag["w"]=str(w).lower()
  
   # Settlement name 
-  name = header.b.get_text()
+  name=''
+  rest=''
+  if header.b:                # for location-headers
+    name = header.b.get_text()
+    ohneB= BeautifulSoup(str(header))
+    ohneB.b.decompose()
+    rest=unicode(ohneB)
+  
+  else:                       # for locations in family headers
+    liste=header.get_text().split(',', 1)
+    name=liste[0]
+    if len(liste)>1:
+      rest=liste[1]
+    else:
+      rest=''
+  
+  
+ 
   settleTag.append(name)
-  
-  ohneB= BeautifulSoup(str(header))
-  ohneB.b.decompose()
-  rest=ohneB
-  
   
   # SettlementType, RefPoint, District, Region, Country
   settlement="Dorf|Stadt|Stadtteil|Burgsiedlung|Burg|ehem. Burg|Hofgut|Hof|Ort|.rtlichkeit|Gemeinde|Kloster|Abtei|Schloss|Herrschaft|Gft\.|Kgr\.|Land|Kgr\.|Herzogtum|Hzgt\.|Grafschaft|F.rstentum|Deutschordenskommende|Bistum|Vogtei|Regierungssitz|Hochstift|Pfarrei|Erzstift|Erzbistum|Dekanat|Domstift|Reichsland|Deutschordensballei|\w*abtei|Wasserburg|M.hle|Zisterzienserabtei|Region"
-  districtKeys="Gem|Stadtverband [^;,]+|Gde. Bliesmengen-Bolchen|Gde\. [^,;]+|[\w-]+-Kreis|Kr\. [^,;]+|[-\w]+kreis|Stadt [\w][\w]\.|Stadt [\w-]+|Kreis [^;,]+"
+  districtKeys="Gem|Stadtverband [^;,]+|Gde\. [^,;]+|[\w-]+-Kreis|Kr\. [^,;]+|[-\w]+kreis|Stadt [\w][\w]\.|Stadt [\w-]+|Kreis [^;,]+"
   district= "(?:"+districtKeys + ")(?:, (?:" + districtKeys + "))?"
   regionKeys="Dep\.,? [A-Za-z-]+|SL|NRW|By|RLP|BW|Prov\..+|Hessen"
   country="B|F|NL|CH|Lux|It|L|Spanien|T.rkei"
   settlementKeys="(?:"+settlement+")(?![\w])"
-  #settlementKeys="(?:"+settlement+")(?:"+settlement+")(?![\w])"
   countryKeys="(?:"+country+")(?![\w])"
   
-  #print(text)
-  placeNameTag, ohneAddN=addNamesToXML(placeNameTag, unicode(rest))
-  #print (placeNameTag)
-  
+
+  placeNameTag, ohneAddN=addNamesToXML(placeNameTag, rest)
   if ohneAddN:
     text=BeautifulSoup(ohneAddN).get_text()
   else:
-    text=rest.get_text()
-  #placeNameTag.append(', ')  
-  #print(text)
+    text=BeautifulSoup(rest).get_text()
   
   
   # Mentionings
@@ -253,21 +294,19 @@ def locHeaderToXML(header):
   if settleMatch:
     placeNameTag, index = annotateGrNames(settleMatch, placeNameTag)
     text=text[index:]
-    #print(text)
     settleTag["type"]=settleMatch.group(2)
   else:
     settleTag["type"]='unknown'
-    #text=text.lstrip(',')
   
   
-  distRegMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<referencePoint>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district + ')(.*)(?P<region>'+ regionKeys + ')(.*)', text)
-  distRegCountMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<referencePoint>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district +')(.*)(?P<region>'+ regionKeys + ')(.*)(?P<country>' + countryKeys + ')(.*)', text)
-  distCountMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<referencePoint>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district +')(.*)(?P<country>' + countryKeys + ')(.*)', text)
-  regCountMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<referencePoint>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<region>'+ regionKeys + ')(.*)(?P<country>' + countryKeys + ')(.*)', text)
-  countMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<referencePoint>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<country>'+ countryKeys + ')(.*)', text)
-  regMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<referencePoint>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<region>'+ regionKeys + ')(.*)', text)
-  distMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<referencePoint>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district + ')(.*)', text)
-  settleMatch=re.match('(?u)([^\w]?(?:siehe [\w/-]+)?)(?P<referencePoint>[\w\.\/ -]*?)(.*)', text)
+  distRegMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district + ')(.*)(?P<region>'+ regionKeys + ')(.*)', text)
+  distRegCountMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district +')(.*)(?P<region>'+ regionKeys + ')(.*)(?P<country>' + countryKeys + ')(.*)', text)
+  distCountMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district +')(.*)(?P<country>' + countryKeys + ')(.*)', text)
+  regCountMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<region>'+ regionKeys + ')(.*)(?P<country>' + countryKeys + ')(.*)', text)
+  countMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<country>'+ countryKeys + ')(.*)', text)
+  regMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<region>'+ regionKeys + ')(.*)', text)
+  distMatch=re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district + ')(.*)', text)
+  settleMatch=re.match('(?u)([^\w]?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)(.*)', text)
   
   possibleMatches = [distRegCountMatch, distRegMatch, distCountMatch,  regCountMatch, regMatch, distMatch, countMatch, settleMatch]
   for m in possibleMatches:
@@ -285,7 +324,14 @@ def locHeaderToXML(header):
           
       break
 
-  #print (placeNameTag)
+  return (placeNameTag, ment, name)
+
+
+def locHeaderToXML(header):
+  headerTag = soup.new_tag("location-header")
+  placeNameTag=soup.new_tag('placeName')
+  placeNameTag, ment, name = parsePlaceName(header, placeNameTag)
+  
   
   headerTag.append(placeNameTag)
   
@@ -304,42 +350,48 @@ def locHeaderToXML(header):
 ####################### 3.1.2 Family Header ####################################
 
 def famHeaderToXML(header):
+  ''' Converts the html of an item header into a xml header of the type family-header.'''
   headerTag = soup.new_tag("family-header")
 
   # Name
   name = header.b.get_text()
   famNameTag=soup.new_tag('family-name')
-  headerTag.append(famNameTag)
   nameTag=soup.new_tag('name')
   famNameTag.append(nameTag)
   nameTag.append(name)
+  
   ohneB= BeautifulSoup(str(header))
   ohneB.b.decompose()
   
-  # rest + mentionings
-  rest, ment = parseMentionings(soup, ohneB.get_text())
 
   # Alternative names & locations (both are in parentesis right after the name, alternative names are in italics, locations not)
-  parMatch=re.match(r"(.*?)\((.*[A-Za-z][a-z][a-z][a-z].*)(\), .*)", rest)
-  famNameTag, rx=addNamesToXML(famNameTag, rest)
-
-  if rx:
-    r=rx
-  # location  
-  elif parMatch:
-    headerTag.append(BeautifulSoup(parMatch.group(1)).get_text())
-    loc =BeautifulSoup(parMatch.group(2)).get_text().strip()
-    locTag = soup.new_tag("location")
-    headerTag.append('(')
-    headerTag.append(locTag)
-    locTag.append(loc)
-    headerTag.append('')
-    r=parMatch.group(3)
+  famNameTag, ohneAddN=addNamesToXML(famNameTag, unicode(ohneB))
+  headerTag.append(famNameTag)
+  
+  if ohneAddN:
+    rest=BeautifulSoup(ohneAddN).get_text()
   else:
-    r=rest
+    rest=ohneB.get_text()
+
+  parMatch=re.match(r"([^\w]*?)\((.*[A-Za-z][a-z]{1,3}.*)(\), .*)", rest)
+  if parMatch:
+    headerTag.append(BeautifulSoup(parMatch.group(1)).get_text())
+    loc =BeautifulSoup(parMatch.group(2))
+    placeNameTag=soup.new_tag('location')
+    placeNameTag, m, n = parsePlaceName(loc, placeNameTag)
+    headerTag.append('(')
+    headerTag.append(placeNameTag)
+    t=parMatch.group(3)
+  else:
+    t=BeautifulSoup(rest).get_text()
+  
+ 
+  
+  # rest + mentionings
+  rest, ment = parseMentionings(soup, t)
   
   #append mentionings
-  headerTag.append(r)
+  headerTag.append(rest)
   if ment:
     headerTag.append(ment)
     
@@ -992,6 +1044,7 @@ def index_to_xml():
                 locHeadTag.append(placeNameTag)
                 placeNameTag.append(settleTag)
                 settleTag['type']=settleType
+                settleTag['w']='false'
                 placeNameTag.append(item.header.get_text())
                 
               if type=='family':
@@ -1048,7 +1101,7 @@ def index_to_xml():
       file.write(item.encode('utf-8') + "\n")
   print ("allXmlItems.xml ausgegeben")'''
  
-  with open ('index4.xml', 'w') as file:
+  with open ('index9.xml', 'w') as file:
     for item in xmlItemsComplete:
       indexTag.append(item)
       indexTag.append('\n')
@@ -1057,7 +1110,7 @@ def index_to_xml():
      
   with open ('prettyXmlItems.xml', 'w') as file:
     for item in xmlItemsComplete:
-      file.write(item.prettify().encode('utf-8') + "\n")
+      file.write(item.encode('utf-8') + "\n")
 
   with open ('extractedItems.txt', 'w') as file: #
     file.write(str(items))
