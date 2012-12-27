@@ -443,9 +443,9 @@ def landHeaderToXML(header):
     headerTag.append(landMatch.group(1))
     landtype =landMatch.group(2)
     geogTag["type"]=landtype
-    geogFTag=soup.new_tag('geogFeat')
-    headerTag.append(geogFTag)
-    geogFTag.append(landtype)
+    #geogFTag=soup.new_tag('geogFeat')
+    #headerTag.append(geogFTag)
+    headerTag.append(landtype)
     rest= landMatch.group(3)
   else:
     landkey+="|furt|berg"
