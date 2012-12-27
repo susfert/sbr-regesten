@@ -4,6 +4,9 @@
 from bs4 import BeautifulSoup, Tag, NavigableString
 import codecs, string, re, sys
 
+from regesten_webapp import models
+from regesten_webapp.models import Location, Family, Person, Region, PersonGroup, Landmark, Concept, IndexEntry, Regest, RegestDate
+
 sys.setrecursionlimit(10000)
 
 
@@ -66,39 +69,73 @@ class IndexItem:
 ###############################################   3. ITEMPARSER   #######################################################
 #########################################################################################################################
 
+with codecs.open("sbr-regesten.xml", "r", "utf-8") as f:
+  s= BeautifulSoup(f)
+  regSoup= s.regesten
+  regList=regSoup.findAll('regest')
+
 
 def getRegID(reg_ref):
-  id="regest_1"
-  #for reg in soup.regest.findall(regest):
-    #if str(reg_id) in
+  ''' Seaches the restesten part of the xml to match a given reg-ref to its corresponding regest, returning its id.
+      As the regesten part of the xml was not available during development, it's probably not fully working (not tested).
+      If no regest is found, the default value of regest_0 (the first regest) will be returned.'''
+  
+  id="regest_0" # default regest
+  #uniqueID=False
+  idList=[]
+  count=False
+  countR=0
 
-  return id
-  
-  
-'''def mentToDB(xmlNode, concept):
-  if hasattr(xmlNode, 'mentioned-in') and xmlNode.find('mentioned-in'):
-    for reg_ref in xmlNode.find('mentioned-in'):
-      if isinstance(reg_ref, NavigableString):
-        continue
+  '''
+  titleList=RegestTitle.objects.filter(title__startswith=reg_ref.get_text().strip())
+  if not len(titleList)==1:
+    print('Keine eindeutige Zuweisung von Regest moeglich.')
+    #continue
+    #break
+  else:
+    print('Regest gefunden!')
+  for reg in regList:
+    fromdate=reg.date.find('from')
+    offset=reg.date.offset
+    print(fromdate)
+    print(offset)
+    
+    if fromdate+offset == reg_ref.strip() or fromdate+' '+offset == reg_ref.strip():
+      if uniqueID==False:
+        uniqueID=True
       else:
-        titleList=RegestTitle.objects.filter(title__startswith=reg_ref.get_text().strip())
-        if not len(titleList)==1:
-          #print('Keine eindeutige Zuweisung von Regest moeglich.')
-          continue
-        else:
-          print('Regest gefunden!')
-          regestList=Regest.objects.filter(title=titleList[0])
-          regest=regestList[0]
-          con=regest.content
-          concept.regestcontent_set.add(con)'''
-
+        print('no unique id for reg-ref found')
+        uniqueID=False
+        break'''
+      
+  for reg in regList:
+    if countR>10:
+      break
+    if count:
+      countR+=1
+    #print('text: ')
+    #print(reg.date.get_text())
+    
+    
+    if reg.date.get_text().startswith(reg_ref):
+      idList.append(reg['id'])
+      count=True
+      
+  if len(idList)==1:
+    print('regest gefunden!!!!!')
+    return idList[0]
+  else:
+    #print('keine eindeutige regestzuweisung moeglich:' + str(idList))
+    return id # defaultID'''
+  
+  
 
 # to parse (find and tag) the mentionings in the headers
 def parseMentionings(soup, t):
   mentioningsTag=None
   text=t
   mentionings=[]
-  ment='((?:\[?\+\]? )?[01][0-9][0-9][0-9]\-?\/?[01]?[0-9]?\-?[0-3]?[0-9]? ?\([a-f]?k?u?r?z? ??n?a?c?h?v?o?r?n?t?e?u?m?p?o?s?t?\??\.?\) ?)( Anm\.)?|((?:\[?\+\]? )?[01][0-9][0-9][0-9]\-?[01]?[0-9]?\-?[0-3]?[0-9]? ?\(?z?w?i?s?c?h?e?n?\)?)'
+  ment='((?:\[?\+\]? )?[01][0-9][0-9][0-9]\-?\/?[01]?[0-9]?\-?[0-3]?[0-9]? ?\([a-f]?k?u?r?z? ??n?a?c?h?v?o?r?n?t?e?u?m?p?o?s?t?a?n?t?e?\??\.?\) ?)( Anm\.)?|((?:\[?\+\]? )?[01][0-9][0-9][0-9]\-?[01]?[0-9]?\-?[0-3]?[0-9]? ?\(?z?w?i?s?c?h?e?n?\)?)'
   #1306-03-24 (?), 1504/1505 (a) Anm., 1431-1459 (zwischen)
   
   mentMatch=re.match('(.*?)('+ment+',? ?)$', text)
@@ -919,23 +956,18 @@ def index_to_xml():
       emptyCount+=1
     else:
       emptyCount=0
-      #print(htmlItem.get_text())
       if htmlItem.get_text().strip() == 'Index':
         foundIndex=True
         nextIndexInfo=True
-        print('Index gefunden')
        
       elif nextIndexInfo:
-        print('found index-info')
         indexInfoTag.append(htmlItem.get_text())
         indexInfoTag.append('\n')
         nextIndexInfo=False
         continue
 
       if foundIndex:
-        s2=unicode(htmlItem)
-        #print (s2)
-        s=s2#.replace("\n"," ")
+        s=unicode(htmlItem)
         pMatch=re.search('<p.*?>(.*)<.p.*?>', s)
         s=pMatch.group(1)
         brMatch=re.search('(.*?)<br>(.*)', s)
@@ -1101,7 +1133,7 @@ def index_to_xml():
       file.write(item.encode('utf-8') + "\n")
   print ("allXmlItems.xml ausgegeben")'''
  
-  with open ('index9.xml', 'w') as file:
+  with open ('index11.xml', 'w') as file:
     for item in xmlItemsComplete:
       indexTag.append(item)
       indexTag.append('\n')
