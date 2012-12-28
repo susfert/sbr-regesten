@@ -128,10 +128,20 @@ def getRegID(reg_ref):
     #print('keine eindeutige regestzuweisung moeglich:' + str(idList))
     return id # defaultID'''
   
-  
+def findSiehe(text):
+  siehe=''
+  sieheMatch=re.match('(.*[0-9]{2,})(m?i?t? [Ss]iehe[^0-9]*$)', text)
+  if sieheMatch:
+    text = sieheMatch.group(1)
+    siehe = sieheMatch.group(2)
+    print('siehe: '+ siehe)
+  return text, siehe
 
-# to parse (find and tag) the mentionings in the headers
+
 def parseMentionings(soup, t):
+  '''
+  Finds and tags mentionings in a given soup.
+  '''
   mentioningsTag=None
   text=t
   mentionings=[]
@@ -140,10 +150,10 @@ def parseMentionings(soup, t):
   
   mentMatch=re.match('(.*?)('+ment+',? ?)$', text)
   while mentMatch:
-    text= mentMatch.group(1)
-    menti=mentMatch.group(2)
+    text = mentMatch.group(1)
+    menti = mentMatch.group(2)
     mentionings.insert(0, menti)
-    mentMatch=re.match('(.*?)('+ment+'),\.? $', text)
+    mentMatch = re.match('(.*?)('+ment+'),\.? $', text)
   
   if mentionings:
     mentioningsTag = soup.new_tag("mentioned-in")
@@ -322,6 +332,7 @@ def parsePlaceName (header, placeNameTag):
   else:
     text=BeautifulSoup(rest).get_text()
   
+  text, siehe = findSiehe(text)
   
   # Mentionings
   text, ment = parseMentionings(soup, text)
@@ -361,13 +372,13 @@ def parsePlaceName (header, placeNameTag):
           
       break
 
-  return (placeNameTag, ment, name)
+  return (placeNameTag, ment, name, siehe)
 
 
 def locHeaderToXML(header):
   headerTag = soup.new_tag("location-header")
   placeNameTag=soup.new_tag('placeName')
-  placeNameTag, ment, name = parsePlaceName(header, placeNameTag)
+  placeNameTag, ment, name, siehe = parsePlaceName(header, placeNameTag)
   
   
   headerTag.append(placeNameTag)
@@ -375,6 +386,8 @@ def locHeaderToXML(header):
   
   if ment:
     headerTag.append(ment)
+  if siehe:
+    headerTag.append(siehe)
   
   if header.get_text().strip() != headerTag.get_text().strip():
     print(header.get_text())
@@ -415,7 +428,7 @@ def famHeaderToXML(header):
     headerTag.append(BeautifulSoup(parMatch.group(1)).get_text())
     loc =BeautifulSoup(parMatch.group(2))
     placeNameTag=soup.new_tag('location')
-    placeNameTag, m, n = parsePlaceName(loc, placeNameTag)
+    placeNameTag, m, n, s = parsePlaceName(loc, placeNameTag)
     headerTag.append('(')
     headerTag.append(placeNameTag)
     t=parMatch.group(3)
@@ -423,7 +436,7 @@ def famHeaderToXML(header):
     t=BeautifulSoup(rest).get_text()
   
  
-  
+  t, siehe = findSiehe(t)
   # rest + mentionings
   rest, ment = parseMentionings(soup, t)
   
@@ -431,6 +444,8 @@ def famHeaderToXML(header):
   headerTag.append(rest)
   if ment:
     headerTag.append(ment)
+  if siehe:
+    headerTag.append(siehe)
     
   if header.get_text().strip() != headerTag.get_text().strip():
     print(header.get_text())
@@ -467,6 +482,7 @@ def landHeaderToXML(header):
 
   headerTag.append(geogTag)
 
+  text, siehe = findSiehe(t)
   ohneMent, ment = parseMentionings(soup, t)
   #print(ohneMent)
   t=ohneMent
@@ -500,6 +516,8 @@ def landHeaderToXML(header):
 
   if ment:
     headerTag.append(ment)
+  if siehe:
+    headerTag.append(siehe)
   
   if header.get_text().strip() != headerTag.get_text().strip():
     print(header.get_text())
@@ -515,8 +533,9 @@ def landHeaderToXML(header):
 def persGrHeaderToXML(header):
   headerTag = soup.new_tag("persongroup-header")
   
+  text, siehe = findSiehe(header.get_text())
   # name + mentionings
-  rest, ment = parseMentionings(soup, header.get_text())
+  rest, ment = parseMentionings(soup, text)
   value= header.b.get_text() # sollte eigenlich nicht noetig sein, da name= value..
   name = rest
   grNameTag= soup.new_tag("group-name")
@@ -525,6 +544,8 @@ def persGrHeaderToXML(header):
   
   if ment:
     headerTag.append(ment)
+  if siehe:
+    headerTag.append(siehe)
   
   if header.get_text().strip() != headerTag.get_text().strip():
     print(header.get_text())
@@ -550,14 +571,17 @@ def persHeaderToXML(header):
   nameTag= soup.new_tag("persName")
   
   # alternative names ???
-  rest1= BeautifulSoup(str(header))
-  rest1.b.decompose()
+  ohneB= BeautifulSoup(str(header))
+  ohneB.b.decompose()
   
+  text, siehe = findSiehe(header.get_text())
   # description + mentionings
-  description, ment = parseMentionings(soup, rest1.get_text())
-  
+  #description, ment = parseMentionings(soup, text)
+  text, ment = parseMentionings(soup, text)
+  description, ment2=parseMentionings(soup, ohneB.get_text())
+  print(text)
   #
-  text, ment2 = parseMentionings(soup, header.get_text())
+  #text, ment2 = parseMentionings(soup, text)
   genNameKeys="der .ltere|d\. .ltere|der J.ngere|der Erste|der Zweite|I\.|II\.|der Dritte|III\.|IV\.|V\.|VI\.|VII\.|VIII\.|IX\.|X\.|Junior|Jr|Senior|Sr|der Junge|der Alte"
   roleKeys="K.nig|Kaiser|Herzog|Graf|Hzg\.|Kg\.|Ks\.|Herzogin|Gf\.|dt\. Kg\. und r.m\. Ks\.|Gr.fin"
   
@@ -566,7 +590,7 @@ def persHeaderToXML(header):
     forenameKeys=file.read()
     
     # Fust von Diebach gen. Knebel
-    
+    #description=text
     #print(forename)
     surForeMatch=re.match('(?P<surname>[^, ]+?)(, )(?P<forename>'+forenameKeys+')([ von]*,? )' , text)
     foreMatch=re.match('(?P<forename>'+forenameKeys+')(,)' , text)
@@ -584,6 +608,8 @@ def persHeaderToXML(header):
         break
   if not matched:
     nameTag.append(name)
+    #if ohneB:
+      #description=ohneB.get_text()
 
   persTag.append(nameTag)
   
@@ -594,6 +620,8 @@ def persHeaderToXML(header):
 
   if ment:
     headerTag.append(ment)
+  if siehe:
+    headerTag.append(siehe)
     
   if header.get_text().strip() != headerTag.get_text().strip():
     print(header.get_text())
@@ -627,7 +655,7 @@ def relConcToXML(liste, prefix):
     concTag=soup.new_tag('concept')
     relConcTag.append(prefix)
     relConcTag.append(concTag)
-    rest, ment = parseMentionings(soup, conc.get_text())
+    rest, ment= parseMentionings(soup, conc.get_text())
     nameTag=soup.new_tag('name')
     concTag.append(nameTag)
     nameTag.append(rest)
@@ -654,6 +682,7 @@ def listingBodyToXML(body):
   listBodyTag.append(membersTag)
 
   personList=str(body).split("<br>") # personlist kann auch concepts enthalten
+  #print(personList)
   concList=[]
   hyp=''
   personTag=None
@@ -711,6 +740,7 @@ def listingBodyToXML(body):
     
     if ment:
       personTag.append(ment)
+
  
   if body.get_text().strip() != listBodyTag.get_text().strip():
     print(body.get_text())
@@ -915,21 +945,30 @@ def writeHeaders():
 #################################################################################
 ########################## 6. index_to_xml  #######################################
 
+def headBod(h,b,lineList):
+  if len(lineList)>0:
+  
+    if "siehe" in lineList[0]:
+     h += lineList[0]
+     lineList=lineList[1:]
+     h,b=headBod(h,b,lineList)
+     
+    else:
+      b='<br>'.join(lineList)
+  return (h,b)
+
+
 
 def index_to_xml():
   print('Item Extractor is working ..')
   text=""
   t=""
-  # cp1252
-  #
-  #with codecs.open("index_n_mod_kurz.htm", "r", "cp1252") as f:
+
   with codecs.open("html/sbr-regesten2.html", "r", "cp1252") as f:
     text=f.read()
     text=unicode(text)
     t2=text.replace("\n"," ")
     t=t2.replace("\r","")
-    #\n\c oder \cr
-    #t=t2.encode('utf-8')
 
   soup = BeautifulSoup(t)
   soup=preprocess(soup)
@@ -968,20 +1007,21 @@ def index_to_xml():
 
       if foundIndex:
         s=unicode(htmlItem)
-        pMatch=re.search('<p.*?>(.*)<.p.*?>', s)
-        s=pMatch.group(1)
-        brMatch=re.search('(.*?)<br>(.*)', s)
-        if brMatch:
-          h=brMatch.group(1)
-          b=brMatch.group(2)
-        else:
-          h=s
-          b=""
+
+        
+        lineList=s.split('<br>')
+        h=lineList[0]
+        b=''
+        restList=lineList[1:]
+        
+        h,b = headBod(h,b,restList)
+
         h='<itemHeader>'+h+'</itemHeader>'
         b='<itemBody>'+b+'</itemBody>'
         header=BeautifulSoup(h)
         body=BeautifulSoup(b)
         item=IndexItem(header, body)
+        #print(item)
         items.append(item)
 
   print("ItemClassifier and ItemExtractor is processing..")
@@ -1133,7 +1173,7 @@ def index_to_xml():
       file.write(item.encode('utf-8') + "\n")
   print ("allXmlItems.xml ausgegeben")'''
  
-  with open ('index11.xml', 'w') as file:
+  with open ('index13.xml', 'w') as file:
     for item in xmlItemsComplete:
       indexTag.append(item)
       indexTag.append('\n')
