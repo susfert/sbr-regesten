@@ -42,6 +42,7 @@ def joini (s):
   s=re.sub('(?u)(\</i\>)([(:?\<.*?\>), ]*)(\<i\>)','\g<2>', s)
   return s
 
+
   
 def preprocess(soup):
   ''' Preprocesses the soup. '''
@@ -55,6 +56,13 @@ def preprocess(soup):
 
 
 ########################## 2. ItemExtractor ########################
+
+class ExtractorException(Exception):
+  def __init__(self, text):
+    self.text = text
+    
+  def __str__(self):
+    return self.text
 
 class IndexItem:
   def __init__(self, header, body):
@@ -147,6 +155,7 @@ def parseMentionings(soup, t):
   mentionings=[]
   ment='((?:\[?\+\]? )?[01][0-9][0-9][0-9]\-?\/?[01]?[0-9]?\-?[0-3]?[0-9]? ?\([a-f]?k?u?r?z? ??n?a?c?h?v?o?r?n?t?e?u?m?p?o?s?t?a?n?t?e?\??\.?\) ?)( Anm\.)?|((?:\[?\+\]? )?[01][0-9][0-9][0-9]\-?[01]?[0-9]?\-?[0-3]?[0-9]? ?\(?z?w?i?s?c?h?e?n?\)?)'
   #1306-03-24 (?), 1504/1505 (a) Anm., 1431-1459 (zwischen)
+  # TODO 1482-07-16 (nach) - 1499-01-08 (vor)
   
   mentMatch=re.match('(.*?)('+ment+',? ?)$', text)
   while mentMatch:
@@ -635,7 +644,7 @@ def persHeaderToXML(header):
 
 def relConcToXML(liste, prefix):
   #parst eine Liste von concepts
-  relConcTag=soup.new_tag('related_concepts')  
+  relConcTag=soup.new_tag('related-concepts')  
   concList=[]
   concTag=None
   for concHTML in liste:
@@ -761,7 +770,7 @@ def relConcBodyToXML(body):
   if not body.get_text():
     return listBodyTag
   
-  relTag = soup.new_tag("related_concepts")
+  relTag = soup.new_tag("related-concepts")
   listBodyTag.append(relTag)
   concList=[]
   conceptTag=None
@@ -770,6 +779,9 @@ def relConcBodyToXML(body):
     
     einrueckMatch=re.match('( *-)(.*)', concept.get_text())
     if einrueckMatch:
+      if einrueckMatch.group(2).strip().startswith('-') and not concList:
+        print einrueckMatch.group(2)
+        raise ExtractorException('Ill-formed HTML (body): unexpected indentation level in inner related concept (too many \'-\')')
       concList.append(einrueckMatch.group(2))
       continue
       
@@ -793,14 +805,13 @@ def relConcBodyToXML(body):
       relConcTag=relConcToXML(concList, ' -')
       if conceptTag:
         conceptTag.append(relConcTag)
+      else:
+        raise ExtractorException('Ill-formed HTML (body): unexpected indentation level in related concept')
   
  
   if body.get_text().strip() != listBodyTag.get_text().strip():
     print(body.get_text())
-    print(listBodyTag.get_text())
-    #print(rest.get_text())
-    #print(listBodyTag)
-    print('\n')
+    print(listBodyTag.get_text() + '\n')
     
   return listBodyTag
 
