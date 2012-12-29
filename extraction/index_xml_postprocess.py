@@ -27,9 +27,7 @@ def parseSiehe(inItem, itemList):
   saarbrMatch = re.match('(?u)(.*?siehe (?:auch )?)(Saarbr.cken, [\w]+)(.*)', inItem)
   sieheMatch =  re.match('(?u)(.*?siehe (?:auch )?)((?:'+sieheNameKeys+')(?:, (?:'+sieheNameKeys+'))*)(.*)', inItem)
   if saarbrMatch:
-    print('matched SB')
     sieheNames=[sieheMatch.group(2)]
-    print(sieheNames)
   if sieheMatch:
     if not sieheNames:
       sieheNames = re.split(',|/',sieheMatch.group(2))
@@ -63,6 +61,7 @@ def parseSiehe(inItem, itemList):
 
     outItem += parseSiehe(sieheMatch.group(3), itemList)
     sieheNames=''
+    print(outItem)
     return outItem
   else:
     return inItem
@@ -71,17 +70,22 @@ def parseSiehe(inItem, itemList):
 # postprocesses the xml (Aufloesung von 'siehe'-Referenzen innerhalb des Indexes)
 def index_xml_postprocess():
   print('postprocessing ..')    
-  with codecs.open ('allXmlItems.xml', 'r', 'utf-8') as inFile:
-    with codecs.open ('allXmlItems_post.xml', 'w', 'utf-8') as outFile:
+  with codecs.open ('index17.xml', 'r', 'utf-8') as inFile:
+    with codecs.open ('index17_post.xml', 'w', 'utf-8') as outFile:
       inXml=inFile.read()
       inXmlSoup = BeautifulSoup(inXml)
-      itemList=inXmlSoup.find_all('indexitem')
-      itemList2=itemList
+      itemList=inXmlSoup.find_all('item')
       print(len(itemList))
       lines=inXml.split('\n')
       
       for line in lines:
-        outItem=parseSiehe(line, itemList)
+        if "index-refs" in line:
+          headerMatch = re.match('(.*?)(<.*?-header.*?-header>)(.*)',line)
+          header=headerMatch.group(2)
+          header=re.sub('<.?index-refs>','', header)
+          outItem=headerMatch.group(1)+parseSiehe(header, itemList)+headerMatch.group(3)
+        else:
+          outItem=line
         outFile.write(outItem)
         outFile.write("\n")
   print ('postprocessing done!')
