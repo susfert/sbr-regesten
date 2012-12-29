@@ -601,7 +601,8 @@ def persHeaderToXML(header):
   
   with codecs.open("forenames.txt", "r", "utf-8") as file:
     matched=False
-    forenameKeys=file.read()
+    forenameList=file.read().split('\n')
+    forenameKeys='|'.join(forenameList)
     
     # Fust von Diebach gen. Knebel
     #description=text
@@ -696,7 +697,6 @@ def listingBodyToXML(body):
   listBodyTag.append(membersTag)
 
   personList=str(body).split("<br>") # personlist kann auch concepts enthalten
-  #print(personList)
   concList=[]
   hyp=''
   personTag=None
@@ -709,7 +709,6 @@ def listingBodyToXML(body):
       continue
       
     elif concList:
-      #print(concList)
       relConcTag=relConcToXML(concList, ' -')
       if personTag:
         personTag.append(relConcTag)
@@ -738,7 +737,6 @@ def listingBodyToXML(body):
     attrs=""
     if len(personAttrList)>1:
       possAddName=personAttrList[1]
-      #print(possAddName)
       if re.match("[ ]"+"(gen\.|den man nennet|dem man sprichet)"+"(.+)",possAddName):
         nameTag.append(", ")
         parsePersName(nameTag, possAddName)
@@ -759,8 +757,6 @@ def listingBodyToXML(body):
   if body.get_text().strip() != listBodyTag.get_text().strip():
     print(body.get_text())
     print(listBodyTag.get_text())
-    #print(rest.get_text())
-    #print(listBodyTag)
     print('\n')
     
   return listBodyTag
@@ -1060,8 +1056,6 @@ def index_to_xml():
     
     sieheMatch= re.search('siehe', header)
     
-    #print(header)
-    
     if famMatch:
       x=famToXML(item, id)
       xmlItems.append(x)
@@ -1112,43 +1106,35 @@ def index_to_xml():
         itemTag = soup.new_tag("item")
         for i in xmlItems:
           if not isinstance(i, IndexItem):
-            #print(i['value'])
             if n in i['value'].strip():
               type=i['type']
               itemTag['type']=type
-              print(type)
               itemTag['value']=item.header.b.get_text()
               itemTag['id']='item_'+str(item.header['tmp_id'])
-              #print(itemTag)
               if not type:
                 print (value+" konnte nicht aufgeloest werden!?!")
               if type=='location':
                 settleType=i.find('location-header').placeName.settlement['type']
-                #print('settletype: '+ settleType)
-                locHeadTag=soup.new_tag("location-header")
-                placeNameTag=soup.new_tag("placeName")
-                settleTag=soup.new_tag("settlement")
-                itemTag.append(locHeadTag)
-                locHeadTag.append(placeNameTag)
-                placeNameTag.append(settleTag)
-                settleTag['type']=settleType
-                settleTag['w']='false'
-                placeNameTag.append(item.header.get_text())
+                value, header=locHeaderToXML(item.header)
+                header.placeName.settlement['type']=settleType
+                itemTag.append(header)
                 
               if type=='family':
-                famHeaderTag=soup.new_tag('family-header')
+                value, header=famHeaderToXML(item.header)
+                itemTag.append(header)
+                
+                '''famHeaderTag=soup.new_tag('family-header')
                 famNameTag=soup.new_tag('family-name')
                 nameTag=soup.new_tag('name')
                 
                 itemTag.append(famHeaderTag)
                 famHeaderTag.append(famNameTag)
                 famNameTag.append(nameTag)
-                nameTag.append(item.header.get_text())
+                nameTag.append(item.header.get_text())'''
                 
               xmlItemsComplete.append(itemTag)
               break
-        #print (n+' nicht aufgeloest')
-      print(type)
+
 
   print("Items classified")  
   print("Familien: "+ str(len(families)))
@@ -1189,7 +1175,7 @@ def index_to_xml():
       file.write(item.encode('utf-8') + "\n")
   print ("allXmlItems.xml ausgegeben")'''
  
-  with open ('index17.xml', 'w') as file:
+  with open ('index19.xml', 'w') as file:
     for item in xmlItemsComplete:
       indexTag.append(item)
       indexTag.append('\n')
@@ -1216,7 +1202,7 @@ def index_to_xml():
 
   # legt mit forenames.txt eine Datei mit Vornamen an
   with codecs.open ('forenames2.txt', 'w', "utf-8") as file:
-    file.write('|'.join(forenames))
+    file.write('\n'.join(forenames))
 
   print ('Forenames.txt angelegt. Anzahl der Vornamen: '+str(len(forenames)))
 
@@ -1224,24 +1210,19 @@ def index_to_xml():
 '''if __name__=='main':
   index_to_xml()'''
  
-index_to_xml()
+#index_to_xml()
 
 
 ####################### 7. TODO ##############################################
 
 ### wenn 2fach eingerueckt
 ### wenn als letztes
-# Bucherbach: Keller (Hans danach weg)
 # Familie Ihn
 # conc-body ueberpruefen und variablen umbenennen
 # Bindestriche sammeln
 # Ihn
 # Kursivdrucke bahalten als quotes
-
 # Ebersingen, Gemuend
 # Franken, Hergesheim, Kigelat/Kuechelar
-
-# <listing-body><members><person><persName><forename>
-
 
 # Wolfstein, Walpershofen
