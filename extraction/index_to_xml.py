@@ -95,6 +95,7 @@ def get_regest_ID(reg_ref):
   idList = []
   count = False
   countR = 0
+  reg_ref=reg_ref.strip(' +')
   
   for regest in regestenList:
     if countR>10:
@@ -141,12 +142,12 @@ def parse_mentionings(soup, t):
   #1306-03-24 (?), 1504/1505 (a) Anm., 1431-1459 (zwischen)
   # TODO 1482-07-16 (nach) - 1499-01-08 (vor)
   
-  mentMatch = re.match('(.*?)('+ment+',? ?)$', text)
+  mentMatch = re.match('(.*?)('+ment+',? ? ?)$', text)
   while mentMatch:
     text = mentMatch.group(1)
     menti = mentMatch.group(2)
     mentionings.insert(0, menti)
-    mentMatch = re.match('(.*?)('+ment+'),\.? $', text)
+    mentMatch = re.match('(.*?)('+ment+'),\.? ? $', text)
   
   if mentionings:
     mentioningsTag = soup.new_tag("mentioned-in")
@@ -352,7 +353,7 @@ def parsePlaceName (header, placeNameTag):
   return (placeNameTag, ment, name, indexRefsTag)
 
 
-def locHeaderToXML(header):
+def loc_header_to_XML(header):
   '''
   Converts an html header into a xml location header.
   '''
@@ -377,7 +378,7 @@ def locHeaderToXML(header):
 
 ####################### 3.1.2 Family Header ####################################
 
-def famHeaderToXML(header):
+def fam_header_to_XML(header):
   '''
   Converts an html header into a xml family header.
   '''
@@ -436,7 +437,7 @@ def famHeaderToXML(header):
 
 ####################### 3.1.3 Landmark Header ####################################
 
-def landHeaderToXML(header):
+def land_header_to_XML(header):
   '''
   Converts an html header into a xml landmark header.
   '''
@@ -506,7 +507,7 @@ def landHeaderToXML(header):
 
 ####################### 3.1.4 Persongroup Header ####################################
 
-def persGrHeaderToXML(header):
+def persgr_header_to_XML(header):
   '''
   Converts an html header into a xml persongroup header.
   '''
@@ -537,7 +538,7 @@ def persGrHeaderToXML(header):
 
 ####################### 3.1.5 Person Header ####################################
 
-def persHeaderToXML(header):
+def pers_header_to_XML(header):
   '''
   Converts an html header into a xml person header.
   '''
@@ -606,6 +607,26 @@ def persHeaderToXML(header):
 
 ############################## 3.2 Bodies ###########################
 
+
+def build_conc_tag(text):
+  '''Builds a concept out of a given text.'''
+  soup=BeautifulSoup()
+  concTag = soup.new_tag('concept')
+  rest, ment = parse_mentionings(soup, text)
+  nameMatch = re.match('(?P<name>.*?)(?P<description>,{1}.*)',rest)
+  if nameMatch:
+    concTag, index = annotateGrNames(nameMatch, concTag)
+  else:
+    #print(rest)
+    nameTag = soup.new_tag('name')
+    nameTag.append(rest)
+    concTag.append(nameTag)
+  if ment:
+    concTag.append(ment)
+  return (concTag)
+
+
+
 def relConcToXML(liste, prefix):
   '''
   Parses a list of concepts.
@@ -627,16 +648,10 @@ def relConcToXML(liste, prefix):
       else:
         concTag = innerRelConcTag
       concList = []
-      
-    concTag = soup.new_tag('concept')
+
+    concTag = build_conc_tag(conc.get_text())
     relConcTag.append(prefix)
     relConcTag.append(concTag)
-    rest, ment = parse_mentionings(soup, conc.get_text())
-    nameTag = soup.new_tag('name')
-    concTag.append(nameTag)
-    nameTag.append(rest)
-    if ment:
-      concTag.append(ment)
 
   if concList:
       innerRelConcTag = relConcToXML(concList, prefix + ' -')
@@ -727,7 +742,7 @@ def listingBodyToXML(body):
 
 ############################ 3.2.2 RelatedConceptsBody (rest) ##############
 
-def relConcBodyToXML(body):
+def relconc_body_to_XML(body):
   '''
   Converts an html body into a xml body type concept-body.
   '''
@@ -757,15 +772,9 @@ def relConcBodyToXML(body):
       conceptTag.append(relConcTag)
       concList = []
   
-    rest, ment = parse_mentionings(soup, concept.get_text())
-    conceptTag = soup.new_tag('concept')
-    relTag.append(conceptTag)
-    nameTag = soup.new_tag('name')
-    conceptTag.append(nameTag)
-    nameTag.append(rest)
   
-    if ment:
-      conceptTag.append(ment)
+    conceptTag=build_conc_tag(concept.get_text())
+    relTag.append(conceptTag)
  
   if concList:
       relConcTag = relConcToXML(concList, ' -')
@@ -786,9 +795,9 @@ def relConcBodyToXML(body):
 
 ############################ 4.1 Familiy Parser  #####################
 
-def famToXML(family, id):
+def fam_to_XML(family, id):
   itemTag = soup.new_tag("item")
-  value, itemHeader = famHeaderToXML(family.header)
+  value, itemHeader = fam_header_to_XML(family.header)
   itemTag['id'] = 'item_'+str(id)
   itemTag['type'] = 'family'
   itemTag['value'] = value
@@ -801,9 +810,10 @@ def famToXML(family, id):
 
 ################## 4.2 PersongroupParser #############
 
-def persGrToXML(persongroup, id):
+def persgr_to_XML(persongroup, id):
+  ''' Converts an html item into a completely annotated xml persongroup item. '''
   itemTag = soup.new_tag("item")
-  value, itemHeader = persGrHeaderToXML(persongroup.header)
+  value, itemHeader = persgr_header_to_XML(persongroup.header)
   itemTag['id'] = 'item_'+str(id)
   itemTag['type'] = 'persongroup'
   itemTag['value'] = value
@@ -816,14 +826,15 @@ def persGrToXML(persongroup, id):
   
 ################## 4.3 PersonParser #############
 
-def persToXML(person, id):
+def pers_to_XML(person, id):
+  ''' Converts an html item into a completely annotated xml person item. '''
   itemTag = soup.new_tag("item")
-  value, itemHeader = persHeaderToXML(person.header)
+  value, itemHeader = pers_header_to_XML(person.header)
   itemTag['id'] = 'item_'+str(id)
   itemTag['type'] = 'person'
   itemTag['value'] = value
   itemTag.append(itemHeader)
-  itemBody = relConcBodyToXML(person.body)
+  itemBody = relconc_body_to_XML(person.body)
   itemTag.append(itemBody)
   print(value)
   return itemTag
@@ -832,14 +843,14 @@ def persToXML(person, id):
 ################## 4.4 LocationParser #############
 
 def locToXML(location, id):
-  pass
+  ''' Converts an html item into a completely annotated xml location item. '''
   itemTag = soup.new_tag("item")
-  value, itemHeader = locHeaderToXML(location.header)
+  value, itemHeader = loc_header_to_XML(location.header)
   itemTag['id'] = 'item_'+str(id)
   itemTag['type'] = 'location'
   itemTag['value'] = value
   itemTag.append(itemHeader)
-  itemBody = relConcBodyToXML(location.body)
+  itemBody = relconc_body_to_XML(location.body)
   itemTag.append(itemBody)
   print(value)
   return itemTag
@@ -848,13 +859,14 @@ def locToXML(location, id):
 ################## 4.5 LandmarkParser #############
 
 def landToXML(landmark, id):
+  ''' Converts an html item into a completely annotated xml landmark item. '''
   itemTag = soup.new_tag("item")
-  value, itemHeader = landHeaderToXML(landmark.header)
+  value, itemHeader = land_header_to_XML(landmark.header)
   itemTag.append(itemHeader)
   itemTag['id'] = 'item_'+str(id)
   itemTag['type'] = 'landmark'
   itemTag['value'] = value
-  itemBody = relConcBodyToXML(landmark.body)
+  itemBody = relconc_body_to_XML(landmark.body)
   itemTag.append(itemBody)
   print(value)
   return itemTag
@@ -886,11 +898,11 @@ def writeHeader(liste, funcToXML, file):
       file.write(str(x) + "\n")
 
 def writeHeaders():
-  writeHeader(persons, persHeaderToXML, 'persHeaderXML.xml')
-  writeHeader(locations, locHeaderToXML, 'locHeaderXML.xml')
-  writeHeader(families, famHeaderToXML, 'famHeaderXML.xml')
-  writeHeader(landmarks, landHeaderToXML, 'landHeaderXML.xml')
-  writeHeader(persongroups, persGrHeaderToXML, 'persGrHeaderXML.xml')
+  writeHeader(persons, pers_header_to_XML, 'persHeaderXML.xml')
+  writeHeader(locations, loc_header_to_XML, 'locHeaderXML.xml')
+  writeHeader(families, fam_header_to_XML, 'famHeaderXML.xml')
+  writeHeader(landmarks, land_header_to_XML, 'landHeaderXML.xml')
+  writeHeader(persongroups, persgr_header_to_XML, 'persGrHeaderXML.xml')
 
 
 #################################################################################
@@ -997,7 +1009,7 @@ def index_to_xml():
     sieheMatch = re.search('siehe', header)
     
     if famMatch:
-      x = famToXML(item, id)
+      x = fam_to_XML(item, id)
       xmlItems.append(x)
       families.append(item)
 
@@ -1008,12 +1020,12 @@ def index_to_xml():
       locations.append(item)
 
     elif grpMatch:
-      x = persGrToXML(item, id)
+      x = persgr_to_XML(item, id)
       xmlItems.append(x)  
       persongroups.append(item)
 
     elif persMatch:
-      x = persToXML(item, id)
+      x = pers_to_XML(item, id)
       xmlItems.append(x)
       persons.append(item)
 
@@ -1056,12 +1068,12 @@ def index_to_xml():
                 
               if type == 'location':
                 settleType = i.find('location-header').placeName.settlement['type']
-                value, header = locHeaderToXML(item.header)
+                value, header = loc_header_to_XML(item.header)
                 header.placeName.settlement['type'] = settleType
                 itemTag.append(header)
                 
               if type == 'family':
-                value, header = famHeaderToXML(item.header)
+                value, header = fam_header_to_XML(item.header)
                 itemTag.append(header)
 
               xmlItemsComplete.append(itemTag)
@@ -1079,7 +1091,7 @@ def index_to_xml():
   '''
 
 
-  with open ('index21.xml', 'w') as file:
+  with open ('index25.xml', 'w') as file:
     for item in xmlItemsComplete:
       indexTag.append(item)
       indexTag.append('\n')
@@ -1100,8 +1112,6 @@ def index_to_xml():
 
   # adds forenames to forenames.txt if found new forenames
   with codecs.open ('resources/forenames.txt', 'w', "utf-8") as file:
-    
-    print(forenameList)
     file.write('\n'.join(forenameList))
 
   print ('Forenames.txt angelegt bzw. erweitert. Anzahl der Vornamen: '+str(len(forenameList)))
