@@ -18,7 +18,7 @@ class Command(NoArgsCommand):
         frontmatter_extractor.extract_frontmatter()
         toc_extractor.extract_toc()
         preface_extractor.extract_preface() # TODO
-        bibliography_extractor.extract_bibliography() # TODO
+        bibliography_extractor.extract_bibliography()
         abbrev_extractor.extract_abbrevs()
         initials_extractor.extract_initials()
         regest_extractor.extract_regests()
