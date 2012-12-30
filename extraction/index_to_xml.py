@@ -298,8 +298,64 @@ def annotateGrNames(m, nameTag):
 
 ####################### 3.1.1 LocationHeader ####################################
 
-def parsePlaceName (header, placeNameTag):
+def parse_place_name (placeNameTag, text, ref_point=True):
+       
+    districtKeys = "Gem|Stadtverband [^;,]+|Gde\. [^,;]+|[\w-]+-Kreis|Kr\. [^,;]+|[-\w]+kreis|Stadt [\w][\w]\.|Stadt [\w-]+|Kreis [^;,]+"
+    district = "(?:"+districtKeys + ")(?:, (?:" + districtKeys + "))?"
+    regionKeys = "Dep\.,? [A-Za-z-]+|SL|NRW|By|RLP|BW|Prov\..+|Hessen"
+    country = "B|F|NL|CH|Lux|It|L|Spanien|T.rkei"
+    countryKeys = "(?:"+country+")(?![\w])"
+    
+    
+    if ref_point:
+        refPointMatch = re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?=(?:'+district+'|'+regionKeys+'|'+countryKeys+'))', text) 
+        if refPointMatch:
+            placeNameTag, index = annotateGrNames(refPointMatch, placeNameTag)
+            text=text[index:]
+    else:
+        m = re.match('(.*?)(?=(?:'+district+'|'+regionKeys+'|'+countryKeys+'))(.*)', text)
+        if m:
+            placeNameTag.append(m.group(1))
+            print(placeNameTag)
+            text=m.group(2)
+            #print(placeNameTag)
+    
+    
+    distRegMatch = re.match('(?u)(?P<district>'+ district + ')(.*)(?P<region>'+ regionKeys + ')(.*)', text)
+    distRegCountMatch = re.match('(?u)(?P<district>'+ district +')(.*)(?P<region>'+ regionKeys + ')(.*)(?P<country>' + countryKeys + ')(.*)', text)
+    distCountMatch = re.match('(?u)(?P<district>'+ district +')(.*)(?P<country>' + countryKeys + ')(.*)', text)
+    regCountMatch = re.match('(?u)(?P<region>'+ regionKeys + ')(.*)(?P<country>' + countryKeys + ')(.*)', text)
+    countMatch = re.match('(?u)(?P<country>'+ countryKeys + ')(.*)', text)
+    regMatch = re.match('(?u)(?P<region>'+ regionKeys + ')(.*)', text)
+    distMatch = re.match('(?u)(?P<district>'+ district + ')(.*)', text)
+    settleMatch = re.match('(?u)([^\w]?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)(.*)', text)
+    
+    possibleMatches = [distRegCountMatch, distRegMatch, distCountMatch, regCountMatch, regMatch, distMatch, countMatch, settleMatch]
+    for m in possibleMatches:
+        if m:
+            placeNameTag, index = annotateGrNames(m, placeNameTag)
+            
+            if "region" in m.groupdict():     
+                region = m.group("region")
+                if "Prov" in region:
+                    placeNameTag.find("region")['type'] = 'Provinz'
+                elif "Dep" in region:
+                    placeNameTag.find("region")['type'] = 'Departement'
+                elif "NRW" or "SL" or "RLP" or "By" or "BW" or "Hessen" in region:
+                    placeNameTag.find("region")['type'] = 'Bundesland'
+                    
+            break
 
+    return (placeNameTag)
+
+
+def loc_header_to_XML(header):
+    '''
+    Converts an html header into a xml location header.
+    '''
+    headerTag = soup.new_tag("location-header")
+    placeNameTag = soup.new_tag('placeName')
+    
     # Wuestungen
     settleTag = soup.new_tag("settlement")
     placeNameTag.append(settleTag)
@@ -328,20 +384,9 @@ def parsePlaceName (header, placeNameTag):
             rest = liste[1]
         else:
             rest= ''
-    
-    
+
     settleTag.append(name)
     
-    # SettlementType, RefPoint, District, Region, Country
-    settlement = "Dorf|Stadt|Stadtteil|Burgsiedlung|Burg|ehem. Burg|Hofgut|Hof|Ort|.rtlichkeit|Gemeinde|Kloster|Abtei|Schloss|Herrschaft|Gft\.|Kgr\.|Land|Kgr\.|Herzogtum|Hzgt\.|Grafschaft|F.rstentum|Deutschordenskommende|Bistum|Vogtei|Regierungssitz|Hochstift|Pfarrei|Erzstift|Erzbistum|Dekanat|Domstift|Reichsland|Deutschordensballei|\w*abtei|Wasserburg|M.hle|Zisterzienserabtei|Region"
-    districtKeys = "Gem|Stadtverband [^;,]+|Gde\. [^,;]+|[\w-]+-Kreis|Kr\. [^,;]+|[-\w]+kreis|Stadt [\w][\w]\.|Stadt [\w-]+|Kreis [^;,]+"
-    district = "(?:"+districtKeys + ")(?:, (?:" + districtKeys + "))?"
-    regionKeys = "Dep\.,? [A-Za-z-]+|SL|NRW|By|RLP|BW|Prov\..+|Hessen"
-    country = "B|F|NL|CH|Lux|It|L|Spanien|T.rkei"
-    settlementKeys = "(?:"+settlement+")(?![\w])"
-    countryKeys = "(?:"+country+")(?![\w])"
-    
-
     placeNameTag, ohneAddN = parse_addnames(placeNameTag, rest)
     if ohneAddN:
         text = BeautifulSoup(ohneAddN).get_text()
@@ -351,6 +396,9 @@ def parsePlaceName (header, placeNameTag):
     text, indexRefsTag = find_index_refs(text)
     text, ment = parse_mentionings(soup, text)
     
+    # SettlementType, RefPoint, District, Region, Country
+    settlement = "Dorf|Stadt|Stadtteil|Burgsiedlung|Burg|ehem. Burg|Hofgut|Hof|Ort|.rtlichkeit|Gemeinde|Kloster|Abtei|Schloss|Herrschaft|Gft\.|Kgr\.|Land|Kgr\.|Herzogtum|Hzgt\.|Grafschaft|F.rstentum|Deutschordenskommende|Bistum|Vogtei|Regierungssitz|Hochstift|Pfarrei|Erzstift|Erzbistum|Dekanat|Domstift|Reichsland|Deutschordensballei|\w*abtei|Wasserburg|M.hle|Zisterzienserabtei|Region"
+    settlementKeys = "(?:"+settlement+")(?![\w])"
     settleMatch = re.match('(?u)(.*?)('+ settlementKeys +')(.*?)', text)
     
     if settleMatch:
@@ -360,42 +408,7 @@ def parsePlaceName (header, placeNameTag):
     else:
         settleTag["type"] = 'unknown'
     
-    
-    distRegMatch = re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district + ')(.*)(?P<region>'+ regionKeys + ')(.*)', text)
-    distRegCountMatch = re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district +')(.*)(?P<region>'+ regionKeys + ')(.*)(?P<country>' + countryKeys + ')(.*)', text)
-    distCountMatch = re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district +')(.*)(?P<country>' + countryKeys + ')(.*)', text)
-    regCountMatch = re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<region>'+ regionKeys + ')(.*)(?P<country>' + countryKeys + ')(.*)', text)
-    countMatch = re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<country>'+ countryKeys + ')(.*)', text)
-    regMatch = re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<region>'+ regionKeys + ')(.*)', text)
-    distMatch = re.match('(?u)([^\w]*? ?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)([^\w-]+|[^\w]+W.stung.*?[^\w]+)(?P<district>'+ district + ')(.*)', text)
-    settleMatch = re.match('(?u)([^\w]?(?:siehe [\w/-]+)?)(?P<reference_point>[\w\.\/ -]*?)(.*)', text)
-    
-    possibleMatches = [distRegCountMatch, distRegMatch, distCountMatch, regCountMatch, regMatch, distMatch, countMatch, settleMatch]
-    for m in possibleMatches:
-        if m:
-            placeNameTag, index = annotateGrNames(m, placeNameTag)
-            
-            if "region" in m.groupdict():     
-                region = m.group("region")
-                if "Prov" in region:
-                    placeNameTag.find("region")['type'] = 'Provinz'
-                elif "Dep" in region:
-                    placeNameTag.find("region")['type'] = 'Departement'
-                elif "NRW" or "SL" or "RLP" or "By" or "BW" or "Hessen" in region:
-                    placeNameTag.find("region")['type'] = 'Bundesland'
-                    
-            break
-
-    return (placeNameTag, ment, name, indexRefsTag)
-
-
-def loc_header_to_XML(header):
-    '''
-    Converts an html header into a xml location header.
-    '''
-    headerTag = soup.new_tag("location-header")
-    placeNameTag = soup.new_tag('placeName')
-    placeNameTag, ment, name, indexRefsTag = parsePlaceName(header, placeNameTag)
+    placeNameTag = parse_place_name(placeNameTag, text)
     
     headerTag.append(placeNameTag)
     
@@ -404,9 +417,9 @@ def loc_header_to_XML(header):
     if indexRefsTag:
         headerTag.append(indexRefsTag)
     
-    if header.get_text().strip() != headerTag.get_text().strip():
+    '''if header.get_text().strip() != headerTag.get_text().strip():
         print(header.get_text())
-        print(headerTag.get_text() + '\n')
+        print(headerTag.get_text() + '\n')'''
 
     return name.rstrip(', '), headerTag
 
@@ -442,9 +455,13 @@ def fam_header_to_XML(header):
     parMatch = re.match(r"([^\w]*?)\((.*[A-Za-z][a-z]{1,3}.*)(\), .*)", rest)
     if parMatch:
         headerTag.append(BeautifulSoup(parMatch.group(1)).get_text())
-        loc = BeautifulSoup(parMatch.group(2))
+        #loc = BeautifulSoup(parMatch.group(2))
+        loc=parMatch.group(2)
+        print(loc)
         placeNameTag = soup.new_tag('location')
-        placeNameTag, m, n, s = parsePlaceName(loc, placeNameTag)
+        placeNameTag= parse_place_name(placeNameTag, loc, ref_point=False)
+        print(placeNameTag)
+        #placeNameTag=tmpPlaceNameTag.find('reference-point').decompose()
         headerTag.append('(')
         headerTag.append(placeNameTag)
         t = parMatch.group(3)
@@ -461,9 +478,9 @@ def fam_header_to_XML(header):
     if indexRefsTag:
         headerTag.append(indexRefsTag)
         
-    if header.get_text().strip() != headerTag.get_text().strip():
+    '''if header.get_text().strip() != headerTag.get_text().strip():
         print(header.get_text())
-        print(headerTag.get_text() + '\n')
+        print(headerTag.get_text() + '\n')'''
 
     return name.rstrip(', '), headerTag
 
@@ -1165,7 +1182,7 @@ def index_to_xml():
     '''
 
 
-    with open ('index31.xml', 'w') as file:
+    with open ('index33.xml', 'w') as file:
         for item in xmlItemsComplete:
             indexTag.append(item)
             indexTag.append('\n')
