@@ -8,7 +8,6 @@ sys.setrecursionlimit(10000)
 def getItemIndex(itemList,name):
   matched=False
   for item in itemList:
-    #print(item)
     if unicode(re.split('/',item['value'])[0]).strip() == unicode(name):
       if matched:
         return None
@@ -61,7 +60,6 @@ def parseSiehe(inItem, itemList):
 
     outItem += parseSiehe(sieheMatch.group(3), itemList)
     sieheNames=''
-    print(outItem)
     return outItem
   else:
     return inItem
@@ -69,9 +67,12 @@ def parseSiehe(inItem, itemList):
 
 # postprocesses the xml (Aufloesung von 'siehe'-Referenzen innerhalb des Indexes)
 def index_xml_postprocess():
+  '''
+  Postprocesses the parsed xml index (index.xml). Solves the regest-references in the item header.
+  '''
   print('postprocessing ..')    
-  with codecs.open ('index17.xml', 'r', 'utf-8') as inFile:
-    with codecs.open ('index17_post.xml', 'w', 'utf-8') as outFile:
+  with codecs.open ('index26.xml', 'r', 'utf-8') as inFile:
+    with codecs.open ('index26_post.xml', 'w', 'utf-8') as outFile: # TODO 'a'
       inXml=inFile.read()
       inXmlSoup = BeautifulSoup(inXml)
       itemList=inXmlSoup.find_all('item')
@@ -79,6 +80,8 @@ def index_xml_postprocess():
       lines=inXml.split('\n')
       
       for line in lines:
+        line=re.sub('&lt;', '<', line)  # necessary due to some encoding problems
+        line=re.sub('&gt;','>', line)  # necessary due to some encoding problems
         if "index-refs" in line:
           headerMatch = re.match('(.*?)(<.*?-header.*?-header>)(.*)',line)
           header=headerMatch.group(2)
