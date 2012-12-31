@@ -1,23 +1,36 @@
+"""
+This module extracts the index from the xml and writes it into the database.
+
+Author: Susanne Fertmann <s9sufert@stud.uni-saarland.de>
+"""
+
 # -*- coding: utf-8 -*-
+
 
 from bs4 import BeautifulSoup, Tag, NavigableString
 import codecs, string, re, sys
 from regesten_webapp import models
-from regesten_webapp.models import Location, Family, Person, Region, PersonGroup, Landmark, Concept, IndexEntry, Regest, RegestDate, Quote #*
+from regesten_webapp.models import Location, Family, Person, Region
+from regesten_webapp.models import PersonGroup, Landmark, Concept, IndexEntry
+from regesten_webapp.models import Regest, RegestDate, Quote
 
 countConc=2000
 idCount=0
 
 
 def ment_to_db(xmlNode, concept): # TODO
-    ''' TODO: Extracts related regests and writes them into the database. To be done when the regests are extracted.'''
+    '''
+    TODO: Extracts related regests and writes them into the database.
+    To be done when the regests are extracted.
+    '''
     pass
     '''if hasattr(xmlNode, 'mentioned-in'):
       for reg_ref in xmlNode.find('mentioned-in'):
         if isinstance(reg_ref, NavigableString):
           continue
         else:
-          titleList=RegestTitle.objects.filter(title__startswith=reg_ref.get_text().strip())
+          titleList=RegestTitle.objects.filter\
+                    (title__startswith=reg_ref.get_text().strip())
           if not len(titleList)==1:
             #print('Keine eindeutige Zuweisung von Regest moeglich.')
             continue
@@ -97,7 +110,8 @@ def relconc_to_db(relConc, createElement=create_concept):
                 c.save()
                 ment_to_db(conc, c)
                 if hasattr(conc, 'related-concepts'):
-                    add_all(c.related_concepts, relconc_to_db(conc.find('related-concepts')))
+                    add_all(c.related_concepts, relconc_to_db(conc.find\
+                           ('related-concepts')))
                     clist.append(c)
     return clist
 
@@ -141,11 +155,13 @@ def loc_to_db(itemsoup):
     
     # region  
     if placeName.region:
-        regs = Region.objects.filter(name=placeName.region.get_text().strip(' ,;.'))
+        regs = Region.objects.filter(name=placeName.region.get_text()\
+                                    .strip(' ,;.'))
         if regs:
             region = regs[0]
         else:
-            region = Region.objects.create(name=placeName.region.get_text().strip(' ,;.'), region_type=placeName.region['type'])
+            region = Region.objects.create(name=placeName.region.get_text()\
+                     .strip(' ,;.'), region_type=placeName.region['type'])
         l.region = region
 
     # country
@@ -175,7 +191,8 @@ def loc_to_db(itemsoup):
         #add_all(l.related_entries, header.find('index-refs'))
     
     if itemsoup.find('concept-body'):
-        add_all(l.related_concepts, relconc_to_db(itemsoup.find('concept-body').find('related-concepts')))
+        add_all(l.related_concepts, relconc_to_db(itemsoup.find\
+               ('concept-body').find('related-concepts')))
        
     print(l)
     return l
@@ -191,7 +208,6 @@ def land_to_db(itemsoup):
     land.name = itemsoup['value']
     if header.geogname:
         land.add_Names = header.geogname
-      
         land.landmark_type = str(header.geogname['type'])
    
     land.save()
@@ -201,7 +217,8 @@ def land_to_db(itemsoup):
  
     # related concepts
     if hasattr(itemsoup, 'concept-body'):
-        add_all(land.related_concepts, relconc_to_db(itemsoup.find('concept-body').find('related-concepts')))
+        add_all(land.related_concepts, relconc_to_db(itemsoup.find\
+                ('concept-body').find('related-concepts')))
        
     print(land)
     return land
@@ -231,7 +248,8 @@ def pers_to_db(itemsoup):
         
         # related concepts
         if hasattr(itemsoup, 'concept-body'):
-            add_all(p.related_concepts, relconc_to_db(itemsoup.find('concept-body').find('related-concepts')))
+            add_all(p.related_concepts, relconc_to_db(itemsoup.find\
+                   ('concept-body').find('related-concepts')))
            
         print (p)
         return p
@@ -253,7 +271,8 @@ def persgr_to_db(itemsoup):
     
     # related-concepts
     if itemsoup.find('listing-body'):
-        add_all(pg.members, relconc_to_db(itemsoup.find('listing-body').members, createElement=create_person))
+        add_all(pg.members, relconc_to_db(itemsoup.find('listing-body').members\
+               , createElement=create_person))
     
     print(pg)
     return pg
@@ -268,8 +287,6 @@ def fam_to_db(itemsoup):
     # Name & Additional names
     f.name = itemsoup['value'].strip(' ,;.')
     f.addnames = if_exists(header.addnames)
-    print(f.addnames)
-    #land.add_Names= TODO
     
     f.save()
     
@@ -278,7 +295,8 @@ def fam_to_db(itemsoup):
     
     # related concepts
     if itemsoup.find('listing-body'):
-        add_all(f.members, relconc_to_db(itemsoup.find('listing-body').members, createElement=create_person))
+        add_all(f.members, relconc_to_db(itemsoup.find('listing-body').members\
+                , createElement=create_person))
     
     print (f)
     return f
@@ -290,7 +308,8 @@ def index_to_db():
     Extracts the index items from the sbr-regesten.xml and writes them
     into the database sbr-regesten.db
     '''
-
+    print('Writing index into db..')
+    
     '''for a in [Location, Family, Person, Region, PersonGroup, Landmark, Concept, IndexEntry, Regest, RegestDate]:
       a.objects.all().delete()
       
