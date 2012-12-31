@@ -35,7 +35,9 @@ with codecs.open ('resources/forenames.txt', 'r', "utf-8") as file:
 with codecs.open("sbr-regesten.xml", "r", "utf-8") as f:
     s = BeautifulSoup(f)
     regSoup = s.regesten
-    regestenList = regSoup.findAll('regest')
+    regestenList=[]
+    if regSoup:
+        regestenList = regSoup.findAll('regest')
 
 
 ########################## 1. Preprocessing ########################
