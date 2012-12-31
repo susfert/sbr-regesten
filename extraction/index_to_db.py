@@ -3,9 +3,10 @@
 from bs4 import BeautifulSoup, Tag, NavigableString
 import codecs, string, re, sys
 from regesten_webapp import models
-from regesten_webapp.models import Location, Family, Person, Region, PersonGroup, Landmark, Concept, IndexEntry, Regest, RegestDate #*
+from regesten_webapp.models import Location, Family, Person, Region, PersonGroup, Landmark, Concept, IndexEntry, Regest, RegestDate, Quote #*
 
 countConc=2000
+idCount=0
 
 
 def ment_to_db(xmlNode, concept): # TODO
@@ -30,14 +31,14 @@ def ment_to_db(xmlNode, concept): # TODO
 
 def add_all(obj, li):
     for elem in li:
-      obj.add(elem)
+          obj.add(elem)
 
 
 def if_exists(node):
     ''' Checks if a node exists.'''
     if node:
         #print(node.get_text())
-        return node.get_text()
+        return node.get_text().strip(') (')
     else:
         return ''
 
@@ -59,9 +60,27 @@ def create_person(xmlNode):
 def create_concept(xmlNode):
     ''' Creates a concept. '''
     c = Concept()
-    c.name = xmlNode.name
+    name = xmlNode.find('name')
+    c.name = name.get_text()
+    #print(c.name)
+    c.description = if_exists(xmlNode.description)
+    quoteList = []
+    qList = []
+    '''if xmlNode.description:
+        quoteList = xmlNode.description.findAll('quote')
+    if not isinstance(name, NavigableString):
+        quoteList += name.findAll('quote')
+    for quote in quoteList:
+        q = create_quote(quote)
+        qList.append(q)
+    add_all(c.quotes, qList)'''
     return c
 
+def create_quote(xmlNode):
+    '''Creates a quote.'''
+    q = Quote()
+    q.content = xmlNode.get_text
+    return q
 
 def relconc_to_db(relConc, createElement=create_concept):
     '''Extracts related-concepts and writes them into the database.'''
@@ -83,18 +102,19 @@ def relconc_to_db(relConc, createElement=create_concept):
     return clist
 
 
+'''def indexrefs_to_db(indexrefs):
+      pass'''
+        
 
 def loc_to_db(itemsoup):
     '''Extracts a location and writes it into the database.'''
-    l=Location()
-    placeName=itemsoup.find('location-header').placename
-    attrs=placeName.settlement.attrs
+    l = Location()
+    header = itemsoup.find('location-header')
+    placeName = header.placename
+    attrs = placeName.settlement.attrs
      
     # Name & Additional names
-    if placeName.addNames:
-        l.additional_names = placeName.addNames
-    else:
-        l.additional_names = ''
+    l.additional_names = if_exists(placeName.addNames)
     l.name = itemsoup['value']
         
     # Wuestungen
@@ -109,17 +129,17 @@ def loc_to_db(itemsoup):
         
       
     # Reference point & District
-    point=placeName.find('reference_point')
-    if point:
-        point=point.get_text().strip(' ,;.')
-    if point:
-        l.reference_point = point
+    ref_point=placeName.find('reference_point')
+    if ref_point:
+        ref_point=ref_point.get_text().strip(' ,;.')
+    if ref_point:
+        l.reference_point = ref_point
     else:
         l.reference_point = ''
     if placeName.district:
         l.district = placeName.district.get_text().strip(' ,;.')
-      
-    # Region & Country
+    
+    # region  
     if placeName.region:
         regs = Region.objects.filter(name=placeName.region.get_text().strip(' ,;.'))
         if regs:
@@ -127,6 +147,8 @@ def loc_to_db(itemsoup):
         else:
             region = Region.objects.create(name=placeName.region.get_text().strip(' ,;.'), region_type=placeName.region['type'])
         l.region = region
+
+    # country
     if placeName.country:
         if placeName.country.get_text() == "F":
             l.country = "Frankreich"
@@ -138,26 +160,21 @@ def loc_to_db(itemsoup):
             l.country = "Luxemburg"
         if placeName.country.get_text() == "L":
             l.country = "Luxemburg"
-        if unicode(placeName.country.get_text()) == u'Tuerkei': # TODO
-            l.country = u'Tuerkei'
         if placeName.country.get_text() == "Spanien":
             l.country = "Spanien"
         if placeName.country.get_text() == "It":
             l.country = "Italien"
-    # all Bundeslaender are in Deutschland by definition, although this information is not included in the original Regesten
     elif l.region and l.region.region_type == 'Bundesland':
         l.country = "Deutschland"
-        
-        
-    # ID
-    #l.id=itemsoup['id'].split('_')[1]
+
     l.save()
     
-    # mentioned_in
-    ment_to_db(itemsoup.find('location-header'), l)
+    ment_to_db(header, l)
     
-    # related concepts
-    if itemsoup.find('concept-body'):#.get_text():
+    #if header.find('index-refs'):
+        #add_all(l.related_entries, header.find('index-refs'))
+    
+    if itemsoup.find('concept-body'):
         add_all(l.related_concepts, relconc_to_db(itemsoup.find('concept-body').find('related-concepts')))
        
     print(l)
@@ -177,8 +194,6 @@ def land_to_db(itemsoup):
       
         land.landmark_type = str(header.geogname['type'])
    
-    # ID
-    #land.id=itemsoup['id'].split('_')[1]
     land.save()
        
     # mentioned_in
@@ -207,11 +222,8 @@ def pers_to_db(itemsoup):
         p.maidenname = if_exists(pers_name.maidenname)
         p.rolename = if_exists(pers_name.rolename)
         p.genname = if_exists(pers_name.genname)
-        #print(if_exists(header.person.description.get_text()))
         p.description = if_exists(header.person.description)
 
-        # ID
-        #p.id=itemsoup['id'].split('_')[1]
         p.save()
             
         # mentioned_in
@@ -231,11 +243,9 @@ def persgr_to_db(itemsoup):
     pg = PersonGroup()
     header = itemsoup.find('persongroup-header')
      
-    # Name
+    # name
     pg.name = header.find('group-name').get_text()
     
-    # ID
-    #pg.id=itemsoup['id'].split('_')[1]
     pg.save()
     
     # mentioned_in
@@ -245,14 +255,11 @@ def persgr_to_db(itemsoup):
     if itemsoup.find('listing-body'):
         add_all(pg.members, relconc_to_db(itemsoup.find('listing-body').members, createElement=create_person))
     
-    #print('members'+ str(pg.members))
-       
     print(pg)
-    #pg.save()
     return pg
 
 
-# writes a family into the database
+
 def fam_to_db(itemsoup):
     '''Extracts a family and writes it into the database.'''
     f = Family()
@@ -260,10 +267,10 @@ def fam_to_db(itemsoup):
      
     # Name & Additional names
     f.name = itemsoup['value'].strip(' ,;.')
+    f.addnames = if_exists(header.addnames)
+    print(f.addnames)
     #land.add_Names= TODO
     
-    # ID
-    #f.id=itemsoup['id'].split('_')[1]
     f.save()
     
     # mentioned_in
@@ -277,7 +284,7 @@ def fam_to_db(itemsoup):
     return f
  
  
-#  Entry point: writes the XML-index into the database
+
 def index_to_db():
     '''
     Extracts the index items from the sbr-regesten.xml and writes them
@@ -301,12 +308,9 @@ def index_to_db():
     
     with codecs.open ('index32_post.xml', 'r', 'utf-8') as file:
         soup = BeautifulSoup(file)
-        #itemList = soup.index.findall('item')
         itemList = soup.findAll('item')
         
-        
         for itemsoup in itemList:
-            #soup=BeautifulSoup(item)
             type = itemsoup['type']
 
             if type == 'location':
