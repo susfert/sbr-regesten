@@ -325,9 +325,9 @@ def index_to_db():
     
     countIndex = 0
     
-    with codecs.open ('index32_post.xml', 'r', 'utf-8') as file:
+    with codecs.open ('sbr-regesten.xml', 'r', 'utf-8') as file:
         soup = BeautifulSoup(file)
-        itemList = soup.findAll('item')
+        itemList = soup.find('index').findAll('item')
         
         for itemsoup in itemList:
             type = itemsoup['type']
