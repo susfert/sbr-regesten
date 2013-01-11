@@ -168,17 +168,17 @@ def parse_mentionings(soup, t):
     mentioningsTag = None
     text = t
     mentionings = []
-    ment = '((?:\[?\+\]? )?[01][0-9][0-9][0-9]\-?\/?[01]?[0-9]?\-?[0-3]?'\
+    ment = '((?:\[?\+\]? )?[01][0-9]{3}\-?\/?[01]?[0-9]?\-?[0-3]?'\
           '[0-9]? ?\([a-f]?k?u?r?z? ??n?a?c?h?v?o?r?n?t?e?u?m?p?o?s?t?a?n?t?e?'\
-          '\??\.?\) ?)( Anm\.)?|((?:\[?\+\]? )?[01][0-9][0-9][0-9]\-?[01]?'\
-          '[0-9]?\-?[0-3]?[0-9]? ?\(?z?w?i?s?c?h?e?n?\)?)'
+          '\??\.?\) ?)( Anm\.)?|((?:\[?\+\]? )?[01][0-9]{3}\-?[01]?'\
+          '[0-9]?\-?[0-3]?[0-9]?(\/[01][0-9])? ?\(?z?w?i?s?c?h?e?n?\)?)'
     
     mentMatch = re.match('(.*?)('+ment+',? ? ?)$', text)
     while mentMatch:
         text = mentMatch.group(1)
         menti = mentMatch.group(2)
         mentionings.insert(0, menti)
-        mentMatch = re.match('(.*?)('+ment+'),\.? ? $', text)
+        mentMatch = re.match('(.*?)('+ment+')[,\.]{1,} ? $', text)
     
     if mentionings:
         mentioningsTag = soup.new_tag("mentioned-in")
@@ -989,7 +989,7 @@ def index_to_xml():
     Main function. Finds the index in html/sbr-regesten.html, converts
     it into xml and writes it into index.xml.
     '''
-    print('Item Extractor is working ..')
+    print('Index Extractor is working ..')
     text = ""
     t = ""
 
@@ -1166,7 +1166,7 @@ def index_to_xml():
     with codecs.open ('resources/forenames.txt', 'w', "utf-8") as file:
         file.write('\n'.join(forenameList))
         
-    with open ('index.xml', 'w') as file:
+    with open ('index40.xml', 'w') as file:
         for item in xmlItemsComplete:
             indexTag.append(item)
             indexTag.append('\n')
