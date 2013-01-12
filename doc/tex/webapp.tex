@@ -28,4 +28,85 @@ application. Also included is a detailed description of the data model
 used for storing information extracted from the Sbr-Regesten in the
 database associated with the application.
 
+\subsection{The Django Web Framework}
+\label{sec:django}
+
+The information in this section is based on the official Django
+documentation which can be found at
+\url{https://docs.djangoproject.com/}.
+
+Django is a Python Framework for rapid prototyping and development of
+interactive web applications. It uses the MVC pattern to separate the
+different tasks that are involved in creating interactive web
+applications.
+
+\subsubsection{The MVC Pattern}
+\label{sec:mvc}
+
+\href{https://en.wikipedia.org/wiki/Model_view_controller}{Model-View-Controller},
+or MVC for short, is a
+\href{https://en.wikipedia.org/wiki/Software_design_pattern}{Software Design Pattern}
+
+commonly used by Web Frameworks such as Django and Ruby on Rails. The
+basic idea of MVC is is to divide application logic into three layers.
+The \emph{Model} layer is responsible for storing and operating on
+data. This usually involves at least the basic
+\href{https://en.wikipedia.org/wiki/CRUD}{CRUD} operations
+\emph{Create}, \emph{Read}, \emph{Update}, and \emph{Delete}.The
+\emph{View} layer takes care of presenting available data to end
+users. \emph{Controllers} are responsible for handling user requests.
+Depending on the type of request, this usually involves querying the
+model layer for data, manipulating this data in various ways (if
+necessary), and sending it off to the view layer for presentation.
+
+Different frameworks interpret MVC in different ways; the next chapter
+describes Django's implementation of this pattern.
+
+\subsubsection{How Django Implements MVC}
+\label{sec:django-mvc}
+
+This chapter presents an overview of how Django interprets and
+implements the MVC pattern. For an in-depth treatment of the
+individual components, please consult the documentation at
+\url{https://docs.djangoproject.com/}.
+
+While Django's seperation of concerns is heavily influenced by the MVC
+pattern conceptually, the framework uses a different terminology to
+distinguish the individual components for dealing with (user)
+requests, data, and presentation. The terminological differences tend
+to confuse users that are new to Django or to working with MVC
+frameworks in general, which makes it all the more important to
+understand these differences before delving into Django development.
+
+Django distinguishes between \emph{models}, \emph{templates}, and
+\emph{views}, which is why the framework is commonly referred to as an
+``MTV'' framework. The model layer in Django corresponds to the
+concept of a model layer as it is defined (or at least commonly
+understood) in the context of MVC. Django templates correspond to
+views in MVC, and the responsibilities of Django views are similar to
+those of controllers in MVC.
+
+From an architectural point of view, a Django \emph{project} usually
+consists of one or more Django \emph{apps}. Among other things, each
+app includes a dedicated Python module for the model layer (called
+\texttt{models.py}), two Python modules that are jointly responsible for
+handling user requests (called \texttt{views.py} and \texttt{urls.py})
+and a hierarchy of templates written in Django's template language.
+
+The \texttt{models.py} module contains specialized Python classes
+(called \emph{models}) which define the data model of a given Django
+app. Each class corresponds to a table in the database of the project,
+with additional tables being created as necessary to represent
+relationships between different models.
+
+The \texttt{views.py} module contains specialized Python functions
+(called \emph{view functions}) for handling user requests. These
+functions are responsible for querying the database for information,
+manipulating that information if necessary, and rendering the
+appropriate templates back to the user, filled with the information
+that was requested. In this context, the \texttt{urls.py} module acts
+as a kind of \emph{dispatcher}: It contains a mapping from URLs (or,
+generally speaking, URL patterns) to appropriate view functions,
+allowing Django to identify the actions it needs to take based on the
+URL that was requested by the user.
 
