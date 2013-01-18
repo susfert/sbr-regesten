@@ -179,5 +179,46 @@ installed using pip as follows:
 $ pip install ipython
 \end{verbatim}
 
+\subsubsection{Running the Application}
+\label{sec:run}
+
+Once all necessary dependencies are installed, you can run the
+application. Extract the contents of the source archive to an
+appropriate folder in your file system and \texttt{cd} into the root
+folder of the project. This folder is called \texttt{sbr-regesten}.
+Look for a file called \texttt{sbr-regesten.db}. If it's there, this
+means that source package you have received includes a prepopulated
+database, and that you can run the application right away by typing
+
+\begin{verbatim}
+$ python manage.py runserver
+\end{verbatim}
+
+If you find that the database file is missing from the source archive,
+you need to proceed as follows: First, initialize the database by running
+
+\begin{verbatim}
+$ python manage.py syncdb
+\end{verbatim}
+
+At some point you will be asked whether or not you would like to
+create a superuser for the database. Type \texttt{yes} and press
+Enter, then provide a username, email address and password. For
+development purposes it is both convenient and acceptable to simply
+set username and password to \texttt{admin}.
+
+When the \texttt{syncdb} command finishes, you can either start using
+the application with an empty database by typing the
+\texttt{runserver} command listed above, or you can go ahead and
+populate the database with information from the Sbr-Regesten. Since
+the extraction process was implemented as a Django \emph{management command},
+you can trigger it using the following command:
+
+\begin{verbatim}
+$ python manage.py extract
+\end{verbatim}
+
+Note that this process might take a long time to finish.
+
 \subsection{Django Data Model}
 \label{sec:data-model}
