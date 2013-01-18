@@ -117,5 +117,67 @@ This chapter explains how to install and use the Sbr-Regesten Web
 Application, and also provides some pointers on how to extend and
 deploy it.
 
+\subsubsection{Installation}
+\label{sec:install}
+
+\paragraph{Python and Django}
+The Sbr-Regesten Web Application was developed using Python 2.7.3 and
+Django 1.4.3.
+
+Python binaries and source code for all major operating systems can be
+obtained from \url{http://python.org/download/}. Python binaries are
+usually pre-installed on Linux distributions, and different versions
+can be obtained from standard repositories using a package manager:
+Please note that at the time of this writing, Django is \textbf{not}
+compatible with Python 3, so in order to run the app successfully,
+Python 2.7.* needs to be installed.
+
+The easiest way to install specific versions of Django is using the
+\href{http://www.pip-installer.org/en/latest/}{pip-installer} which is
+a tool for installing and managing Python packages. \texttt{pip}
+should be available in the standard repositories of most Linux
+distributions (package: python-pip). For generic installation
+instructions, visit
+\url{http://www.pip-installer.org/en/latest/installing.html}.
+
+Once \texttt{pip} has been installed, version 1.4.3 of Django can be
+installed using the following command:
+
+\begin{verbatim}
+$ pip install Django==1.4.3
+\end{verbatim}
+
+For instructions on how to install Django manually, consult
+\href{https://www.djangoproject.com/download/}{this part} of the
+Django documentation.
+
+\paragraph{BeautifulSoup}
+The process of extracting and annotating information from the
+Sbr-Regesten makes heavy use of a tool called \emph{BeautifulSoup},
+which needs to be installed in order to reproduce the extraction
+process locally.
+
+Like Django, BeautifulSoup is pip-installable:
+
+\begin{verbatim}
+$ pip install beautifulsoup4
+\end{verbatim}
+
+For the purpose of improving or extending the extraction process,
+detailed information about BeautifulSoup can be found in its
+\href{http://www.crummy.com/software/BeautifulSoup/bs4/doc/}{official documentation}.
+
+\paragraph{Further Recommendations}
+In addition to the hard dependencies described in the previous
+sections, we recommend installing the \emph{IPython} interpreter as it
+provides a lot of features not included in the standard python
+interpreter and thus makes interacting with the database from Django's
+development shell a lot easier. The latest version of IPython can be
+installed using pip as follows:
+
+\begin{verbatim}
+$ pip install ipython
+\end{verbatim}
+
 \subsection{Django Data Model}
 \label{sec:data-model}
