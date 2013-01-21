@@ -220,5 +220,197 @@ $ python manage.py extract
 
 Note that this process might take a long time to finish.
 
+\subsubsection{Using the Application}
+\label{sec:use}
+
+After starting the development server with the \texttt{runserver}
+command, direct your browser to \url{http://127.0.0.1:8000/admin} to
+access the application. You will be greeted by a login form:
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{img/admin-login}
+  \caption{Login screen for the Django admin interface}
+  \label{fig:admin-login}
+\end{figure}
+
+If you are working with a prepopulated database, enter \texttt{admin}
+in both the \emph{Benutzername} and the \emph{Passwort} field. If you
+initialized the database yourself, use the credentials you specified
+in the \texttt{syncdb} step explained in the previous section.
+Clicking on \emph{Anmelden} will take you to the main page of the
+\emph{Django Admin Interface}:
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{img/admin-main}
+  \caption{Main page of the admin interface, starting point for actions described below}
+  \label{fig:admin-main}
+\end{figure}
+
+The admin interface allows you to browse, search and manipulate (i.e.
+add, change, and delete) the data that is stored in the database from
+the convenience of your browser.
+
+\paragraph{Browsing and Searching Data}
+From the main page of the admin interface you can get listings of
+database entries for the following entities that can be found in the
+Sbr-Regesten\footnote{Consult chapter \ref{sec:data-model} for more
+  information about these entities.}:
+
+\begin{itemize}
+\item Archives (listed as \emph{Archive})
+\item Families (listed as \emph{Familien})
+\item Landmarks (listed as \emph{Flurnamen})
+\item Concepts (listed as \emph{Konzepte})
+\item Locations (listed as \emph{Orte})
+\item Persons (listed as \emph{Personen})
+\item Person groups (listed as \emph{Personengruppen})
+\item Regests (listed as \emph{Regesten})
+\item Regions (listed as \emph{Regionen})
+\end{itemize}
+
+Click on the name of a specific entity to get to the corresponding
+listing of database entries. The listing for locations (\emph{Orte})
+looks like this:
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{img/admin-loc-listing}
+  \caption{Example listing of database entries}
+  \label{fig:admin-loc-listing}
+\end{figure}
+
+To sort the table by a specific column, click on its header. Clicking
+more than once will toggle between ascending and descending order for
+that column.
+
+If you are looking for a specific entry, you can narrow down the list
+by entering appropriate search terms in the search field and clicking
+the \emph{Suchen} button. On the result page, click on the link next
+to the information about the number search results to get back to the
+full listing.
+
+Note that for efficiency reasons, search is configured to consult only
+a limited number of model fields for each entity.
+
+\paragraph{Adding Data}
+Starting from the main page of the admin interface, you can manipulate
+the data in the database in various ways. For each entity/model that
+has been configured to be editable via the admin interface, Django
+displays two buttons; one for adding a new database entry for a
+specific model (\emph{Hinzufügen}), and another one for changing
+information associated with existing entries (\emph{Ändern}).
+
+To add a new database entry for a specific model, click on the
+corresponding \emph{Hinzufügen} button. This brings up the appropriate
+input form for the model. For instance, the (top part of the) form for
+adding a new Regest entry to the database looks like this:
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{img/add-regest}
+  \caption{Example interface for adding a new entry to the database}
+  \label{fig:add-regest}
+\end{figure}
+
+In any input form, fields with labels in bold font are mandatory. This
+means that Django will not allow you to save a new entry to the
+database without filling them in. Instead, it will annotate the fields
+you failed to fill in with appropriate error messages and redisplay
+the input form\footnote{The interface behaves in exactly the same way
+  if you \textbf{edit} the information for an existing entry and
+  (accidentally) delete any mandatory information.}:
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{img/add-regest-fail}
+  \caption{Input form with errors}
+  \label{fig:add-regest-fail}
+\end{figure}
+
+When you are done filling in the information that you would like to
+store as a new entry in the database, click the \emph{Sichern} button
+at the very bottom of the input form. This will take you back to the
+listing of existing entries for the model that you were working on.
+Alternatively, if you want to add another database entry for the same
+model, click the \emph{Sichern und neu hinzufügen} button. This will
+bring up a new input form for the same model. If you want to save the
+entry and continue working on it afterwards, click \emph{Sichern und
+  weiter bearbeiten}.\footnote{Note that this won't work if any of the
+  mandatory fields are empty.}
+
+If you are familiar with the Sbr-Regesten, most of the fields included
+in the input forms for the different models should be
+self-explanatory. Some of the less obvious fields are annotated with
+examples of the type of input that they expect. However, before
+starting to add or edit information from the admin interface, please
+refer to chapter \ref{sec:data-model} to get a more detailed
+understanding of the type of information represented by any given
+field.
+
+\paragraph{Manipulating Data}
+The steps that are involved in editing existing data are very similar
+to the ones that are required for adding new entries. On the main page
+of the admin interface, click on the \emph{Ändern} button that
+corresponds to the type of model you would like to edit one or more
+entries for. This will bring up the already familiar listing of
+database entries for the model. If necessary, sort or narrow down the
+list as described above, then click on the name of the entry you would
+like to edit. The fields of the input form that comes up will be
+prepopulated with the information that is available for this entry.
+Other than that it looks and behaves exactly like the form you are
+already used to for adding new entries.
+
+To get a list of all changes that were made to a specific database
+entry via the admin interface, click on the button that says
+\emph{Geschichte} in the top right corner of the input form.
+
+\paragraph{Removing Data}
+If you want to remove a specific entry from the database, navigate to
+its input form as described above. Then, on the very bottom of the
+page, click the \emph{Löschen} button. This will bring up a
+confirmation page that looks like this:
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{img/confirm-delete}
+  \caption{Confirmation page for deleting items}
+  \label{fig:confirm-delete}
+\end{figure}
+
+Click on the \emph{Ja, ich bin sicher} button to finalize the action.
+If you change your mind, you can use e.g. the breadcrumbs to navigate
+somewhere else.
+
+It is also possible to delete multiple entries at once. On the page
+that lists all existing entries for a given model, mark the entries
+you would like to delete by clicking on the checkboxes next to the
+names of the entries. Then choose \emph{Ausgewählte MODEL\_NAME
+  löschen} from the drop-down menu labeled \emph{Aktion} at the top
+and click the \emph{Ausführen} button:
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{img/delete-multiple}
+  \caption{Deleting multiple items at once}
+  \label{fig:delete-multiple}
+\end{figure}
+
+\subsection{Deployment}
+\label{sec:deploy}
+
+\subsection{Extending the Web Application}
+\label{sec:extend}
+
+\subsubsection{Version Control with Git}
+\label{sec:git}
+
+\subsubsection{Next Steps: Suggestions for Future Extensions}
+\label{sec:next}
+
+\subsubsection{Internationalization: Translating the Application}
+\label{sec:translate}
+
 \subsection{Django Data Model}
 \label{sec:data-model}
