@@ -424,6 +424,79 @@ should be implemented next.
 \subsubsection{Version Control with Git}
 \label{sec:git}
 
+The Sbr-Regesten Web Application was developed using the
+\href{http://git-scm.com/}{Git Distributed Version Control System}.
+For the purpose of extending the application we recommend you continue
+using this system, as this will enable you to make use of the
+development history in various ways.
+
+\paragraph{Installing Git}
+
+Git is available for all major operating systems. On most major Linux
+distributions it can be installed from the standard repositories using
+a package manager. For detailed platform-specific instructions and/or
+to download graphical installers for MacOS X and Windows, go to
+\url{http://git-scm.com/downloads}.
+
+\paragraph{Using Git to Download the Source Code}
+
+The source code repository for the Sbr-Regesten is hosted on
+\href{https://github.com/}{GitHub} at
+\url{https://github.com/itsjeyd/sbr-regesten}. To obtain a copy of the
+most recent version of the source code, \texttt{cd} to the directory
+in which you want to store it and enter the following command:
+
+\begin{verbatim}
+$ git clone https://github.com/itsjeyd/sbr-regesten.git
+\end{verbatim}
+
+This will download (\emph{clone}) the repository to a folder called
+\texttt{sbr-regesten} in your current working directory.
+
+Note that doing this will \textbf{not} give you \emph{push access} to
+the GitHub repository: Git lets you commit any future changes you make
+to the source code \emph{locally}; hosting code on a remote server is
+not necessary in order to successfully keep it under version control
+with Git. However, unless you are granted permission by the owner of
+the GitHub repository, you will not be able to \emph{push} your
+changes back to the server.
+
+If you would like to host your own copy of the source code on GitHub
+(e.g. to facilitate collaboration among multiple developers), instead
+of cloning the code from the original repository, you
+should follow these steps:
+
+\begin{enumerate}
+\item \href{https://github.com/plans}{Create a GitHub account}
+\item \href{https://help.github.com/articles/fork-a-repo}{Fork} the
+  original repository
+\item Clone the repository from your own fork to your local machine,
+  using the \texttt{clone} command above with the appropriate URL.
+\end{enumerate}
+
+\paragraph{Git Resources}
+There is a wealth of information about how to use Git available
+online, so it does not make sense to duplicate this information here.
+If you are new to Version Control with Git, the following resources
+will help you get started:
+
+\begin{itemize}
+\item \href{http://try.github.com/levels/1/challenges/1}{tryGit}, a
+  free, no-setup-required
+  CodeSchool\footnote{\url{http://www.codeschool.com/}} course that
+  lets you practise working with Git in the comfort of your browser
+\item \href{http://git-scm.com/book}{Pro Git} by Scott Chacon, a
+  comprehensive book about Git that is available both in print and
+  online; the link references the online version which is searchable
+  and continuously receives updates
+\item The \href{http://gitref.org/}{Git Reference},
+  \begin{quote}
+    ``a quick reference for learning and remembering the most
+    important and commonly used Git commands'',
+  \end{quote}
+  which also provides links to relevant sections of the Pro Git book.
+\end{itemize}
+
 \subsubsection{Next Steps: Suggestions for Future Extensions}
 \label{sec:next}
 
@@ -432,3 +505,9 @@ should be implemented next.
 
 \subsection{Django Data Model}
 \label{sec:data-model}
+
+\subsubsection{Regesten}
+\label{sec:reg-model}
+
+\subsubsection{Index}
+\label{sec:index-model}
