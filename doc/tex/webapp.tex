@@ -425,6 +425,24 @@ consult the
   Django} section of the Django documentation for detailed information
 on different ways to get the application running on your server.
 
+\paragraph{A Note on Debug Mode}
+
+Despite not going into detail here about how to deploy the
+Sbr-Regesten Web Application, there is one important security issue
+that needs to be addressed: For the purpose of making applications
+easy to develop and debug, Django provides a \emph{debug mode}. If
+this mode is turned on, Django displays a debug page for any errors or
+exceptions that occur while interacting with the application in the
+browser. This page includes a full error traceback containing
+extensive information about the environment the application is running
+in. This poses a high security risk, as it provides users (who might
+have malicious intentions) with information they should not have
+access to. Therefore, before deploying the Sbr-Regesten Web
+Application in a production environment, make sure that the
+\texttt{DEBUG} variable (which is used to turn debug mode on and off)
+is set to \texttt{False} in
+\texttt{sbr-regesten/sbr\_regesten/settings.py}.
+
 \subsection{Extending the Web Application}
 \label{sec:extend}
 
