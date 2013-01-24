@@ -531,6 +531,93 @@ will help you get started:
 \subsubsection{Next Steps: Suggestions for Future Extensions}
 \label{sec:next}
 
+Before creating a full-fledged web application for the Sbr-Regesten, a
+data model to represent the contents of the original document had to
+be created. This task was the main focus of our project, along with
+extracting, annotating and storing the information contained in the
+Sbr-Regesten based on this new model. The purpose of this section is
+to point out functionality that was outside the scope of this project
+but should most likely be implemented next.
+
+\paragraph{Changing the Database Backend}
+
+Django supports a number of different database engines. By default it
+uses \emph{sqlite3}, as this involves virtually no additional setup,
+because Python 2.7 includes sqlite connector modules in its standard
+library. For development purposes, sqlite is an acceptable choice. In
+terms of performance, however, it leaves a lot to be desired and is
+therefore not recommended for use in a production environment.
+\href{http://www.mysql.com/}{MySQL} and
+\href{http://www.postgresql.org/}{PostgreSQL} are much more suited for
+these kinds of environments.
+
+There are several steps involved in changing the database backend:
+
+\begin{enumerate}
+\item If you haven't already, install the database engine of your
+  choice on the server you are planning to deploy on
+\item Install the appropriate Python bindings for the type of database
+  you picked
+\item Grant Django the necessary rights to create and alter tables;
+  for testing purposes, Django will also need permission to create
+  test databases
+\item Change the \texttt{ENGINE} option in the \texttt{DATABASES}
+  constant in \texttt{settings.py} to the value corresponding to the
+  new engine.
+\end{enumerate}
+
+For additional information, refer to the
+\href{https://docs.djangoproject.com/en/1.4/topics/install/#database-installation}{Get
+your database running} section of the Django documentation.
+
+\paragraph{XML Export}
+
+As new information gets added to the database via the admin interface
+of the web application, the XML version of the Sbr-Regesten will
+become more and more outdated. In order to prevent this, a feature
+that allows for XML export of database entries needs to be
+implemented. In the spirit of
+\href{https://en.wikipedia.org/wiki/CRUD}{CRUD}, this could e.g. be
+done by adding entity-specific \texttt{to\_xml} methods to each of the
+relevant models. Additionally, for convenience sake, this
+functionality could be integrated into the admin interface by writing
+a custom
+\href{https://docs.djangoproject.com/en/1.4/ref/contrib/admin/actions/}{Admin
+  Action}. Admin actions are useful for performing the same task on
+multiple database entries at once; for example, deleting multiple
+database entries is an instance of an admin action. They are available
+from the drop-down menu labeled \emph{Actions} on the pages that list
+existing entries for individual models (see section \ref{sec:use},
+``Browsing and Searching Data'').
+
+\paragraph{Public Pages for End-Users}
+
+In terms of actual functionality, the web application so far ``only''
+provides an interface for \emph{administrating} the information stored
+in the database. Regular users will most likely not be given access to
+this interface, and the Django Admin Interface was also not designed
+to be used by a large number of end users. The application is lacking
+functionalities for (presenting the information stored in the database
+to) end users, which will have to be implemented before releasing the
+application to the public. In more technical terms, this means that
+future work will focus heavily on the \emph{view} and \emph{template}
+layers of the application.
+
+The following sections of the Django documentation provide detailed
+information about these layers:
+
+\begin{itemize}
+\item
+  \href{https://docs.djangoproject.com/en/1.4/topics/http/}{Handling
+    HTTP requests}
+\item
+  \href{https://docs.djangoproject.com/en/1.4/topics/forms/}{Working
+    with forms}
+\item
+  \href{https://docs.djangoproject.com/en/1.4/topics/templates/}{The
+    Django template language}
+\end{itemize}
+
 \subsubsection{Adding Tests for New Features}
 \label{sec:test}
 
