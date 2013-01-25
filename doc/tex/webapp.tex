@@ -621,6 +621,54 @@ information about these layers:
 \subsubsection{Adding Tests for New Features}
 \label{sec:test}
 
+Django comes with a built-in test execution framework which extends
+the \texttt{unittest} module included the Python Standard Library for
+web development-specific needs. By default, when using the
+\texttt{startapp} management command to create the basic structure for
+a new Django app, Django creates a single module for the tests
+associated with the app called \texttt{tests.py}. This module is
+located in the top-level directory of the app. However, as individual
+apps grow in size, it might become necessary to split up their tests
+into several modules to keep the overall architecture modular. Django
+provides support for this: If you create a directory called
+\texttt{tests} on the same level as the default \texttt{tests.py}
+module, you can put as many test modules in this directory as you
+like, and you can name them whatever you want, without the need for
+any additional setup.
+
+The current version of the Sbr-Regesten Web Application already
+includes tests for non-trivial methods of the model layer. They are
+located in the default \texttt{tests.py} module under
+\texttt{sbr-regesten/regesten\_webapp/}. To run them, issue the
+following command from the top-level directory of the \emph{project}:
+
+\begin{verbatim}
+$ python manage.py test regesten_webapp
+\end{verbatim}
+
+The Django framework itself also comes with a large number of tests.
+To run tests for all built-in Django apps that the Sbr-Regesten
+project uses, along with the tests that are currently defined in
+\texttt{sbr-regesten/regesten\_webapp/tests.py}, you can use the
+following command:
+
+\begin{verbatim}
+$ python manage.py test
+\end{verbatim}
+
+When extending the Sbr-Regesten Web Application, tests for any new
+features of the model layer (e.g. XML export) can be added to the
+existing \texttt{tests.py} module. As soon as you start implementing
+views and templates for end users, however, we recommend that you
+switch to using a dedicated \texttt{tests} directory and multiple test
+modules as described above.
+
+To learn more about about writing and running tests for Django
+applications as well as using alternative testing frameworks, consult
+the
+\href{https://docs.djangoproject.com/en/1.4/topics/testing/}{Testing
+  Django applications} section of the official Django documentation.
+
 \subsubsection{Internationalization: Translating the Application}
 \label{sec:translate}
 
