@@ -555,15 +555,37 @@ There are several steps involved in changing the database backend:
 
 \begin{enumerate}
 \item If you haven't already, install the database engine of your
-  choice on the server you are planning to deploy on
+  choice on the server you are planning to deploy on.
 \item Install the appropriate Python bindings for the type of database
-  you picked
+  you picked.
 \item Grant Django the necessary rights to create and alter tables;
   for testing purposes, Django will also need permission to create
-  test databases
-\item Change the \texttt{ENGINE} option in the \texttt{DATABASES}
-  constant in \texttt{settings.py} to the value corresponding to the
-  new engine.
+  test databases.
+\item Back up the data currently stored in the \texttt{sqlite3}
+  database using the following command:
+\begin{verbatim}
+$ python manage.py dumpdata > datadump.json
+\end{verbatim}
+\item Adapt the \texttt{DATABASES} setting in \texttt{settings.py}:
+  \begin{itemize}
+  \item Change the \texttt{ENGINE} option to the value corresponding
+    to the new engine (see instructions in the module for a list of
+    possible values).
+  \item Change the \texttt{NAME} option to the name of the database
+    you would like to use with MySQL.
+  \item Provide values for the \texttt{USER} and \texttt{PASSWORD}
+    options.
+  \item (Optional) Provide values for the \texttt{HOST} and
+    \texttt{PORT} options.
+  \end{itemize}
+\item If you haven't added any additional information to the database,
+  create a new database and re-run the extraction process, following
+  the steps listed in section \ref{sec:run}. Alternatively, you can
+  load the data you backed up in step 4 into the new database with
+  this command:
+\begin{verbatim}
+$ python manage.py loaddata datadump.json
+\end{verbatim}
 \end{enumerate}
 
 For additional information, refer to the
