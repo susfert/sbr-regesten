@@ -413,15 +413,14 @@ def loc_header_to_XML(header):
     wuestMatch = re.search('(Staerk, W.stungen Nr. [0-9]{1,2})', \
                            header.get_text())
     w = False
+    if re.search('W.stung', header.get_text()):
+        w = True
     if wuestMatch:
-        w = True            
         w_ref = wuestMatch.group(0)
         settleTag['w-ref'] = w_ref
     settleTag['w'] = str(w).lower()
  
     # Settlement name 
-    name = ''
-    rest = ''
     if header.b:               # for location-headers
         name = header.b.get_text()
         hasNoB = del_b_tag(header)
