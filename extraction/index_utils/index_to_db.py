@@ -14,8 +14,8 @@ from regesten_webapp.models import Location, Family, Person, Region
 from regesten_webapp.models import PersonGroup, Landmark, Concept, IndexEntry
 from regesten_webapp.models import Regest, RegestDate, Quote
 
-countConc=2000
-idCount=0
+countConc = 2000
+idCount = 0
 
 
 def ment_to_db(xmlNode, concept): # TODO
@@ -50,7 +50,6 @@ def add_all(obj, li):
 def if_exists(node):
     ''' Checks if a node exists.'''
     if node:
-        #print(node.get_text())
         return node.get_text().strip(') (')
     else:
         return ''
@@ -75,7 +74,6 @@ def create_concept(xmlNode):
     c = Concept()
     name = xmlNode.find('name')
     c.name = name.get_text()
-    #print(c.name)
     c.description = if_exists(xmlNode.description)
     quoteList = []
     qList = []
@@ -135,17 +133,17 @@ def loc_to_db(itemsoup):
     if 'type' in attrs:
         l.location_type = placeName.settlement['type']
     vill = placeName.settlement['w']
-    if vill=='true':
+    if vill == 'true':
        l.abandoned_village = True
-       l.av_ref = placeName.settlement['w-ref']
     else:
        l.abandoned_village = False    
-        
+    if 'w-ref' in attrs:
+        l.av_ref = placeName.settlement['w-ref']    
       
     # Reference point & District
-    ref_point=placeName.find('reference_point')
+    ref_point = placeName.find('reference_point')
     if ref_point:
-        ref_point=ref_point.get_text().strip(' ,;.')
+        ref_point = ref_point.get_text().strip(' ,;.')
     if ref_point:
         l.reference_point = ref_point
     else:
@@ -310,19 +308,6 @@ def index_to_db():
     '''
     print('Writing index into db..')
     
-    '''for a in [Location, Family, Person, Region, PersonGroup, Landmark, Concept, IndexEntry, Regest, RegestDate]:
-      a.objects.all().delete()
-      
-    r=Regest()
-    r.title = RegestTitle.objects.create(title='1290-08-30 (a)')
-    r.content = RegestContent.objects.create(content='Dies ist ein Regesten-Content..')
-    r.save()
-    
-    r2=Regest()
-    r2.title = RegestTitle.objects.create(title='1290')
-    r2.content = RegestContent.objects.create(content='Dies ist ein weiterer Regesten-Content..')
-    r2.save()'''
-    
     countIndex = 0
     
     with codecs.open ('sbr-regesten.xml', 'r', 'utf-8') as file:
@@ -354,7 +339,6 @@ def index_to_db():
       
       
             i = IndexEntry()
-            #i.defines = entry
             i.xml_repr = itemsoup
             i.id = entry.id
             #i.id = countIndex
