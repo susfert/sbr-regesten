@@ -998,10 +998,8 @@ def landToXML(landmark, id):
     itemTag.append(itemBody)
     #print(value)
     return itemTag
-    
 
-
-########################## 5. index_to_xml    ################################
+##########################################################
 
 def build_header_body(h, b, lineList):
     if len(lineList) > 0:
@@ -1018,16 +1016,7 @@ def build_header_body(h, b, lineList):
 
 
 
-def index_to_xml():
-    '''
-    Main function. Finds the index in html/sbr-regesten.html, converts
-    it into xml and writes it into index.xml.
-    Hardcoded lists of triggers for families, alndmarks, persons, persongroups and landmarks are 
-    used to classify of whihc of the types an index entry is.
-    If the type is not specified in the html item header (e.g. 'Mengen siehe Bliesmengen'),
-    it contains a reference to another index-entry from which te type can be referred. Such cases are collected in the list siehe.
-    '''
-    print('Index Extractor is working ..')
+def item_extractor():
     text = ''
     t = ''
 
@@ -1038,7 +1027,6 @@ def index_to_xml():
         t = t2.replace('\r','')
 
     soup = BeautifulSoup(t)
-
     indexTag = soup.new_tag('index')
     indexInfoTag = soup.new_tag('index-info')
     indexTag.append('Index \n')
@@ -1068,7 +1056,6 @@ def index_to_xml():
                 nextIndexInfo = False
                 continue
 
-
             if foundIndex:
                 htmlItem=preprocess(htmlItem)
                 s = unicode(htmlItem)
@@ -1086,6 +1073,18 @@ def index_to_xml():
                 body = BeautifulSoup(b)
                 item = IndexItem(header, body)
                 items.append(item)
+                
+    return indexTag, items
+
+
+########################################################
+
+def classify_and_parse(items):
+    '''
+    Gets a list of (html) items, decides whether it is a location, family, person, landmark or persongroup and parses them respectively.
+    Appends items it classifies as "siehe" without parsing them. Has to be done seperately.
+    Returns a list of xml items and html-siehe-items.
+    '''
 
     xmlItems = []
     id = -1
@@ -1162,10 +1161,19 @@ def index_to_xml():
             unclassified.append(item)
         
         id += 1
+    return xmlItems
 
-        
+
+#########################################
+
+def postprocess_siehe(items):
+    '''
+    Postprocesses a list of items. Solves references in the item headers to find out its type.
+    Tags them and add them to the complete list of xml items.
+    '''
     xmlItemsComplete = []
-    for item in xmlItems:
+    
+    for item in items:
         if not isinstance(item, IndexItem):
             xmlItemsComplete.append(item)
         else:
@@ -1175,7 +1183,7 @@ def index_to_xml():
             if sieheMatch:
                 n = sieheMatch.group(1).strip()
                 itemTag = soup.new_tag('item')
-                for i in xmlItems:
+                for i in items:
                     if not isinstance(i, IndexItem):
                         if n in i['value'].strip():
                             type = i['type']
@@ -1198,9 +1206,26 @@ def index_to_xml():
 
                             xmlItemsComplete.append(itemTag)
                             break
+    return xmlItemsComplete
 
 
-    # adds forenames to forenames.txt if found new forenames
+########################## 5. index_to_xml    ################################
+
+def index_to_xml():
+    '''
+    Main function. Finds the index in html/sbr-regesten.html, converts
+    it into xml and writes it into index.xml.
+    Hardcoded lists of triggers for families, alndmarks, persons, persongroups and landmarks are 
+    used to classify of whihc of the types an index entry is.
+    If the type is not specified in the html item header (e.g. 'Mengen siehe Bliesmengen'),
+    it contains a reference to another index-entry from which te type can be referred. Such cases are collected in the list siehe.
+    '''
+    print('Index Extractor is working ..')
+    
+    indexTag, items = item_extractor()        
+    items = classify_and_parse(items)
+    xmlItemsComplete = postprocess_siehe(items)
+
     with codecs.open ('resources/forenames.txt', 'w', 'utf-8') as file:
         file.write('\n'.join(forenameList))
         
@@ -1209,5 +1234,5 @@ def index_to_xml():
             indexTag.append(item)
             indexTag.append('\n')
         file.write(indexTag.encode('utf-8'))
-    print ('Created index.xml')
+    
     print('Index converted into xml.')
