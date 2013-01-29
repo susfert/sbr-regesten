@@ -65,7 +65,7 @@ persongroups   & Notare, Grafen, Markgrafen, Herzöge, Bischöfe, Edelknechte, H
 \end{figure}
 
 \paragraph{Locations}
-The locations found in the index are geographical or political. They might also be buildings. Among them are towns, castles, parishes, kingdoms or mills. A full list of the types of locations found in the index can be found in figure \ref{fig:location-list}. They are usually specified in the index entry, right after the name or eventual additional names. They are often followed by districts (Gemeinde, Stadt, Stadtverband, Kreis), regions (Province, Bundesland or Departement) and/or country. Most of the locations are in Germany. The country is only specified, when the location is not in Germany. Sometimes additional descriptions of where to find the location can be found right after the type name (e.g. Dorf im Köllertal, Hof bei St. Ingbert). Locations also specify if a location is no longer inhabited. Entries of such abandoned villages (\textit{Wüstungen}) contain references where to find more information about them (their number in Staerk's \textit{Die Wüstungen des Saarlandes}\footnote{Dieter Staerk, Die Wüstungen des Saarlandes, Minerva-Verlag, Saarbrücken, 1974.}). See figure \ref{fig:location-example} for sample entries.
+The locations found in the index are geographical or political. They might also be buildings. Among them are towns, castles, parishes, kingdoms or mills. A full list of the types of locations found in the index can be found in figure \ref{fig:location-list}. They are usually specified in the index entry, right after the name or eventual additional names. They are often followed by districts (Gemeinde, Stadt, Stadtverband, Kreis), regions (Province, Bundesland or Departement) and/or country. Most of the locations are in Germany. The country is only specified, when the location is not in Germany. Sometimes additional descriptions of where to find the location can be found right after the type name (e.g. Dorf im Köllertal, Hof bei St. Ingbert). Locations also specify if a location is no longer inhabited. Entries of such abandoned villages (\textit{Wüstungen}) contain references where to find them in Staerk's catalogue\footnote{Dieter Staerk, Die Wüstungen des Saarlandes, Minerva-Verlag, Saarbrücken, 1974.}). See figure \ref{fig:location-example} for sample entries.
 
 \begin{figure}[h]
   \centering
@@ -105,7 +105,7 @@ See figure \ref{fig:family-example} for sample entries.
 \end{figure}
 
 \paragraph{Persongroups}
-Persongroups are index entries that contain a list of people. For example, there is a list for popes, for inhabitants of Saarbrücken, bishops etc. The whole list is shown in fugure \ref{fig:location-list}. 
+Persongroups are index entries that contain a list of people. For example, there is a list for popes, for inhabitants of Saarbrücken, bishops etc. The whole list is shown in figure \ref{fig:location-list}. 
 Similar to the families the body is list of concepts which can be specified more concretely. In the case of persongroups, each concept on the first level of the body is a person and so-to-speak member of the group. See figure \ref{fig:persongroup-example} for sample entries.
 
 \begin{figure}[h]
@@ -116,7 +116,7 @@ Similar to the families the body is list of concepts which can be specified more
 \end{figure}
 
 \paragraph{Others}
-Only one of them is very non-typical and does not fit in any of the proposed groups. It is the entry \textit{Saarbrücken, Gliederung}, which shows an overview over the Saarbrücken entry (see figure \ref{fig:sb-gliederung}). The Saarbrücken entry is the largest index entry with almost 100 pages. It is therefore split up into seven entries, Saarbrücken, Gliederung giving an overview over them.
+Only one index entry is very non-typical and does not fit in any of the proposed groups. It is the entry \textit{Saarbrücken, Gliederung}, which shows an overview over the Saarbrücken entry (see figure \ref{fig:sb-gliederung}). The Saarbrücken entry is the largest index entry with almost 100 pages. It is therefore split up into seven entries, Saarbrücken, Gliederung giving an overview over them.
 
 \begin{figure}[h]
   \centering
@@ -126,13 +126,13 @@ Only one of them is very non-typical and does not fit in any of the proposed gro
 \end{figure}
 
 
-\subsection{XML-Scheme for the Index}
+\subsection{XML Schema for the Index}
 
-One of the main contributions of the sbr-regesten project was to create an XML-scheme for the Saarbrücker Regesten. The scheme can be found in the file \textit{sbr-regesten.xsd}.
-It was as far as it was applicable designed to comply with the TEI Guidelines \footnote{TEI P5: Guidelines for Electronic Text Encoding and Interchange by the TEI Consortium, Version 2.0.2, 2012}.This section describes the scheme for the index.
+One of the main contributions of the Sbr-regesten project was to create an XML schema for the Sbr-regesten. The schema can be found in the file \texttt{sbr-regesten.xsd}.
+It was as far as it was applicable designed to comply with the TEI Guidelines \footnote{TEI P5: Guidelines for Electronic Text Encoding and Interchange by the TEI Consortium, Version 2.0.2, 2012}.This section describes the schema for the index.
 
 The index consists of an index-info (for general information about the index), followed by an unrestricted number of items. These are the single index entries.
-Each index entry is an item and either a location, person, landmark, persongroup or family. The scheme covers them respectively.
+Each index entry is an item and either a location, person, landmark, persongroup or family. The schema covers them respectively.
 
 Each index item has (required) the following attributes: 
 \begin{itemize}
@@ -146,7 +146,7 @@ Each index item has (required) the following attributes:
 %%<item id="item_661" type="persongroup" value="Notare">
 %%\end{verbatim}
 %%\label{fig:placeName}
-%%\caption{\textit{item} in TEI vs. \textit{placeName} in the Sbr. Regesten scheme.}
+%%\caption{\textit{item} in TEI vs. \textit{placeName} in the Sbr. Regesten schema.}
 %%\end{figure}
 
 An index item consists of an item-header and can also have an item-body. The header might for all header types end with the elements \textit{mentioned-in}, followed by \textit{index-refs}. \textit{Mentioned-in} is of type \textit{mentionings} and contains a sequence of references to the regests. The attribute \textit{regest} specifies the id from the regest it refers to. \textit{Index-refs} contains  a sequence of references to other index entries. The attribute \textit{itemid} contains the id from the index item it refers to. Index-refs are allowed to contain free text to insert key words/indications to make evident to the reader, that these are references to index entries (mostly \textit{siehe}).
@@ -155,8 +155,8 @@ The next sections will describe in more detail the elements, that items have dep
 \subsubsection{Headers}
 
 \paragraph{Location-Header}
-Figure \ref{fig:location-header-xml} and \ref{fig:location-wuest-xml} show examples for location headers. Location headers contain the element \textit{placeName}, which corresponds mostly to TEI's \textit{placeName}. See figure \ref{fig:placeName}for an example for a comparision between both. The sbr-regesten scheme adopts TEI's \textit{settlement}, \textit{district}, \textit{region} and \textit{country}. It introduces two new attributes for the settlement element, aside from \textit{type}. It gets the additional attributes \textit{w} and \textit{w-ref} to encode information about abandoned villages (\textit{Wüstungen}). \textit{W} denotes if the settlement is an abandoned village. In that case \textit{w-ref} encodes the reference to the catalogue of Staerk \footnote{Dieter Staerk, Die Wüstungen des Saarlandes, Minerva-Verlag, Saarbrücken, 1974.}. Region types may be \textit{Bundesland} (if located in Germany), \textit{Departement} (in France) or \textit{Province} (TODO: Luxembourg/Belgium/else?). \textit{Country} has no attribute. TEI defines a \textit{district} as “any kind of subdivision of a settlement, such as a parish, ward, or other administrative or geographic unit.”\footnote{TEI P5: Guidelines for Electronic Text Encoding and Interchange by the TEI Consortium, Version 2.0.2, 2012} In contrast, in our index-locations a \textit{district} is any administrative unit below a \textit{region} (Kreis, Gemeinde, Stadtverband).
-Additional to the elements proposed by TEI, the index scheme for locations has two more elements: \textit{additional names} (which contains a list of additional names of the location) and \textit{reference-point}, which contains further information not covered by\textit{ district/region/country}. This information specifies where to find the location, e.g. \textit{Im Köllertal, bei St. Ingbert} (in the Köllertal, near St. Ingbert). All of the elements are optional (even settlement, as it also appears in the family headers, where \textit{locations/placeNames} are given, without their names being explicitly specified.)   
+Figure \ref{fig:location-header-xml} and \ref{fig:location-wuest-xml} show examples for location headers. Location headers contain the element \textit{placeName}, which corresponds mostly to TEI's \textit{placeName}. See figure \ref{fig:placeName}for an example for a comparision between both. The Sbr-regesten schema adopts TEI's \textit{settlement}, \textit{district}, \textit{region} and \textit{country}. It introduces two new attributes for the settlement element, aside from \textit{type}. It gets the additional attributes \textit{w} and \textit{w-ref} to encode information about abandoned villages (\textit{Wüstungen}). \textit{W} denotes if the settlement is an abandoned village. In that case \textit{w-ref} encodes the reference to the catalogue of Staerk \footnote{Dieter Staerk, Die Wüstungen des Saarlandes, Minerva-Verlag, Saarbrücken, 1974.}. Region types may be \textit{Bundesland} (if located in Germany), \textit{Departement} (in France) or \textit{Province} (Belgium). \textit{Country} has no attribute. TEI defines a \textit{district} as “any kind of subdivision of a settlement, such as a parish, ward, or other administrative or geographic unit.”\footnote{TEI P5: Guidelines for Electronic Text Encoding and Interchange by the TEI Consortium, Version 2.0.2, 2012} In contrast, in our index-locations a \textit{district} is any administrative unit below a \textit{region} (Kreis, Gemeinde, Stadtverband).
+Additional to the elements proposed by TEI, the index schema for locations has two more elements: \textit{additional names} (which contains a list of additional names of the location) and \textit{reference-point}, which contains further information not covered by\textit{ district/region/country}. This information specifies where to find the location, e.g. \textit{Im Köllertal, bei St. Ingbert} (in the Köllertal, near St. Ingbert). All of the elements are optional (even settlement, as it also appears in the family headers, where \textit{locations/placeNames} are given, without their names being explicitly specified.)   
 
 \begin{figure}[H]
 \begin{verbatim}
@@ -187,7 +187,8 @@ Additional to the elements proposed by TEI, the index scheme for locations has t
 \begin{verbatim}
 <location-header>
    <placeName>
-      <settlement type="Dorf" w="true" w-ref="Staerk, Wüstungen Nr. 19">Arschofen</settlement>
+      <settlement type="Dorf" w="true" w-ref="Staerk, Wüstungen Nr. 19">
+         Arschofen</settlement>
       <ddNames> (
          <addName>Arßhoffen</addName>)
       </addNames>, Dorf 
@@ -214,7 +215,7 @@ Additional to the elements proposed by TEI, the index scheme for locations has t
 </placeName>
 \end{verbatim}
 \label{fig:placeName}
-\caption{\textit{placeName} in TEI vs. \textit{placeName} in the Sbr. Regesten scheme.}
+\caption{\textit{placeName} in TEI vs. \textit{placeName} in the Sbr. Regesten schema.}
 \end{figure}
 
 
@@ -321,22 +322,15 @@ We might also find other concepts in relation to the first lever member.
             <concept>
                <name> Hans gen. Phennewert </name>
                <mentioned-in>
-                  <reg-ref regest="regest_99999">1455-11-24</reg-ref>
-               </mentioned-in>
-            </concept> -
-            <concept>
-               <name> Wilhelm von Hermanßhusen</name>
-               <description>, oo Kettgin </description>
-               <mentioned-in>
-                  <reg-ref regest="regest_99999">1504-10-11</reg-ref>
+                  <reg-ref regest="regest_64">1455-11-24</reg-ref>
                </mentioned-in>
             </concept> -
             <concept>
                <name> Philipps Pfenwert von Hermanßhusen</name>
                <description>, Bürger zu Saarbrücken, oo Ursulla </description>
                <mentioned-in>
-                  <reg-ref regest="regest_99999">1510-11-09</reg-ref>, 
-                  <reg-ref regest="regest_99999">1521-12-24</reg-ref>
+                  <reg-ref regest="regest_756">1510-11-09</reg-ref>, 
+                  <reg-ref regest="regest_834">1521-12-24</reg-ref>
                </mentioned-in>
             </concept>
          </related-concepts>
@@ -344,7 +338,7 @@ We might also find other concepts in relation to the first lever member.
       <concept>
          <name> Güter </name>
          <mentioned-in>
-            <reg-ref regest="regest_99999">1296-12-29</reg-ref>
+            <reg-ref regest="regest_43">1296-12-29</reg-ref>
          </mentioned-in>
       </concept>
    </related-concepts>
@@ -358,7 +352,7 @@ We might also find other concepts in relation to the first lever member.
 Figure \ref{fig:listing-body-xml} shows an example for a \textit{listing-body}. A listing-body consist of the element \textit{members}. \textit{Members} consists of a list of persons (same type as the persons appearing in a person-header). Each person can have related concepts, which recursively can have related concepts again, as in a concept-body.
 That means, that in a \textit{persongroup} or \textit{family}, the first layer displays members of that family or group. The concepts on the levels beyond might also be family or group members but not obligatory. Therefore they are not modelled as members on their own, but as related-concepts of that member.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \begin{verbatim}
 <listing-body>
   <members>
@@ -370,13 +364,13 @@ That means, that in a \textit{persongroup} or \textit{family}, the first layer d
            </addNames>
         </persName>
         <mentioned-in>
-           <reg-ref regest="regest_99999">1460-12-01</reg-ref>
+           <reg-ref regest="regest_823">1460-12-01</reg-ref>
         </mentioned-in>
         <related-concepts> -
            <concept>
               <name> Knecht Peter </name>
               <mentioned-in>
-                 <reg-ref regest="regest_99999">1460-12-01</reg-ref>
+                 <reg-ref regest="regest_823">1460-12-01</reg-ref>
               </mentioned-in>
            </concept>
         </related-concepts>
@@ -387,8 +381,8 @@ That means, that in a \textit{persongroup} or \textit{family}, the first layer d
         </persName>
         <description>, Amtmann zu Saargemünd </description>
         <mentioned-in>
-           <reg-ref regest="regest_99999">1518-03-23</reg-ref>, 
-           <reg-ref regest="regest_99999">1519-03-23</reg-ref>
+
+           <reg-ref regest="regest_934">1519-03-23</reg-ref>
         </mentioned-in>
      </person>
   </members>
@@ -399,6 +393,52 @@ That means, that in a \textit{persongroup} or \textit{family}, the first layer d
 \end{figure}
 
 
+\subsection{Index Extraction}
+In order to convert the Sbr-regesten into an XML, relevant pieces of information have to be extracted from the pdf and tagged according to the schema. Additionally, the regests and index entries are written into the database \texttt{sbr-regesten.db}.
 
-\subsection{Extraction of the Index}
+\paragraph{From PDF to HTML}
+In order to extract information from the Sbr-regesten, the structural information an HTML provides, is very useful. Apart from the .pdf file the publishers provided us with a .doc version of the Sbr-regesten. Using Microsoft Word 2010, it is possible to store the document as HTML. Compared to different tools, we tried out, it was the most useful version we could extract. The extracted HTML is the one we use for the extraction.
+As there arose some minor difficulties where the HTML was inconsistent, we manually manipulated it (TODO).
+The extracted HTML file \texttt{html/sbr-regesten.hmtl} is used for the extraction of all parts of the book.
 
+This chapter will describe in more detail how the XML for the index is extracted. Figure (TODO) gives an overview over the index\_extractor.
+The index\_extractor is divided into three parts
+
+\begin{itemize}
+\item index\_to\_xml converts the HTML to an almost complete XML
+\item index\_xml\_postprocess solves the references to the index entries and adds them to the XML
+\item index\_to\_db extracts the index-items from the XML and writes them into the database
+\end{itemize}
+
+The separation of converting the index into XML and writing them into the database, has two reasons: it is easier structured and it is possible to manually correct the XML-file before adding the items into the database.
+
+\subsubsection{From the Index to the XML}
+ItemExtractor
+The extraction of the single index items is very staightforward, as the HTML provides tags for paragraphs (<p>). Each index item is a paragraph. Once the ItemExtractor identified a paragraph, it instantiates an index item, and divides the HTML into header and body.
+
+ItemClassifier
+With the help of a set of names/keys (retrieved by bootstrapping), each item is assigned to a group (location, landmark, person, family, persongroup, siehe) and forwarded to the corresponding parser. The items stored in the "siehe" Liste contain no direct information about the group they belong to. But they contain references to other index entry. Assuming that they have the same type, they are forwarded to the corresponding parser after having solved the reference. Items that do not contain any of the keywords are stored in the list "unclassified" and are not further processed. This is the case for the \textit{Saarbrücken, Gliederung} entry.
+
+ItemParser
+There is an item parser for each of the five groups. It forwards the header to the specific header parser of its group and the body to one of the two body parsers. It then adds the item to an itemList.
+
+
+\subsubsection{From the Index XML to the Database}
+TODO: This section presents possible next steps. Depending on the use or queries of the Sbr-regesten, different expansions will have priority
+
+\subsubsection{Future Work}
+\paragraph{References to the Regests}
+At the time of developing the index extraction, the regest part of the book was not extracted or written into the database yet. Once this is the case, the first expansion of the current code would be to solve the references to the regests. The references are already recognised and tagged with reg-ref. Each reg-ref is supposed to store the id of the regest it refers to in the attribute regest. At the moment, this is not yet the case. The function \texttt{get\_regest\_ID} in \texttt{index\_to\_xml.py} returns the correct id only in cases where the date in the form "1532-11-24" is sufficient to disambiguate the regests. In other cases it returns the dummy id regest\_99999. We would recommand to reimplement the function \texttt{get\_regest\_ID} and solve the references directly searching the database, as the regests are added to the database before \texttt{index\_to\_xml.py} is called. To include the references also in the database, the function def \texttt{ment\_to\_db} in \texttt{index\_to\_db.py} has to be implemented.
+
+\paragraph{Extracting Person Names}
+TODO: The index extractor allows the user to provide a list of forenames (\texttt{resources/forenames.txt}. During the extraction of the index it uses the list to recognize forenames and expands it at the same time. ...
+list of forenames as input, postprocess similar to siehe, manually increment list with forenames from other sources. Same would be possible for surnames
+
+\paragraph{Semantic Network}
+The regests and the index do not provide only information about entities, but also about the relations they have. This becomes evident especially in the case of persons. The index already provides information such as "married with" or "son of". This information could be extracted to build networks of relations between persons.
+
+\paragraph{Quotes}
+The HTML provides information about which parts of the text are original text. Such sections are marked with italics (<i>). To mark original text the Sbr-regesten schema introduces the element 'Quotes'. This is mainly used in the regests. In the index quotes are only possible in the description part of the bodies. The tag <addNames> implicitly encodes this information as they extract text in italics. Otherwise this information gets lost during the process of extraction. But we can imagine the usefulness of conserving information about original text also in other parts of the index, we propose to expand the schema to allow quotes.
+
+\paragraph{Expand References to the Index}
+TODO: References to the index are only found and solved if they appear in the header right after the mentionings. But in some cases such references occur in other places as well (often in the bodies or before the district). The schema could be adapted to allow "reg-refs" there as well. They would have to be marked by texttt{index\_to\_xml.py} and would then (automatically) be extracted by the existing the \texttt{parse\_siehe} function in \texttt{index\_xml\_postprocess}.
