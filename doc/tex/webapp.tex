@@ -777,8 +777,267 @@ consult the
 \subsection{Django Data Model}
 \label{sec:data-model}
 
-\subsubsection{Regesten}
+The Django data model for the Sbr-Regesten was derived from the XML
+schema described in the previous chapters. The level of correspondence
+between the two models is high but they are not completely identical.
+The main purpose of this section is to provide an overview\footnote{We
+  only go into detail about models and model attributes that do not
+  correspond directly to elements or attributes present in the XML
+  schema. If a specific model or attribute is not addressed here, it
+  is intended to be understood as serving the same purpose as its XML
+  equivalent.} of the Django data model and to highlight and motivate
+the differences that exist between the two models.
+
+\subsubsection{Overview}
+\label{sec:model-overview}
+
+The
+\href{https://en.wikipedia.org/wiki/Unified_Modeling_Language}{UML}
+class diagram (which was created using
+\href{http://projects.gnome.org/dia/}{Dia}, a cross-platform drawing
+application with support for a large variety of diagram types) in
+Figure \ref{fig:data-model} shows the Django data model in its
+entirety. Please note that:
+
+\begin{enumerate}
+\item Model methods were omitted to keep the focus on how information
+  from the Sbr-Regesten is represented in the database
+\item Every entity represented by a model class has to have a unique
+  ID that can be used as a \emph{Primary Key} for the corresponding
+  table in the database. This ID is available on instances of each of
+  the models shown in the diagram, in the form of an attribute called
+  \texttt{id}. For brevity, and because this attribute is defined in
+  the common superclass of the models shown in the diagram, it is not
+  explicitly listed in the diagram.
+\end{enumerate}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{img/data-model}
+  \caption{The Django data model of the Sbr-Regesten}
+  \label{fig:data-model}
+\end{figure}
+
+In this diagram, boxes denote model classes. Names of individual
+models are given in bold in the top section of each box; attributes
+are listed in the sections below. Blue arrows with hollow heads denote
+\emph{inheritance} relationships.\footnote{The fact that these arrows
+  are colored in blue in this diagram has nothing to do with UML. They
+  are colored differently to make them easily distinguishable from
+  other types of lines present in the diagram.} Classes with incoming
+arrows are superclasses of classes with outgoing arrows; superclasses
+pass their attributes on to their subclasses. Relationships between
+different types of models (\emph{associations}) are denoted by black
+lines connecting their boxes. These lines are annotated with
+\emph{cardinalities}. For instance, \emph{one} (\texttt{1}) location
+can have \emph{one to many} (\texttt{1...*}) residents. Similarly, a
+single concept can be related to \emph{zero or arbitrarily many}
+concepts.
+
+\subsubsection{General Differences}
+\label{sec:gen-diff}
+
+\paragraph{Naming Schemes}
+
+One of the main differences between the Django data model and the XML
+schema concerns naming schemes for \emph{identifiers} (i.e. class and
+attribute names in Django, element names in XSD): In the XML schema,
+dashes are used to seperate indivdiual words that make up
+\emph{compound} identifiers like \texttt{abbrev-list} and
+\texttt{original-date}. Corresponding Django attributes contain
+underscores instead of dashes, as dashes are not allowed in Python
+identifiers.
+
+As mentioned before, all identifiers in the XML schema are lowercase,
+except for those that were borrowed from the TEI guidelines (which
+were transferred to our schema \emph{as is} to distinguish them from
+custom identifiers that were introduced specifically for the
+Sbr-Regesten). For the Django data model, we stuck to widely used
+Python naming conventions: \texttt{CamelCase} was used for class/model
+names, \texttt{snake\_case} for everything else.
+
+Additionally, some identifiers had to be affixed going from the XML
+schema to the Django data model, due to clashes with names of Python
+functions / keywords. Examples include \texttt{print}, which was
+renamed to \texttt{print\_info}, and \texttt{type}, which was renamed
+to \texttt{regest\_type} / \texttt{location\_type} /
+\texttt{landmark\_type} / \texttt{region\_type}.
+
+\paragraph{Storing Information About High-Level Entities}
+
+The XML schema distinguishes between \emph{elements} and
+\emph{attributes} for storing information about high-level entities.
+Attributes are generally employed to represent names of entities (e.g.
+regest titles, names of index entries) and \emph{meta information},
+which may or may not be provided explicitly for a specific entity
+(e.g. regest author: explicit, type of an index entry: deduced). The
+Django data model, by contrast, makes no such distinction: It
+uniformly stores information about entities in model attributes, the
+majority of which are textual types.
+
+\paragraph{Relationships Between Entities}
+
+In the XML schema, relationships between entities are modeled in two
+different ways: Entities that belong together logically \textbf{and}
+are close to each other in the original text are most often connected
+via (transitive) \emph{parent-child} relationships. On a conceptual
+level, for instance, each regest has at least one date associated with
+it (which is extracted from its title). In the XML version of the
+Sbr-Regesten, any \texttt{date} node is a direct child node of a
+\texttt{regest} node.\footnote{As an additional example for a
+  transitive case, consider the relationship between a regest and its
+  issuer (\emph{Aussteller}): \emph{issuer} is a child node of
+  \emph{content}, which in turn is a child node of \emph{regest}.}
+
+Connections between related entities that are further removed from
+each other structurally can not be modeled in the same way. For these
+cases, the XML schema uses explicit references to unique entity IDs to
+indicate links between specific entities. As an example, consider the
+\texttt{mentioned-in} lists associated with entities listed in the
+index: Along with the titles of the regests a given entity is
+mentioned in, they reference their IDs via the \texttt{regest}
+attribute of the \texttt{reg-ref} node.
+
+In Django, relationships between \emph{high-level} entities (i.e.
+those that are represented by a model class) are all modeled in the
+same way.
+
+In Django there is only one way to model relationships between
+high-level entities: To express that there is a connection between two
+distinct models, \textbf{one} of the two models needs to define an
+(appropriately named) attribute which ``points'' to the other model.
+The type of ``pointer'' that is appropriate for a given relationship
+(\texttt{ForeignKey} vs. \texttt{OneToOneField} vs.
+\texttt{ManyToManyField}) and where/on which model the attribute
+representing it has to be defined depends on the direction and
+cardinality of the relationship: In some cases, the attribute had to
+be set on the \emph{component} model instead of the main one. The
+\texttt{RegestDate} model, for instance, defines a \texttt{regest}
+attribute (of type \texttt{ForeignKey} since it encodes a
+\emph{many-to-one} relationship), instead of the \texttt{Regest} model
+defining a \texttt{regest\_date} attribute like in the XML
+schema.\footnote{This does \textbf{not} mean that associated
+  \texttt{RegestDate} instances are not accessible from the
+  \texttt{Regest} model. For information about how to access related
+  objects from models that do not explicitly define ``relationship
+  attributes'' themselves, see the ``Related objects'' part of the
+  \href{https://docs.djangoproject.com/en/1.4/topics/db/queries/}{Making
+    queries} section in the official Django documentation.}
+
+\paragraph{Representing Structure vs. Content}
+
+The XML schema created for the Sbr-Regesten mixes structural
+information about the original text with mark-up used to identify
+semantic units / entities within the text. By contrast, the Django
+data model was designed to serve as a starting point for a
+comprehensive knowledge base independent of a particular text, and
+therefore strongly emphasizes \emph{content}. However, because
+high-level entities (namely \texttt{Regest} and \texttt{IndexEntry})
+store their XML representations in an attribute (which for obvious
+reasons has no equivalent in the XML schema) called \texttt{xml\_repr},
+structural information about the original text \textbf{can} be derived
+from the database using not only relationships between different
+models, but also the values of this attribute.
+
+Another side effect of having to preserve and represent structure in
+addition to content is that the XML schema requires multiple levels of
+\emph{nesting} of elements in a lot of cases. Compared to that, the
+Django data model is a lot \emph{flatter}: Most pieces of information
+associated with a given entity is stored simply as text (as opposed to
+a more complex data structure).
+
+\subsubsection{Regesten-Specific Differences}
 \label{sec:reg-model}
 
-\subsubsection{Index}
+In addition to the general differences between the XML schema and the
+Django data model, there are some differences specific to the
+representation of the regesten:
+
+\begin{itemize}
+\item In the XML schema, the \texttt{issuer} element is not associated
+  directly with the \texttt{regest} element; instead it is nested into
+  the \texttt{content} element. The Django data model, by contrast,
+  associates the issuer of a given regest with the regest as a whole.
+\item For tagging proper names in the \texttt{content} of individual
+  regests, the XML schema provides the \texttt{name} element. Django
+  collects all concepts that are mentioned in a given regest in the
+  \texttt{mentions} attribute of the \texttt{Regest} model.
+\item Similarly, in the XML schema \texttt{footnote} elements are
+  nested into the different content types representing individual
+  parts of a regest, whereas the Django data model only goes as far as
+  associating \texttt{Footnote} objects with whole regests.
+\item The \texttt{MetaInfo} model has no corresponding XML entity, and
+  does not represent information contained in the original text. It is
+  meant to be used for storing (admin-assigned) comments and tags for
+  individual regests.
+\end{itemize}
+
+\subsubsection{Index-Specific Differences}
 \label{sec:index-model}
+
+With regards to representing the index of the Sbr-Regesten, the
+following differences between the XML schema and the Django data model
+are of note:
+
+\begin{itemize}
+\item Being that it does not aim to be a structural representation of
+  the Sbr-Regesten, the Django data model does not distinguish between
+  \texttt{header} and \texttt{body} of an index entry.
+\item As can be seen in Figure \ref{fig:data-model}, the Django data
+  model defines two classes (\texttt{Concept} and \texttt{IndexEntry})
+  grouping features that are common to all types of concepts and index
+  entries. While XSD does support a limited form of inheritance via
+  the \texttt{<xs:extension>} tag for both simple and complex types,
+  this is restricted to adding attributes and \textbf{appending}
+  additional elements to sequences defined by complex types. Somewhat
+  unfortunately, however, elements common to headers of different
+  types of index entries \textbf{follow} those that are unique:
+
+\begin{verbatim}
+  <xs:complexType name="landmark-header" mixed="true">
+    <xs:sequence>
+      <xs:element name="geogName" type="geogName" />
+      <xs:element name="mentioned-in" type="mentionings" minOccurs="0" />
+      <xs:element name="index-refs" type="index-refs" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="location-header" mixed="true">
+    <xs:sequence>
+      <xs:element name="placeName" type="placeName" />
+      <xs:element name="mentioned-in" type="mentionings" minOccurs="0" />
+      <xs:element name="index-refs" type="index-refs" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+\end{verbatim}
+
+  Therefore, in the XML schema for the Sbr-Regesten we were not able
+  to make use of inheritance to reduce code duplication like we did
+  with the Django data model.
+\item The type of any given index entry is made explicit by the name
+  of the model used to represent it in the database. As a result,
+  there is no need for a dedicated \texttt{type} attribute on the
+  \texttt{IndexEntry} model. This is in contrast to the XML schema
+  which states that each index \texttt{item} must be assigned a valid
+  value for its \texttt{type} attribute.
+\item The XML schema currently does not define elements corresponding
+  to the \texttt{profession} and \texttt{resident\_of} attributes of
+  the \texttt{Person} model. These attributes were added to the Django
+  data model upon request of some of the stakeholders of the
+  Sbr-Regesten Web Application. Within the scope of our project it was
+  not possible to implement functionality to capture this kind of
+  information during the extraction process. However, the application
+  does provide support for adding this information manually via the
+  Django admin interface.
+\end{itemize}
+
+\subsubsection{Other Parts of the Book}
+\label{sec:other-model}
+
+Unlike the XML schema, the Django data model does not extend to other
+parts of the book. The reasoning behind this is that the database
+holding the information extracted from the Sbr-Regesten is not
+intended to be a static representation of one specific book. As
+mentioned in multiple places throughout this document, its main
+purpose is act as a knowledge base which can be constantly expanded
+with new information.
