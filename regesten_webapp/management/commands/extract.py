@@ -12,7 +12,7 @@ from extraction import abbrev_extractor, initials_extractor
 from extraction import regest_extractor, archives_extractor, index_extractor
 
 class Command(NoArgsCommand):
-    help = 'Starts the extraction process for regests and index entries'
+    help = 'Starts and directs the extraction process for the Sbr-Regesten'
 
     def handle_noargs(self, **options):
         frontmatter_extractor.extract_frontmatter()
