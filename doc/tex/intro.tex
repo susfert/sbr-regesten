@@ -2,3 +2,59 @@
 \label{sec:intro}
 %% Kurze Einleitung: Was sind die Sbr Regesten und was haben wir mit
 %% ihnen gemacht? Wie ist der Rest der Dokumentation gegliedert?
+
+This documentation accompanies the work that was carried out over the
+course of nine months by Susanne Fertmann
+\footnote{\texttt{s9sufert@stud.uni-saarland.de}}, Tim Krones
+\footnote{\texttt{tkrones@coli.uni-saarland.de}}, and Conrad Steffens
+\footnote{\texttt{conradsteffens@googlemail.com}} for the Software
+Project ``Computerlinguistische Aufarbeitung kulturhistorischer
+Dokumente'', under supervision of Dr. Caroline Sporleder. The project
+targets the book ``Regesten zur Geschichte der Stadt Saarbrücken (bis
+1545)'' by Irmtraut Eder-Stein, which is a collection of historical
+deeds (\emph{Urkunden}) pertaining to the history of the city of
+Saarbrücken. Throughout this document, we will refer to this work
+simply as \emph{Sbr-Regesten}.
+
+The main goal of the project was to come up with a digital
+representation of the book in order to lay the foundation for making
+the information contained in the original text easily searchable, as
+well as for extracting different kinds of implicit knowledge from it.
+
+To achieve this goal, the following (sub-)tasks were identified and
+completed within the scope of the project:
+
+\begin{enumerate}
+\item Design a custom \emph{XML schema} for the Sbr-Regesten
+\item Extract all information contained in the original text and
+  annotate it according to this schema
+\item Based on the XML schema, create a database schema
+\item Store the information extracted from the Sbr-Regesten in a
+  database created from this schema
+\item Set up a web application on top of the database that allows
+  users with administrative rights to browse, add, modify, and delete
+  database content
+\end{enumerate}
+
+The remainder of this document is structured as follows: Chapter
+\ref{sec:overview} provides an overview of the different components
+that were implemented for the purpose of extracting, annotating, and
+storing information contained in the Sbr-Regesten, and how they are
+chained to form a full \emph{extraction pipeline}. Chapters
+\ref{sec:regesten} and \ref{sec:index} provide a detailed account of
+the XML schema and extraction logic for the Regesten and Index
+chapters of the Sbr-Regesten. Chapter \ref{sec:other} explains the XML
+mark-up for the remaining parts of the book, and how they were
+extracted from the original text. The last chapter focuses on the web
+application, providing general information about the
+\href{https://www.djangoproject.com/}{Django Web Application
+  Framework}, as well detailed guidance for installing, running,
+using, deploying and extending the application. It also includes
+information about the data model the application is based on.
+
+Chapter \ref{sec:index} was written by Susanne Fertmann, and chapter
+\ref{sec:webapp} was written by Tim Krones. Chapter
+\ref{sec:regesten}, as well as sections \ref{sec:preface} and
+\ref{sec:archives} will be supplied by Conrad Steffens at a later
+date. The remaining chapters represent a joint effort between Susanne
+Fertmann and Tim Krones.
