@@ -1,0 +1,362 @@
+\section{Regest Title Patterns}
+
+This appendix lists regest title patterns that the
+\texttt{RegestTitleAnalyzer} and \texttt{RegestDateExtractor} classes
+in understand.
+
+\begin{verbatim}
+1009
+1009-10
+1009-10-20
+
+1009 Diedenhofen
+1009-10 Frankfurt am Main
+1009-10-20 St. Arnual
+
+1009 (vor)
+1009-10 (kurz nach)
+1009-10-20 (ca.)
+1009 (ca. Mitte 15. Jh.)
+
+1009 (?)
+1009-10 (?)
+1009-10-20 (?)
+
+1009 (vor) Diedenhofen
+1009-10 (nach) Frankfurt am Main
+1009-10-20 (um) St. Arnual
+1009 Diedenhofen (kurz nach)
+1009-10 Frankfurt am Main (post)
+1009-10-20 St. Arnual (ca.)
+1009-10 St. Arnual (ca. Mitte 15. Jh.)
+1009-10 (ca. Mitte 15. Jh.) St. Arnual
+1507-12-27 (?) Diedenhofen
+1507-12-27 Diedenhofen (?)
+
+1273 (a)
+1270-07 (b)
+1377-03-05 (c)
+1424-06-03 (a) und (b)
+
+1442 (a) Diedenhofen
+1270-07 (b) Frankfurt am Main
+1354-04-01 (c) St. Arnual
+1424-06-03 (a) und (b) Tull
+
+1200 (vor) (a)
+1200 (a) (vor)
+1200-03 (kurz nach) (b)
+1200-03 (b) (kurz nach)
+1200-03-12 (ca.) (c)
+1200-03-12 (c) (ca.)
+1009-10-20 (ca. Mitte 15. Jh.) (d)
+1009-10-20 (d) (ca. Mitte 15. Jh.)
+
+1024-1030
+1024 - 1030
+1419-05 - 1419-06
+1482-07-16 - 1499-01-03
+
+0935-1000 (ca.)
+1431 - 1459 (zwischen)
+1419-05 - 1419-06 (um)
+1419-05 (nach) - 1419-06 (vor)
+1482-07-16 - 1499-01-08 (ca.)
+1482-07-16 (nach) - 1499-01-08 (vor)
+
+1460-1466 (a) ca.
+1460-1466 (ca.) (b)
+1460-1466 (c) (ca.)
+1419-05 - 1419-06 (a) um
+1419-05 - 1419-06 (um) (b)
+1419-05 - 1419-06 (c) (um)
+1482-07-16 - 1499-01-08 (a) ca.
+1482-07-16 - 1499-01-08 (ca.) (b)
+1482-07-16 - 1499-01-08 (c) (ca.)
+1482-07-16 (nach) - 1499-01-08 (vor) (a)
+
+1419-05 bis 06
+1419-05-10 bis 20
+
+1419-05 bis 06 (kurz nach)
+1419-05-10 bis 20 (ca.)
+1419-05-10 bis 06-20 (ca.)
+1419-05 (nach) bis 06 (vor)
+1419-05-10 (nach) bis 20 (vor)
+1419-05-10 (nach) bis 06-20 (vor)
+
+1419-05 bis 06 (a) kurz nach
+1419-05 bis 06 (kurz nach) (b)
+1419-05 bis 06 (c) (kurz nach)
+1419-05-10 bis 20 (a) ca.
+1419-05-10 bis 20 (ca.) (b)
+1419-05-10 bis 20 (c) (ca.)
+
+1524/1525
+1524 / 1525
+1419-05/1419-06
+1419-05 / 1419-06
+1421-10-05/1422-10-04
+1421-10-05 / 1422-10-04
+1502 (1503)
+1502-11 (1503-02)
+1502-11-22 (1503-02-07)
+1520 [bzw. 1519]
+1520-02 [bzw. 1519-03]
+1520-02-18 [bzw. 1519-03-06]
+1520 bzw. 1519
+1520-02 bzw. 1519-03
+1520-02-18 bzw. 1519-03-06
+1520 bzw. 1519 bzw. 1518
+1520-02 bzw. 1519-03 bzw. 1518-04
+1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23
+
+1524/1525 Diedenhofen
+1524 / 1525 Frankfurt am Main
+1419-05/1419-06 St. Arnual
+1419-05 / 1419-06 Diedenhofen
+1421-10-05/1422-10-04 Frankfurt am Main
+1421-10-05 / 1422-10-04 St. Arnual
+1502 (1503) Diedenhofen
+1502-11 (1503-02) Frankfurt am Main
+1502-11-22 (1503-02-07) St. Arnual
+1520 [bzw. 1519] Diedenhofen
+1520-02 [bzw. 1519-03] Frankfurt am Main
+1520-02-18 [bzw. 1519-03-06] St. Arnual
+1520 bzw. 1519 Diedenhofen
+1520-02 bzw. 1519-03 Frankfurt am Main
+1520-02-18 bzw. 1519-03-06 St. Arnual
+1520 bzw. 1519 bzw. 1518 Diedenhofen
+1520-02 bzw. 1519-03 bzw. 1518-04 Frankfurt am Main
+1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 St. Arnual
+
+1524/1525 (a)
+1524 / 1525 (b)
+1419-05/1419-06 (c)
+1419-05 / 1419-06 (a)
+1421-10-05/1422-10-04 (b)
+1421-10-05 / 1422-10-04 (c)
+1502 (1503) (a)
+1502-11 (1503-02) (b)
+1502-11-22 (1503-02-07) (c)
+1520 [bzw. 1519] (a)
+1520-02 [bzw. 1519-03] (b)
+1520-02-18 [bzw. 1519-03-06] (c)
+1520 bzw. 1519 (a)
+1520-02 bzw. 1519-03 (b)
+1520-02-18 bzw. 1519-03-06 (c)
+1520 bzw. 1519 bzw. 1518 (a)
+1520-02 bzw. 1519-03 bzw. 1518-04 (b)
+1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 (c)
+
+1524/1525 (a) Diedenhofen
+1524 / 1525 (b) Frankfurt am Main
+1419-05/1419-06 (c) St. Arnual
+1419-05 / 1419-06 (a) Diedenhofen
+1421-10-05/1422-10-04 (b) Frankfurt am Main
+1421-10-05 / 1422-10-04 (c) St. Arnual
+1502 (1503) (a) Diedenhofen
+1502-11 (1503-02) (b) Frankfurt am Main
+1502-11-22 (1503-02-07) (c) St. Arnual
+1520 [bzw. 1519] (a) Diedenhofen
+1520-02 [bzw. 1519-03] (b) Frankfurt am Main
+1520-02-18 [bzw. 1519-03-06] (c) St. Arnual
+1520 bzw. 1519 (a) Diedenhofen
+1520-02 bzw. 1519-03 (b) Frankfurt am Main
+1520-02-18 bzw. 1519-03-06 (c) St. Arnual
+1520 bzw. 1519 bzw. 1518 (a) Diedenhofen
+1520-02 bzw. 1519-03 bzw. 1518-04 (b) Frankfurt am Main
+1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 (c) St. Arnual
+
+1524/1525 (vor)
+1524 / 1525 (nach)
+1419-05/1419-06 (um)
+1419-05 / 1419-06 (ca.)
+1421-10-05/1422-10-04 (kurz nach)
+1421-10-05 / 1422-10-04 (post)
+1502 (1503) (vor)
+1502-11 (1503-02) (nach)
+1502-11-22 (1503-02-07) (um)
+1520 [bzw. 1519] (ca.)
+1520-02 [bzw. 1519-03] (kurz nach)
+1520-02-18 [bzw. 1519-03-06] (post)
+1520 bzw. 1519 (um)
+1520-02 bzw. 1519-03 (ca.)
+1520-02-18 bzw. 1519-03-06 (kurz nach)
+1520 bzw. 1519 bzw. 1518 (um)
+1520-02 bzw. 1519-03 bzw. 1518-04 (ca.)
+1520-02-18 bzw. 1519-03-06 bzw. 1518-04-23 (kurz nach)
+
+1270-04/05
+1270-04 / 05
+1440-11-12/17
+1440-11-12 / 17
+1270-04-27/05-28
+1270-04-27 / 05-28
+
+1466 [04/05]
+1466 [04 / 05]
+1466-04 [28/29]
+1466-04 [28 / 29]
+1466 [04-28/05-01]
+1466 [04-28 / 05-01]
+
+1506-05 bzw. 11
+1506-05-12 bzw. 10
+1506-05-12 bzw. 11-10
+1506-05 bzw. 11 bzw. 12
+1506-05-12 bzw. 10 bzw. 01
+1506-05-12 bzw. 11-10 bzw. 12-01
+
+1343-04 oder 05
+1343-04-12 oder 19
+1343-04-12 oder 05-19
+
+1270-04/05 Diedenhofen
+1270-04 / 05 Frankfurt am Main
+1440-11-12/17 St. Arnual
+1440-11-12 / 17 Diedenhofen
+1270-04-27/05-28 Frankfurt am Main
+1270-04-27 / 05-28 St. Arnual
+
+1466 [04/05] Diedenhofen
+1466 [04 / 05] Frankfurt am Main
+1466-04 [28/29] St. Arnual
+1466-04 [28 / 29] Diedenhofen
+1466 [04-28/05-01] Frankfurt am Main
+1466 [04-28 / 05-01] St. Arnual
+
+1506-05 bzw. 11 Diedenhofen
+1506-05-12 bzw. 10 Frankfurt am Main
+1506-05-12 bzw. 11-10 St. Arnual
+1506-05 bzw. 11 bzw. 12 Diedenhofen
+1506-05-12 bzw. 10 bzw. 01 Frankfurt am Main
+1506-05-12 bzw. 11-10 bzw. 12-01 St. Arnual
+
+1343-04 oder 05 Diedenhofen
+1343-04-12 oder 19 Frankfurt am Main
+1343-04-12 oder 05-19 St. Arnual
+
+1270-04/05 (a)
+1270-04 / 05 (b)
+1440-11-12/17 (c)
+1440-11-12 / 17 (a)
+1270-04-27/05-28 (b)
+1270-04-27 / 05-28 (c)
+
+1466 [04/05] (a)
+1466 [04 / 05] (b)
+1466-04 [28/29] (c)
+1466-04 [28 / 29] (a)
+1466 [04-28/05-01] (b)
+1466 [04-28 / 05-01] (c)
+
+1506-05 bzw. 11 (a)
+1506-05-12 bzw. 10 (b)
+1506-05-12 bzw. 11-10 (c)
+1506-05 bzw. 11 bzw. 12 (a)
+1506-05-12 bzw. 10 bzw. 01 (b)
+1506-05-12 bzw. 11-10 bzw. 12-01 (c)
+
+1343-04 oder 05 (a)
+1343-04-12 oder 19 (b)
+1343-04-12 oder 05-19 (c)
+
+1270-04/05 (a) Diedenhofen
+1270-04 / 05 (b) Frankfurt am Main
+1440-11-12/17 (c) St. Arnual
+1440-11-12 / 17 (a) Diedenhofen
+1270-04-27/05-28 (b) Frankfurt am Main
+1270-04-27 / 05-28 (c) St. Arnual
+
+1466 [04/05] (a) Diedenhofen
+1466 [04 / 05] (b) Frankfurt am Main
+1466-04 [28/29] (c) St. Arnual
+1466-04 [28 / 29] (a) Diedenhofen
+1466 [04-28/05-01] (b) Frankfurt am Main
+1466 [04-28 / 05-01] (c) St. Arnual
+
+1506-05 bzw. 11 (a) Diedenhofen
+1506-05-12 bzw. 10 (b) Frankfurt am Main
+1506-05-12 bzw. 11-10 (c) St. Arnual
+1506-05 bzw. 11 bzw. 12 (a) Diedenhofen
+1506-05-12 bzw. 10 bzw. 01 (b) Frankfurt am Main
+1506-05-12 bzw. 11-10 bzw. 12-01 (c) St. Arnual
+
+1343-04 oder 05 (a) Diedenhofen
+1343-04-12 oder 19 (b) Frankfurt am Main
+1343-04-12 oder 05-19 (c) St. Arnual
+
+1270-04/05 (vor)
+1270-04 / 05 (nach)
+1440-11-12/17 (um)
+1440-11-12 / 17 (ca.)
+1270-04-27/05-28 (kurz nach)
+1270-04-27 / 05-28 (post)
+
+1466 [04/05] (vor)
+1466 [04 / 05] (nach)
+1466-04 [28/29] (um)
+1466-04 [28 / 29] (ca.)
+1466 [04-28/05-01] (kurz nach)
+1466 [04-28 / 05-01] (post)
+
+1506-05 bzw. 11 (vor)
+1506-05-12 bzw. 10 (nach)
+1506-05-12 bzw. 11-10 (um)
+1506-05 bzw. 11 bzw. 12 (ca.)
+1506-05-12 bzw. 10 bzw. 01 (kurz nach)
+1506-05-12 bzw. 11-10 bzw. 12-01 (post)
+
+1343-04 oder 05 (um)
+1343-04-12 oder 19 (ca.)
+1343-04-12 oder 05-19 (kurz nach)
+
+1524 und 1525
+1419-05 und 1419-06
+1421-10-05 und 1422-10-04
+
+1524 und 1525 Diedenhofen
+1419-05 und 1419-06 Frankfurt am Main
+1421-10-05 und 1422-10-04 St. Arnual
+
+1524 und 1525 (a)
+1419-05 und 1419-06 (b)
+1421-10-05 und 1422-10-04 (c)
+
+1524 und 1525 (a) Diedenhofen
+1419-05 und 1419-06 (b) Frankfurt am Main
+1421-10-05 und 1422-10-04 (c) St. Arnual
+
+1524 und 1525 (um)
+1419-05 und 1419-06 (ca.)
+1421-10-05 und 1422-10-04 (kurz nach)
+
+1270-04 und 05       (month different, no day)
+1440-11-12 und 17    (day different)
+1270-04-27 und 05-28 (month *and* day different)
+
+1270-04 und 05 Diedenhofen
+1440-11-12 und 17 Frankfurt am Main
+1270-04-27 und 05-28 St. Arnual
+
+1270-04 und 05 (a)
+1440-11-12 und 17 (b)
+1270-04-27 und 05-28 (c)
+
+1270-04 und 05 (a) Diedenhofen
+1440-11-12 und 17 (b) Frankfurt am Main
+1270-04-27 und 05-28 (c) St. Arnual
+
+1270-04 und 05 (um)
+1440-11-12 und 17 (ca.)
+1270-04-27 und 05-28 (kurz nach)
+
+1337-12-
+1400 (15. Jh., Anfang)
+1419-10-20 (und oefter)
+1500 (a) (16. Jh., Anfang)
+1500 (e) (15. Jh., Ende) Saarbruecken
+1419-05 bis 06 (Mai bis Juli)
+1024-1030 (ohne Datum)
+\end{verbatim}

@@ -245,8 +245,8 @@ class RegestTest(TestCase):
         - 1200-03 (b) (kurz nach)
         - 1200-03-12 (ca.) (c)
         - 1200-03-12 (c) (ca.)
-        - 1009-10-20 (ca. Mitte 15. Jh.) (d)'
-        - 1009-10-20 (d) (ca. Mitte 15. Jh.)'
+        - 1009-10-20 (ca. Mitte 15. Jh.) (d)
+        - 1009-10-20 (d) (ca. Mitte 15. Jh.)
         """
         self.__create_and_check_dates('1200 (vor) (a)', self.RegestDate(
                 date(1200, 01, 01), date(1200, 01, 01), 'vor', 'vor', False))
