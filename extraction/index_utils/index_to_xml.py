@@ -409,16 +409,15 @@ def loc_header_to_XML(header):
     settleTag = soup.new_tag('settlement')
     placeNameTag.append(settleTag)
  
-    # Wuestung
-    wuestMatch = re.search('(Staerk, W.stungen Nr. [0-9]{1,2})', \
+    # Abandoned villages (Wuestung)
+    avMatch = re.search('(Staerk, W.stungen Nr. [0-9]{1,2})', \
                            header.get_text())
     w = False
     if re.search('W.stung', header.get_text()):
         w = True
-    if wuestMatch:
-        w_ref = wuestMatch.group(0)
-        settleTag['w-ref'] = w_ref
-    settleTag['w'] = str(w).lower()
+    if avMatch:
+         settleTag['av-ref'] = avMatch.group(0)
+    settleTag['abandoned-village'] = str(w).lower()
  
     # Settlement name 
     if header.b:               # for location-headers
@@ -1087,7 +1086,7 @@ def classify_and_parse(items):
     '''
 
     xmlItems = []
-    id = -1
+    id = 0
 
     for item in items:
         header = item.header.get_text()
@@ -1159,6 +1158,7 @@ def classify_and_parse(items):
             
         else:
             unclassified.append(item)
+            id -= 1
         
         id += 1
     return xmlItems
@@ -1181,7 +1181,8 @@ def postprocess_siehe(items):
             line = item.header.get_text()
             sieheMatch = re.search('siehe (.*)',line)
             if sieheMatch:
-                n = sieheMatch.group(1).strip()
+                n = sieheMatch.group(1).strip().split('/')[0]
+                #n = n
                 itemTag = soup.new_tag('item')
                 for i in items:
                     if not isinstance(i, IndexItem):
@@ -1189,7 +1190,7 @@ def postprocess_siehe(items):
                             type = i['type']
                             itemTag['type'] = type
                             itemTag['value'] = item.header.b.get_text()
-                            itemTag['id'] = 'item_'+str(item.header['tmp_id'])
+                            itemTag['id'] = 'item_' + str(item.header['tmp_id'])
                             if not type:
                               print (value+': unknown type.')
                                 
@@ -1199,10 +1200,12 @@ def postprocess_siehe(items):
                               value, header = loc_header_to_XML(item.header)
                               header.placeName.settlement['type'] = settleType
                               itemTag.append(header)
+                              itemTag.append(relconc_body_to_XML(item.body))
                                 
                             if type == 'family':
                               value, header = fam_header_to_XML(item.header)
                               itemTag.append(header)
+                              itemTag.append(listing_body_to_XML(item.body))
 
                             xmlItemsComplete.append(itemTag)
                             break
