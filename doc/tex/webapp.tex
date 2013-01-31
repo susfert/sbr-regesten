@@ -232,7 +232,17 @@ you can trigger it using the following command:
 $ python manage.py extract
 \end{verbatim}
 
-Note that this process might take a long time to finish.
+Note that this process might take a long time to finish. Also, please
+make sure that there is a file called \texttt{sbr-regesten.xml} in the
+top-level directory of the project (\texttt{sbr-regesten}) with the
+following contents:
+
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+
+\end{verbatim}
+
+For best results, the XML declaration should be followed by a newline.
 
 \subsubsection{Using the Application}
 \label{sec:use}
