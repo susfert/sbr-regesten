@@ -12,11 +12,14 @@ import codecs, string, re, sys
 from regesten_webapp import models
 from regesten_webapp.models import Location, Family, Person, Region
 from regesten_webapp.models import PersonGroup, Landmark, Concept, IndexEntry
-from regesten_webapp.models import Regest, RegestDate, Quote
+from regesten_webapp.models import Regest, RegestDate, Quote, ContentType
 
-countConc = 2000
-idCount = 0
 
+def get_item_ID():
+    global countIndex
+    item_id = countIndex
+    countIndex += 1
+    return item_id
 
 def ment_to_db(xmlNode, concept): # TODO
     '''
@@ -55,6 +58,16 @@ def if_exists(node):
         return ''
 
 
+def create_quote(xmlNode,objId):
+    '''Creates a quote.'''
+    q = Quote()
+    q.content_type = ContentType.objects.get(app_label='regesten_webapp', model='concept')
+    q.content = xmlNode.get_text()
+    q.object_id = objId
+    q.save()
+    return q
+
+
 def create_person(xmlNode):
     ''' Creates a name. '''
     p = Person()
@@ -67,6 +80,10 @@ def create_person(xmlNode):
     p.rolename = if_exists(pers_name.rolename)
     p.genname = if_exists(pers_name.genname)
     p.description = if_exists(xmlNode.description)
+    global idConc
+    p.id = idConc
+    idConc += 1
+    p.save()
     return p
   
 def create_concept(xmlNode):
@@ -75,27 +92,27 @@ def create_concept(xmlNode):
     name = xmlNode.find('name')
     c.name = name.get_text()
     c.description = if_exists(xmlNode.description)
+    global idConc
+    print(idConc)
+    c.id = idConc
+    idConc += 1
+    c.save()
+
     quoteList = []
     qList = []
-    '''if xmlNode.description:
+    if xmlNode.description:
         quoteList = xmlNode.description.findAll('quote')
     if not isinstance(name, NavigableString):
         quoteList += name.findAll('quote')
     for quote in quoteList:
-        q = create_quote(quote)
+        q = create_quote(quote, c.id)
         qList.append(q)
-    add_all(c.quotes, qList)'''
+    add_all(c.quotes, qList)
     return c
 
-def create_quote(xmlNode):
-    '''Creates a quote.'''
-    q = Quote()
-    q.content = xmlNode.get_text
-    return q
 
 def relconc_to_db(relConc, createElement=create_concept):
     '''Extracts related-concepts and writes them into the database.'''
-    global countConc
     clist = []
     if relConc:
         for conc in relConc:
@@ -103,8 +120,6 @@ def relconc_to_db(relConc, createElement=create_concept):
                 continue
             if conc.name == 'concept' or conc.name == 'person':
                 c = createElement(conc)
-                c.xml_repr = conc
-                countConc += 1
                 c.save()
                 ment_to_db(conc, c)
                 if hasattr(conc, 'related-concepts'):
@@ -181,6 +196,8 @@ def loc_to_db(itemsoup):
     elif l.region and l.region.region_type == 'Bundesland':
         l.country = "Deutschland"
 
+    l.id = get_item_ID()
+    l.xml_repr = itemsoup
     l.save()
     
     ment_to_db(header, l)
@@ -207,7 +224,10 @@ def land_to_db(itemsoup):
     if header.geogname:
         land.add_Names = header.geogname
         land.landmark_type = str(header.geogname['type'])
-   
+    
+    
+    land.id = get_item_ID()
+    land.xml_repr = itemsoup
     land.save()
        
     # mentioned_in
@@ -238,7 +258,9 @@ def pers_to_db(itemsoup):
         p.rolename = if_exists(pers_name.rolename)
         p.genname = if_exists(pers_name.genname)
         p.description = if_exists(header.person.description)
-
+        
+        p.id = get_item_ID()
+        p.xml_repr = itemsoup
         p.save()
             
         # mentioned_in
@@ -262,6 +284,8 @@ def persgr_to_db(itemsoup):
     # name
     pg.name = header.find('group-name').get_text()
     
+    pg.id = get_item_ID()
+    pg.xml_repr = itemsoup
     pg.save()
     
     # mentioned_in
@@ -286,6 +310,8 @@ def fam_to_db(itemsoup):
     f.name = itemsoup['value'].strip(' ,;.')
     f.addnames = if_exists(header.addnames)
     
+    f.id = get_item_ID()
+    f.xml_repr = itemsoup
     f.save()
     
     # mentioned_in
@@ -308,11 +334,14 @@ def index_to_db():
     '''
     print('Writing index into db..')
     
-    countIndex = 0
-    
     with codecs.open ('sbr-regesten.xml', 'r', 'utf-8') as file:
         soup = BeautifulSoup(file)
         itemList = soup.find('index').findAll('item')
+        
+        global countIndex
+        countIndex = 0
+        global idConc
+        idConc = len(itemList) + 1
         
         for itemsoup in itemList:
             type = itemsoup['type']
@@ -338,9 +367,13 @@ def index_to_db():
                 break
       
       
-            i = IndexEntry()
-            i.xml_repr = itemsoup
-            i.id = entry.id
+            #i = IndexEntry()
+            #i.xml_repr = itemsoup
+            #i.id = entry.id
             #i.id = countIndex
-            countIndex += 1
+            #countIndex += 1
             #i.save()
+            
+            
+            
+            #TODO: erst concepts speichern, dann quotes hinzufuegen!!
