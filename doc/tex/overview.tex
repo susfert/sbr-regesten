@@ -1,1 +1,77 @@
 \section{Extraction Process: Overview}
+
+In order to keep the architecture for the extraction process modular,
+individual chapters of the Sbr-Regesten were extracted using separate
+modules. Each of these modules works independently of the other
+modules, but to get a well-formed, schema-conforming XML document,
+they must be used in succession.
+
+For ease of use, the extraction process was integrated into the
+Sbr-Regesten Web Application as a \emph{management command}. This
+chapter focuses on where to find the extraction modules and how they
+are chained to form the overall extraction pipeline. For information
+on (re-)running the extraction process, consult chapter \ref{sec:run}.
+
+The order of extraction for the individual parts of the Sbr-Regesten
+follows the order of chapters in the original text. The first module
+is responsible for inserting the start tag of \emph{root element}
+(\texttt{<sbr-regesten>}) into the XML document; the last module to
+process the HTML version of the Sbr-Regesten inserts the corresponding
+end tag (\texttt{</sbr-regesten}). Book chapters and the modules
+responsible for extracting them are listed in the following table:
+
+\begin{figure}[h]
+  \centering
+  \begin{tabular}{l|l}
+    \hline
+    Chapter & Extraction Module \\
+    \hline
+    Frontmatter & \texttt{frontmatter\_extractor.py} \\
+    Table of Contents & \texttt{toc\_extractor.py} \\
+    Preface & \texttt{preface\_extractor.py} \\
+    Bibliography & \texttt{bibliography\_extractor.py} \\
+    List of Abbreviations & \texttt{abbrev\_extractor.py} \\
+    List of Initials & \texttt{initials\_extractor.py} \\
+    Regests & \texttt{regest\_extractor.py} \\
+    List of Archives & \texttt{archives\_extractor.py} \\
+    Index & \texttt{index\_extractor.py} \\
+    \hline
+  \end{tabular}
+  \caption{Book chapters and corresponding extraction modules}
+  \label{fig:extraction-modules}
+\end{figure}
+
+The extraction modules are located in the
+\texttt{sbr-regesten/extraction} directory. Each one of them
+implements a function called \texttt{extract\_<part-of-book>} which
+takes no arguments and serves as an entry point for extracting the
+chapter it is responsible for. The \texttt{extract.py} module located
+in
+
+\begin{verbatim}
+sbr-regesten/regesten_webapp/management/commands
+\end{verbatim}
+
+chains the calls to the entry points in the appropriate order:
+
+\begin{verbatim}
+# Imports ...
+
+class Command(NoArgsCommand):
+    help = 'Starts and directs the extraction process for the Sbr-Regesten'
+
+    def handle_noargs(self, **options):
+        frontmatter_extractor.extract_frontmatter()
+        toc_extractor.extract_toc()
+        preface_extractor.extract_preface()
+        bibliography_extractor.extract_bibliography()
+        abbrev_extractor.extract_abbrevs()
+        initials_extractor.extract_initials()
+        regest_extractor.extract_regests()
+        archives_extractor.extract_archives()
+        index_extractor.extract_index()
+\end{verbatim}
+
+The following chapters describe in detail how individual parts of the
+Sbr-Regesten are extracted, and also provide information about
+relevant parts of the XML schema.
