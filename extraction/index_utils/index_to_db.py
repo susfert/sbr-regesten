@@ -93,7 +93,6 @@ def create_concept(xmlNode):
     c.name = name.get_text()
     c.description = if_exists(xmlNode.description)
     global idConc
-    print(idConc)
     c.id = idConc
     idConc += 1
     c.save()
@@ -147,13 +146,13 @@ def loc_to_db(itemsoup):
     # Wuestungen
     if 'type' in attrs:
         l.location_type = placeName.settlement['type']
-    vill = placeName.settlement['w']
+    vill = placeName.settlement['abandoned-village']
     if vill == 'true':
        l.abandoned_village = True
     else:
        l.abandoned_village = False    
-    if 'w-ref' in attrs:
-        l.av_ref = placeName.settlement['w-ref']    
+    if 'av-ref' in attrs:
+        l.av_ref = placeName.settlement['av-ref']    
       
     # Reference point & District
     ref_point = placeName.find('reference_point')
