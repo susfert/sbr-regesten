@@ -1,8 +1,6 @@
 """ This module extracts the bibliography of the Sbr Regesten. """
 
 import codecs
-import re
-import glob
 import os
 from bs4 import BeautifulSoup
 
@@ -15,7 +13,10 @@ def indent_bibl():
 
 
 def extract_bibliography():
-    '''Extracts the bibliography part of the sbr-regensten from sbr-regesten.html.'''
+    '''
+    Extracts the bibliography part of the sbr-regesten from
+    sbr-regesten.html.
+    '''
     print ('extracting bibliography..')
     text = codecs.open('html/sbr-regesten.html', 'r', 'cp1252').read()
 
@@ -33,16 +34,18 @@ def extract_bibliography():
     nextBiblInfo = False
     for htmlItem in htmlItems:
         item_text = htmlItem.get_text()
-        if htmlItem.get_text().strip() != '' and item_text != '\n' and item_text != '\r':
+        if htmlItem.get_text().strip() != '' and \
+                item_text != '\n' and \
+                item_text != '\r':
             if item_text.startswith('Abk'):
                 break
-            
+
             if item_text.startswith('Literaturverzeichnis'):
                 biblListTag.append(item_text)
                 foundBibl = True
                 nextBiblInfo = True
                 continue
-             
+
             elif nextBiblInfo:
                 biblInfoTag.append(item_text)
                 biblListTag.append(biblInfoTag)
@@ -59,7 +62,7 @@ def extract_bibliography():
 
     with codecs.open('bibl_tmp.xml', 'w', 'utf-8') as biblfile:
         biblfile.write('\n' + unicode(biblListTag.prettify()) + '\n')
-    
+
     indent_bibl()
     os.remove('bibl_tmp.xml')
 

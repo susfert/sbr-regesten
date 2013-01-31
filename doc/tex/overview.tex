@@ -42,11 +42,12 @@ responsible for extracting them are listed in the following table:
 \end{figure}
 
 The extraction modules are located in the
-\texttt{sbr-regesten/extraction} directory. Each one of them
-implements a function called \texttt{extract\_<part-of-book>} which
-takes no arguments and serves as an entry point for extracting the
-chapter it is responsible for. The \texttt{extract.py} module located
-in
+\texttt{sbr-regesten/extraction} directory. Each one of them uses the
+HTML version of the Sbr-Regesten stored in
+\texttt{sbr-regesten/html/sbr-regesten.html} as input and implements a
+function called \texttt{extract\_<part-of-book>}. This function takes
+no arguments and serves as an entry point for extracting the chapter
+it is responsible for. The \texttt{extract.py} module located in
 
 \begin{verbatim}
 sbr-regesten/regesten_webapp/management/commands
