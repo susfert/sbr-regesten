@@ -28,7 +28,7 @@ class Regest(models.Model):
 
     issuer = models.ForeignKey(
         'Person', related_name='regests_issued', verbose_name=_('issuer'),
-        null=True)
+        null=True, blank=True)
     mentions = models.ManyToManyField(
         'Concept', related_name='mentioned_in', verbose_name=_('mentions'),
         null=True, blank=True)
@@ -406,7 +406,7 @@ class Family(PersonGroup):
 
     location = models.ForeignKey(
         'Location', verbose_name=_('location'), null=True,
-        help_text=ugettext_lazy(
+        blank=True, help_text=ugettext_lazy(
             'Location associated with this family'))
 
     def __unicode__(self):
