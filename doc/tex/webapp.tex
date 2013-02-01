@@ -52,7 +52,7 @@ or MVC for short, is a
 \href{https://en.wikipedia.org/wiki/Software_design_pattern}{Software Design Pattern}
 
 commonly used by Web Frameworks such as Django and Ruby on Rails. The
-basic idea of MVC is is to divide application logic into three layers.
+basic idea of MVC is to divide application logic into three layers.
 The \emph{Model} layer is responsible for storing and operating on
 data. This usually involves at least the basic
 \href{https://en.wikipedia.org/wiki/CRUD}{CRUD} operations
@@ -74,7 +74,7 @@ implements the MVC pattern. For an in-depth treatment of the
 individual components, please consult the documentation at
 \url{https://docs.djangoproject.com/}.
 
-While Django's seperation of concerns is heavily influenced by the MVC
+While Django's separation of concerns is heavily influenced by the MVC
 pattern conceptually, the framework uses a different terminology to
 distinguish the individual components for dealing with (user)
 requests, data, and presentation. The terminological differences tend
@@ -192,7 +192,7 @@ archive to an appropriate folder in your file system and \texttt{cd}
 into the root folder of the project. This folder is called
 \texttt{sbr-regesten}. Look for a file called
 \texttt{sbr-regesten.db}. If it's there, this means that the source
-package you have received includes a prepopulated database, and that
+package you have received includes a pre-populated database, and that
 you can run the application right away by typing
 
 \begin{verbatim}
@@ -249,7 +249,7 @@ access the application. You will be greeted by a login form:
   \label{fig:admin-login}
 \end{figure}
 
-If you are working with a prepopulated database, enter \texttt{admin}
+If you are working with a pre-populated database, enter \texttt{admin}
 in both the \emph{Benutzername} and the \emph{Passwort} field. If you
 initialized the database yourself, use the credentials you specified
 in the \texttt{syncdb} step explained in the previous section.
@@ -373,7 +373,7 @@ entries for. This will bring up the already familiar listing of
 database entries for the model. If necessary, sort or narrow down the
 list as described above, then click on the name of the entry you would
 like to edit. The fields of the input form that comes up will be
-prepopulated with the information that is available for this entry.
+pre-populated with the information that is available for this entry.
 Other than that it looks and behaves exactly like the form you are
 already used to for adding new entries.
 
@@ -400,7 +400,7 @@ somewhere else.
 
 It is also possible to delete multiple entries at once. On the page
 that lists all existing entries for a given model, mark the entries
-you would like to delete by clicking on the checkboxes next to the
+you would like to delete by clicking on the check boxes next to the
 names of the entries. Then choose \emph{Ausgewählte MODEL\_NAME
   löschen} from the drop-down menu labeled \emph{Aktion} at the top
 and click the \emph{Ausführen} button:
@@ -434,7 +434,7 @@ that needs to be addressed: For the purpose of making applications
 easy to develop and debug, Django provides a \emph{debug mode}. If
 this mode is turned on, Django displays a debug page for any errors or
 exceptions that occur while interacting with the application in the
-browser. This page includes a full error traceback containing
+browser. This page includes a full error trace-back containing
 extensive information about the environment the application is running
 in. This poses a high security risk, as it provides users (who might
 have malicious intentions) with information they should not have
@@ -467,7 +467,7 @@ development history in various ways.
 Git is available for all major operating systems. On most major Linux
 distributions it can be installed from the standard repositories using
 a package manager. For detailed platform-specific instructions and/or
-to download graphical installers for MacOS X and Windows, go to
+to download graphical installers for Mac OS X and Windows, go to
 \url{http://git-scm.com/downloads}.
 
 \paragraph{Using Git to Download the Source Code}
@@ -686,9 +686,8 @@ views and templates for end users, however, we recommend that you
 switch to using a dedicated \texttt{tests} directory and multiple test
 modules as described above.
 
-To learn more about about writing and running tests for Django
-applications as well as using alternative testing frameworks, consult
-the
+To learn more about writing and running tests for Django applications
+as well as using alternative testing frameworks, consult the
 \href{https://docs.djangoproject.com/en/1.4/topics/testing/}{Testing
   Django applications} section of the official Django documentation.
 
@@ -808,7 +807,7 @@ entirety. Please note that:
   table in the database. This ID is available on instances of each of
   the models shown in the diagram, in the form of an attribute called
   \texttt{id}. For brevity, and because this attribute is defined in
-  the common superclass of the models shown in the diagram, it is not
+  the common super class of the models shown in the diagram, it is not
   explicitly listed in the diagram.
 \end{enumerate}
 
@@ -826,10 +825,10 @@ are listed in the sections below. Blue arrows with hollow heads denote
   are colored in blue in this diagram has nothing to do with UML. They
   are colored differently to make them easily distinguishable from
   other types of lines present in the diagram.} Classes with incoming
-arrows are superclasses of classes with outgoing arrows; superclasses
-pass their attributes on to their subclasses. Relationships between
-different types of models (\emph{associations}) are denoted by black
-lines connecting their boxes. These lines are annotated with
+arrows are super classes of classes with outgoing arrows; super
+classes pass their attributes on to their subclasses. Relationships
+between different types of models (\emph{associations}) are denoted by
+black lines connecting their boxes. These lines are annotated with
 \emph{cardinalities}. For instance, \emph{one} (\texttt{1}) location
 can have \emph{one to many} (\texttt{1...*}) residents. Similarly, a
 single concept can be related to \emph{zero or arbitrarily many}
@@ -843,7 +842,7 @@ concepts.
 One of the main differences between the Django data model and the XML
 schema concerns naming schemes for \emph{identifiers} (i.e. class and
 attribute names in Django, element names in XSD): In the XML schema,
-dashes are used to seperate indivdiual words that make up
+dashes are used to separate individual words that make up
 \emph{compound} identifiers like \texttt{abbrev-list} and
 \texttt{original-date}. Corresponding Django attributes contain
 underscores instead of dashes, as dashes are not allowed in Python
