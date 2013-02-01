@@ -70,6 +70,8 @@ def create_quote(xmlNode,objId):
 
 def create_person(xmlNode):
     ''' Creates a name. '''
+    global idConc
+    
     p = Person()
     pers_name = xmlNode.persname
     p.name = pers_name.get_text()
@@ -80,19 +82,20 @@ def create_person(xmlNode):
     p.rolename = if_exists(pers_name.rolename)
     p.genname = if_exists(pers_name.genname)
     p.description = if_exists(xmlNode.description)
-    global idConc
     p.id = idConc
     idConc += 1
     p.save()
     return p
+
   
 def create_concept(xmlNode):
     ''' Creates a concept. '''
-    c = Concept()
     name = xmlNode.find('name')
+    global idConc
+    
+    c = Concept()
     c.name = name.get_text()
     c.description = if_exists(xmlNode.description)
-    global idConc
     c.id = idConc
     idConc += 1
     c.save()
@@ -134,12 +137,11 @@ def relconc_to_db(relConc, createElement=create_concept):
 
 def loc_to_db(itemsoup):
     '''Extracts a location and writes it into the database.'''
-    l = Location()
     header = itemsoup.find('location-header')
     placeName = header.placename
     attrs = placeName.settlement.attrs
      
-    # Name & Additional names
+    l = Location()
     l.additional_names = if_exists(placeName.addNames)
     l.name = itemsoup['value']
         
@@ -215,24 +217,20 @@ def loc_to_db(itemsoup):
 
 def land_to_db(itemsoup):
     '''Extracts a landmark and writes it into the database.'''
-    land = Landmark()
     header = itemsoup.find('landmark-header')
      
-    # Name & Additional names
+    land = Landmark()
     land.name = itemsoup['value']
     if header.geogname:
         land.add_Names = header.geogname
         land.landmark_type = str(header.geogname['type'])
     
-    
     land.id = get_item_ID()
     land.xml_repr = itemsoup
     land.save()
        
-    # mentioned_in
+    # mentioned_in + related 
     ment_to_db(itemsoup.find('landmark-header'), land)
- 
-    # related concepts
     if hasattr(itemsoup, 'concept-body'):
         add_all(land.related_concepts, relconc_to_db(itemsoup.find\
                 ('concept-body').find('related-concepts')))
@@ -244,6 +242,7 @@ def land_to_db(itemsoup):
 def pers_to_db(itemsoup):
     '''Extracts a person and writes it into the database.'''
     p = Person()
+    #itemsoup.find('person-header')
     if hasattr(itemsoup, 'person-header'):
         header = itemsoup.find('person-header')
         pers_name = header.person.persname
@@ -272,25 +271,23 @@ def pers_to_db(itemsoup):
            
         print (p)
         return p
+    else:
+        exit()
 
 
 
 def persgr_to_db(itemsoup):
     '''Extracts a persongroup and writes it into the database.'''
-    pg = PersonGroup()
     header = itemsoup.find('persongroup-header')
-     
-    # name
-    pg.name = header.find('group-name').get_text()
     
+    pg = PersonGroup()
+    pg.name = header.find('group-name').get_text()
     pg.id = get_item_ID()
     pg.xml_repr = itemsoup
     pg.save()
     
-    # mentioned_in
+    # mentioned_in + related-concepts
     ment_to_db(itemsoup.find('persongroup-header'), pg)
-    
-    # related-concepts
     if itemsoup.find('listing-body'):
         add_all(pg.members, relconc_to_db(itemsoup.find('listing-body').members\
                , createElement=create_person))
@@ -302,21 +299,17 @@ def persgr_to_db(itemsoup):
 
 def fam_to_db(itemsoup):
     '''Extracts a family and writes it into the database.'''
-    f = Family()
     header = itemsoup.find('family-header')
-     
-    # Name & Additional names
+    
+    f = Family() 
     f.name = itemsoup['value'].strip(' ,;.')
     f.addnames = if_exists(header.addnames)
-    
     f.id = get_item_ID()
     f.xml_repr = itemsoup
     f.save()
     
-    # mentioned_in
+    # mentioned_in + related concepts
     ment_to_db(itemsoup.find('family_header'), f)
-    
-    # related concepts
     if itemsoup.find('listing-body'):
         add_all(f.members, relconc_to_db(itemsoup.find('listing-body').members\
                 , createElement=create_person))
@@ -364,15 +357,3 @@ def index_to_db():
                 entry = ''
                 print ('unknown type!!')
                 break
-      
-      
-            #i = IndexEntry()
-            #i.xml_repr = itemsoup
-            #i.id = entry.id
-            #i.id = countIndex
-            #countIndex += 1
-            #i.save()
-            
-            
-            
-            #TODO: erst concepts speichern, dann quotes hinzufuegen!!

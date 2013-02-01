@@ -1015,7 +1015,8 @@ def build_header_body(h, b, lineList):
 
 
 
-def item_extractor():
+def extract_items():
+    '''TODO'''
     text = ''
     t = ''
 
@@ -1066,8 +1067,8 @@ def item_extractor():
                 
                 h,b = build_header_body(h,b,restList)
 
-                h = '<itemHeader>'+h+'</itemHeader>'
-                b = '<itemBody>'+b+'</itemBody>'
+                h = '<itemHeader>' + h + '</itemHeader>'
+                b = '<itemBody>' + b + '</itemBody>'
                 header = BeautifulSoup(h)
                 body = BeautifulSoup(b)
                 item = IndexItem(header, body)
@@ -1225,7 +1226,7 @@ def index_to_xml():
     '''
     print('Index Extractor is working ..')
     
-    indexTag, items = item_extractor()        
+    indexTag, items = extract_items()        
     items = classify_and_parse(items)
     xmlItemsComplete = postprocess_siehe(items)
 
