@@ -104,9 +104,26 @@ called \texttt{biblidtype} for storing a unique ID for each entry in
 the bibliography.
 
 \paragraph{Extraction}
-The bibliography is extracted by the module \texttt{bibliography\_extractor.py}. The module reads the entire HTML source and turns it into a BeautifulSoup instance. It splits it up into paragraphs exploiting the \texttt{<p>} tag in the HTML. Then, the \texttt{bibliography\_extractor.py} creates a \texttt{<listBibl>} tag. In order to find the paragraphs relevant to the bibliography it searches for the keyword \emph{Literaturverzeichnis}. Once this is found, it starts extracting the bibliography. The first paragraph following the keyword \emph{Literaturverzeichnis} is tagged as \texttt{listBibl-info} and appended to it. Each of the following non-empty paragraphs obtains a \texttt{<bibl>} tag with a continuous id as attribute and is again appended to the \texttt{<listBibl>} tag. The \texttt{bibliography\_extractor.py} stops when finding the keyword \emph{Abk}, which is the beginning of the next section of the book. The created BeautifulSoup instance is \href{http://www.crummy.com/software/BeautifulSoup/bs4/doc/#pretty-printing}{prettified} and written into a temporary file. The latter is postprocessed for reason of indentation, before the bibliography is finally added to the \texttt{sbr-regesten.xml}.
 
-
+The bibliography is extracted by the module
+\texttt{bibliography\_extractor.py}. The module reads the entire HTML
+source and turns it into a BeautifulSoup instance. It splits it up
+into paragraphs exploiting the \texttt{<p>} tag in the HTML. Then, the
+\texttt{bibliography\_extractor.py} creates a \texttt{<listBibl>} tag.
+In order to find the paragraphs relevant to the bibliography it
+searches for the keyword \emph{Literaturverzeichnis}. Once this is
+found, it starts extracting the bibliography. The first paragraph
+following the keyword \emph{Literaturverzeichnis} is tagged as
+\texttt{listBibl-info} and appended to it. Each of the following
+non-empty paragraphs obtains a \texttt{<bibl>} tag with a continuous
+id as attribute and is again appended to the \texttt{<listBibl>} tag.
+The \texttt{bibliography\_extractor.py} stops when finding the keyword
+\emph{Abk}, which is the beginning of the next section of the book.
+The created BeautifulSoup instance is
+\href{http://www.crummy.com/software/BeautifulSoup/bs4/doc/#pretty-printing}{prettified}
+and written into a temporary file. The latter is postprocessed for
+reason of indentation, before the bibliography is finally added to the
+\texttt{sbr-regesten.xml}.
 
 \subsection{Abbreviations}
 \label{sec:abbrevs}
