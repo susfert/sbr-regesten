@@ -3,60 +3,50 @@
 
 \emph{Author: Tim Krones} \\
 
-In addition to functionality for extracting and annotating the
-contents of the Sbr-Regesten, the package also provides the basic
-architecture for a web application. This chapter gives an overview of
-the Django Framework for developing web applications. It then describes
-how to
+This chapter describes the Sbr-Regesten Web Application. To provide
+the minimal amount of theoretical background necessary to productively
+work with and extend the application, we first give an overview of the
+\href{https://www.djangoproject.com/}{Django Web Application
+  Framework} which was used to develop the application, and how it
+implements the \emph{MVC pattern}. We then describe in detail how to
+install, run, and use the application, and provide pointers for
+deploying and extending it. In the last section of this chapter, we
+discuss the data model that was designed for the web application,
+focusing mainly on how it differs from the XML schema presented in
+previous chapters.
 
-\begin{itemize}
-\item install necessary dependencies
-\item run the application
-\item use the admin interface to add or change data
-\end{itemize}
-
-and provides basic pointers for extending and deploying the
-application. Also included is a detailed description of the data model
-used for storing information extracted from the Sbr-Regesten in the
-database associated with the application.
-
-Please note that the purpose of this chapter is to provide a mostly
-high-level \emph{overview} of all the different aspects involved in
-dealing with Django applications in general, and with the Sbr-Regesten
-Web Application in particular. While the information it contains about
-how to use the application is quite detailed, some of the other
-aspects (for which the Django documentation provides in-depth
-coverage) are touched on only briefly. We do give pointers to external
-documentation wherever necessary. Therefore, if you have never worked
-with Django, this chapter will give you a basic understanding of the
-architecture of a Django project, but it is not to be understood as a
-replacement for reading the official Django documentation.
+Django-related information provided in this chapter is based on the
+official Django documentation, which provides comprehensive
+information about the framework and can be found
+\href{https://docs.djangoproject.com/}{here}. Please note that this
+chapter is not to be understood as a replacement for reading external
+documentation: Its main purpose is to give the reader a \emph{basic}
+understanding of all aspects involved in dealing with Django
+applications in general, and the Sbr-Regesten Web Application in
+particular. As a result, some Django-related concepts are touched on
+only briefly. We do, however, give pointers to external documentation
+wherever necessary.
 
 \subsection{The Django Web Framework}
 \label{sec:django}
 
-The information in this section is based on the official Django
-documentation which can be found at
-\url{https://docs.djangoproject.com/}.
-
-Django is a Python Framework for rapid prototyping and development of
-interactive web applications. It uses the MVC pattern to separate the
-different tasks that are involved in creating interactive web
-applications.
+Django is a Python framework for rapid prototyping and development of
+interactive web applications. It uses the \emph{MVC pattern} to
+separate the different tasks that are involved in creating interactive
+web applications.
 
 \subsubsection{The MVC Pattern}
 \label{sec:mvc}
 
 \href{https://en.wikipedia.org/wiki/Model_view_controller}{Model-View-Controller},
 or MVC for short, is a
-\href{https://en.wikipedia.org/wiki/Software_design_pattern}{Software Design Pattern}
-
-commonly used by Web Frameworks such as Django and Ruby on Rails. The
-basic idea of MVC is to divide application logic into three layers.
-The \emph{Model} layer is responsible for storing and operating on
-data. This usually involves at least the basic
+\href{https://en.wikipedia.org/wiki/Software_design_pattern}{Software
+  Design Pattern} commonly used by Web Frameworks such as Django and
+Ruby on Rails. The basic idea of MVC is to divide application logic
+into three layers. The \emph{Model} layer is responsible for storing
+and operating on data. This usually involves at least the basic
 \href{https://en.wikipedia.org/wiki/CRUD}{CRUD} operations
-\emph{Create}, \emph{Read}, \emph{Update}, and \emph{Delete}.The
+\emph{Create}, \emph{Read}, \emph{Update}, and \emph{Delete}. The
 \emph{View} layer takes care of presenting available data to end
 users. \emph{Controllers} are responsible for handling user requests.
 Depending on the type of request, this usually involves querying the
@@ -76,11 +66,11 @@ individual components, please consult the documentation at
 
 While Django's separation of concerns is heavily influenced by the MVC
 pattern conceptually, the framework uses a different terminology to
-distinguish the individual components for dealing with (user)
-requests, data, and presentation. The terminological differences tend
-to confuse users that are new to Django or to working with MVC
-frameworks in general, which makes it all the more important to
-understand these differences before delving into Django development.
+distinguish the individual components for dealing with user requests,
+data, and presentation. The terminological differences tend to confuse
+users that are new to Django or to working with MVC frameworks in
+general, which makes it all the more important to understand these
+differences before delving into Django development.
 
 Django distinguishes between \emph{models}, \emph{templates}, and
 \emph{views}, which is why the framework is commonly referred to as an
@@ -92,10 +82,11 @@ those of controllers in MVC.
 
 From an architectural point of view, a Django \emph{project} usually
 consists of one or more Django \emph{apps}. Among other things, each
-app includes a dedicated Python module for the model layer (called
-\texttt{models.py}), two Python modules that are jointly responsible for
-handling user requests (called \texttt{views.py} and \texttt{urls.py})
-and a hierarchy of templates written in Django's template language.
+app includes a dedicated Python module for the model layer called
+\texttt{models.py}, two Python modules that are jointly responsible
+for handling user requests called \texttt{views.py} and
+\texttt{urls.py}, and a hierarchy of templates written in Django's
+template language.
 
 The \texttt{models.py} module contains specialized Python classes
 (called \emph{models}) which define the data model of a given Django
@@ -114,12 +105,11 @@ generally speaking, URL patterns) to appropriate view functions,
 allowing Django to identify the actions it needs to take based on the
 URL that was requested by the user.
 
-\subsection{Installing and Using the Web Application}
+\subsection{Installation and Usage}
 \label{sec:install-run-use}
 
-This chapter explains how to install and use the Sbr-Regesten Web
-Application, and also provides some pointers on how to extend and
-deploy it.
+This chapter explains how to install, run, and use the Sbr-Regesten
+Web Application.
 
 \subsubsection{Installation}
 \label{sec:install}
@@ -140,8 +130,8 @@ The easiest way to install specific versions of Django is using the
 \href{http://www.pip-installer.org/en/latest/}{pip-installer} which is
 a tool for installing and managing Python packages. \texttt{pip}
 should be available in the standard repositories of most Linux
-distributions (package: python-pip). For generic installation
-instructions, visit
+distributions as a package called \texttt{python-pip}. For generic
+installation instructions, visit
 \url{http://www.pip-installer.org/en/latest/installing.html}.
 
 Once \texttt{pip} has been installed, version 1.4.3 of Django can be
@@ -206,11 +196,11 @@ you need to proceed as follows: First, initialize the database by running
 $ python manage.py syncdb
 \end{verbatim}
 
-At some point you will be asked whether or not you would like to
-create a superuser for the database. Type \texttt{yes} and press
-Enter, then provide a username, email address and password. For
-development purposes it is both convenient and acceptable to simply
-set username and password to \texttt{admin}.
+At some point before this command finishes, you will be asked whether
+or not you would like to create a superuser for the database. Type
+\texttt{yes} and press Enter, then provide a username, email address
+and password. For development purposes it is both convenient and
+acceptable to simply set username and password to \texttt{admin}.
 
 When the \texttt{syncdb} command finishes, you can either start using
 the application with an empty database by typing the
@@ -240,7 +230,8 @@ For best results, the XML declaration should be followed by a newline.
 
 After starting the development server with the \texttt{runserver}
 command, direct your browser to \url{http://127.0.0.1:8000/admin} to
-access the application. You will be greeted by a login form:
+access the application. You will be greeted by a login form, shown in
+Figure \ref{fig:admin-login}.
 
 \begin{figure}[h]
   \centering
@@ -254,12 +245,14 @@ in both the \emph{Benutzername} and the \emph{Passwort} field. If you
 initialized the database yourself, use the credentials you specified
 in the \texttt{syncdb} step explained in the previous section.
 Clicking on \emph{Anmelden} will take you to the main page of the
-\emph{Django Admin Interface}:
+\emph{Django Admin Interface} which is shown in Figure
+\ref{fig:admin-main}.
 
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.3]{img/admin-main}
-  \caption{Main page of the admin interface, starting point for actions described below}
+  \caption{Main page of the admin interface, starting point for
+    browsing and manipulating data}
   \label{fig:admin-main}
 \end{figure}
 
@@ -306,8 +299,9 @@ the \emph{Suchen} button. On the result page, click on the link next
 to the information about the number search results to get back to the
 full listing.
 
-Note that for efficiency reasons, search is configured to consult only
-a limited number of model fields for each entity.
+Please note that as of this writing, search is configured to consult
+only a limited number of model fields for each entity for efficiency
+reasons.
 
 \paragraph{Adding Data}
 Starting from the main page of the admin interface, you can manipulate
@@ -319,13 +313,15 @@ information associated with existing entries (\emph{Ändern}).
 
 To add a new database entry for a specific model, click on the
 corresponding \emph{Hinzufügen} button. This brings up the appropriate
-input form for the model. For instance, the (top part of the) form for
-adding a new Regest entry to the database looks like this:
+input form for the model. As an example, consider the form for adding
+a new Regest entry to the database, shown in Figure
+\ref{fig:add-regest}.
 
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.3]{img/add-regest}
-  \caption{Example interface for adding a new entry to the database}
+  \caption{Top part of the form for adding a new Regest entry to the
+    database}
   \label{fig:add-regest}
 \end{figure}
 
@@ -335,7 +331,8 @@ database without filling them in. Instead, it will annotate the fields
 you failed to fill in with appropriate error messages and redisplay
 the input form\footnote{The interface behaves in exactly the same way
   if you \textbf{edit} the information for an existing entry and
-  (accidentally) delete any mandatory information.}:
+  accidentally delete any mandatory information.}; see Figure
+\ref{fig:add-regest-fail} for an example.
 
 \begin{figure}[h]
   \centering
@@ -357,12 +354,12 @@ entry and continue working on it afterwards, click \emph{Sichern und
 
 If you are familiar with the Sbr-Regesten, most of the fields included
 in the input forms for the different models should be
-self-explanatory. Some of the less obvious fields are annotated with
-examples of the type of input that they expect. However, before
-starting to add or edit information from the admin interface, please
-refer to chapter \ref{sec:data-model} to get a more detailed
-understanding of the type of information represented by any given
-field.
+self-explanatory. To help you along, some of the less obvious fields
+are annotated with examples of the type of input that they expect.
+However, before starting to add or edit information from the admin
+interface, please refer to chapter \ref{sec:data-model} to get a more
+detailed understanding of the type of information represented by any
+given field.
 
 \paragraph{Manipulating Data}
 The steps that are involved in editing existing data are very similar
@@ -374,8 +371,8 @@ database entries for the model. If necessary, sort or narrow down the
 list as described above, then click on the name of the entry you would
 like to edit. The fields of the input form that comes up will be
 pre-populated with the information that is available for this entry.
-Other than that it looks and behaves exactly like the form you are
-already used to for adding new entries.
+Other than that the input form looks and behaves exactly like the form
+you are already used to for adding new entries.
 
 To get a list of all changes that were made to a specific database
 entry via the admin interface, click on the button that says
@@ -385,7 +382,7 @@ entry via the admin interface, click on the button that says
 If you want to remove a specific entry from the database, navigate to
 its input form as described above. Then, on the very bottom of the
 page, click the \emph{Löschen} button. This will bring up a
-confirmation page that looks like this:
+confirmation page, shown in Figure \ref{fig:confirm-delete}.
 
 \begin{figure}[h]
   \centering
@@ -403,7 +400,9 @@ that lists all existing entries for a given model, mark the entries
 you would like to delete by clicking on the check boxes next to the
 names of the entries. Then choose \emph{Ausgewählte MODEL\_NAME
   löschen} from the drop-down menu labeled \emph{Aktion} at the top
-and click the \emph{Ausführen} button:
+and click the \emph{Ausführen} button. Figure
+\ref{fig:delete-multiple} shows the page right before finalizing the
+delete action.
 
 \begin{figure}[h]
   \centering
@@ -432,26 +431,27 @@ Despite not going into detail here about how to deploy the
 Sbr-Regesten Web Application, there is one important security issue
 that needs to be addressed: For the purpose of making applications
 easy to develop and debug, Django provides a \emph{debug mode}. If
-this mode is turned on, Django displays a debug page for any errors or
-exceptions that occur while interacting with the application in the
-browser. This page includes a full error trace-back containing
+this mode is turned on, Django displays a \emph{debug page} for any
+errors or exceptions that occur while interacting with the application
+in the browser. This page includes a full error trace-back containing
 extensive information about the environment the application is running
 in. This poses a high security risk, as it provides users (who might
-have malicious intentions) with information they should not have
-access to. Therefore, before deploying the Sbr-Regesten Web
+have malicious intentions) with all kinds of information they should
+not have access to. Therefore, before deploying the Sbr-Regesten Web
 Application in a production environment, make sure that the
 \texttt{DEBUG} variable (which is used to turn debug mode on and off)
-is set to \texttt{False} in
-\texttt{sbr-regesten/sbr\_regesten/settings.py}.
+is set to \texttt{False} in the \texttt{settings.py} modules located
+in the \texttt{sbr-regesten/sbr\_regesten/} directory.
 
 \subsection{Extending the Web Application}
 \label{sec:extend}
 
 This section provides information about how to obtain a copy of the
 source code for development purposes that includes the complete
-history of changes. It also includes information about translating the
-application, as well as some suggestions about missing features that
-should be implemented next.
+history of changes made since the beginning of the project. It also
+includes information about testing and translating the application, as
+well as some suggestions about missing features that should be
+implemented next.
 
 \subsubsection{Version Control with Git}
 \label{sec:git}
@@ -543,7 +543,7 @@ but should most likely be implemented next.
 \paragraph{Changing the Database Backend}
 
 Django supports a number of different database engines. By default it
-uses \emph{sqlite3}, as this involves virtually no additional setup,
+uses \texttt{sqlite3}, as this involves virtually no additional setup,
 because Python 2.7 includes sqlite connector modules in its standard
 library. For development purposes, sqlite is an acceptable choice. In
 terms of performance, however, it leaves a lot to be desired and is
@@ -610,8 +610,8 @@ a custom
 multiple database entries at once; for example, deleting multiple
 database entries is an instance of an admin action. They are available
 from the drop-down menu labeled \emph{Actions} on the pages that list
-existing entries for individual models (see section \ref{sec:use},
-``Browsing and Searching Data'').
+existing database entries for individual models (see section
+\ref{sec:use}, ``Browsing and Searching Data'').
 
 \paragraph{Public Pages for End-Users}
 
@@ -620,8 +620,8 @@ provides an interface for \emph{administrating} the information stored
 in the database. Regular users will most likely not be given access to
 this interface, and the Django Admin Interface was also not designed
 to be used by a large number of end users. The application is lacking
-functionalities for (presenting the information stored in the database
-to) end users, which will have to be implemented before releasing the
+functionalities for presenting the information stored in the database
+to end users, which will have to be implemented before releasing the
 application to the public. In more technical terms, this means that
 future work will focus heavily on the \emph{view} and \emph{template}
 layers of the application.
@@ -663,7 +663,7 @@ The current version of the Sbr-Regesten Web Application already
 includes tests for non-trivial methods of the model layer. They are
 located in the default \texttt{tests.py} module under
 \texttt{sbr-regesten/regesten\_webapp/}. To run them, issue the
-following command from the top-level directory of the \emph{project}:
+following command from the top-level directory of the project:
 
 \begin{verbatim}
 $ python manage.py test regesten_webapp
@@ -671,9 +671,8 @@ $ python manage.py test regesten_webapp
 
 The Django framework itself also comes with a large number of tests.
 To run tests for all built-in Django apps that the Sbr-Regesten
-project uses, along with the tests that are currently defined in
-\texttt{sbr-regesten/regesten\_webapp/tests.py}, you can use the
-following command:
+project uses, along with any custom tests currently defined in the
+\texttt{tests.py} module, you can use the following command:
 
 \begin{verbatim}
 $ python manage.py test
@@ -687,7 +686,8 @@ switch to using a dedicated \texttt{tests} directory and multiple test
 modules as described above.
 
 To learn more about writing and running tests for Django applications
-as well as using alternative testing frameworks, consult the
+as well as using alternative testing frameworks with Django, consult
+the
 \href{https://docs.djangoproject.com/en/1.4/topics/testing/}{Testing
   Django applications} section of the official Django documentation.
 
@@ -704,8 +704,8 @@ The basic procedure for translating relevant parts of a Django
 application consists of the following steps:
 
 \begin{enumerate}
-\item Add translation hooks to the code where necessary; these hooks
-  are also called \emph{translation strings}
+\item Add translation hooks to the source code where necessary; these
+  hooks are also called \emph{translation strings}
 \item Extract translation strings into a \emph{message file}
 \item Add translations for the individual strings to the message file
 \item Compile the message file
@@ -746,10 +746,10 @@ sbr-regesten/regesten_webapp/locale/de/LC_MESSAGES
 \end{verbatim}
 
 and it is called \texttt{django.po}. To add translations for new
-translation strings open this file and fill all empty \texttt{msgstr}
+translation strings, open this file and fill all empty \texttt{msgstr}
 strings with the appropriate translations. The structure of message
-files is explained in detail in the Django documentation (see below
-for a link).
+files is explained in detail in the Django documentation; see below
+for a link.
 
 As a last step, when you (or your translators) are done editing the
 message file, you need to compile it by running the following command
@@ -762,7 +762,7 @@ $ django-admin.py compilemessages
 
 This command outputs a compiled message file called \texttt{django.mo}
 to the \texttt{LC\_MESSAGES} directory that also holds the plain text
-version of the message.
+version of the message file.
 
 Finally, please note that Django uses the GNU \texttt{gettext}
 utilities for creating and compiling message files. If these utilities
@@ -774,67 +774,71 @@ consult the
 \href{https://docs.djangoproject.com/en/1.4/topics/i18n/}{Internationalization
   and localization} section of the official documentation.
 
-\subsection{Django Data Model}
+\subsection{Django Data Model for the Sbr-Regesten}
 \label{sec:data-model}
 
 The Django data model for the Sbr-Regesten was derived from the XML
-schema described in the previous chapters. The level of correspondence
-between the two models is high but they are not completely identical.
-The main purpose of this section is to provide an overview\footnote{We
-  only go into detail about models and model attributes that do not
-  correspond directly to elements or attributes present in the XML
-  schema. If a specific model or attribute is not addressed here, it
-  is intended to be understood as serving the same purpose as its XML
-  equivalent.} of the Django data model and to highlight and motivate
-the differences that exist between the two models.
+schema described in previous chapters. As a result, the level of
+correspondence between the two models is high, but they are not
+completely identical. The main purpose of this section is to provide
+an overview of the Django data model and to highlight and motivate the
+differences that exist between the two models. We only go into detail
+about models and model attributes that do not correspond directly to
+elements or attributes present in the XML schema. If a specific model
+or attribute is not addressed here, it is intended to be understood as
+serving the same purpose as its XML equivalent.
 
 \subsubsection{Overview}
 \label{sec:model-overview}
 
 The
 \href{https://en.wikipedia.org/wiki/Unified_Modeling_Language}{UML}
-class diagram (which was created using
-\href{http://projects.gnome.org/dia/}{Dia}, a cross-platform drawing
-application with support for a large variety of diagram types) in
-Figure \ref{fig:data-model} shows the Django data model in its
-entirety. Please note that:
+class diagram in Figure \ref{fig:data-model} shows the Django data
+model in its entirety.\footnote{The diagram was created using
+  \href{http://projects.gnome.org/dia/}{Dia}, a cross-platform drawing
+  application with support for a large variety of diagram types.}
+Please note that:
 
 \begin{enumerate}
 \item Model methods were omitted to keep the focus on how information
-  from the Sbr-Regesten is represented in the database
+  from the Sbr-Regesten is represented in the database.
 \item Every entity represented by a model class has to have a unique
   ID that can be used as a \emph{Primary Key} for the corresponding
   table in the database. This ID is available on instances of each of
   the models shown in the diagram, in the form of an attribute called
-  \texttt{id}. For brevity, and because this attribute is defined in
-  the common super class of the models shown in the diagram, it is not
-  explicitly listed in the diagram.
+  \texttt{id}. For brevity, and because the models inherit this
+  attribute from their common super class (\texttt{models.Model})
+  rather than defining it themselves, the attribute is omitted in the
+  diagram.
 \end{enumerate}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.3]{img/data-model}
+  \includegraphics[scale=0.4]{img/data-model}
   \caption{The Django data model of the Sbr-Regesten}
   \label{fig:data-model}
 \end{figure}
 
-In this diagram, boxes denote model classes. Names of individual
-models are given in bold in the top section of each box; attributes
-are listed in the sections below. Blue arrows with hollow heads denote
-\emph{inheritance} relationships.\footnote{The fact that these arrows
-  are colored in blue in this diagram has nothing to do with UML. They
-  are colored differently to make them easily distinguishable from
-  other types of lines present in the diagram.} Classes with incoming
-arrows are super classes of classes with outgoing arrows; super
-classes pass their attributes on to their subclasses. Relationships
-between different types of models (\emph{associations}) are denoted by
-black lines connecting their boxes. These lines are annotated with
-\emph{cardinalities}. For instance, \emph{one} (\texttt{1}) location
-can have \emph{one to many} (\texttt{1...*}) residents. Similarly, a
-single concept can be related to \emph{zero or arbitrarily many}
-concepts.
+Following standard UML notation, boxes denote model classes in the
+diagram. Names of individual models are given in bold in the top
+section of each box; attributes are listed in the middle
+section.\footnote{Bottom sections of classes are empty because they
+  normally hold class methods which, as mentioned above, were omitted
+  in the diagram.} Blue arrows with hollow heads denote
+\emph{inheritance} relationships.\footnote{N.B. that the fact that
+  these arrows are colored in blue in the class diagram has nothing to
+  do with UML. They are colored differently to make them easily
+  distinguishable from other types of lines present in the diagram.}
+Classes with incoming arrows are super classes of classes with
+outgoing arrows; super classes pass their attributes on to their
+subclasses. Relationships between different types of models --
+\emph{associations} -- are denoted by black lines connecting their
+boxes. Associations are annotated with \emph{cardinalities}. For
+instance, \emph{one} (\texttt{1}) location can have \emph{one to many}
+(\texttt{1...*}) residents. Similarly, a single concept can be related
+to \emph{zero or arbitrarily many} concepts.
 
-\subsubsection{General Differences}
+\subsubsection{Data Model vs. XML Schema: General Differences}
 \label{sec:gen-diff}
 
 \paragraph{Naming Schemes}
@@ -843,115 +847,115 @@ One of the main differences between the Django data model and the XML
 schema concerns naming schemes for \emph{identifiers} (i.e. class and
 attribute names in Django, element names in XSD): In the XML schema,
 dashes are used to separate individual words that make up
-\emph{compound} identifiers like \texttt{abbrev-list} and
+\emph{compound identifiers} like \texttt{abbrev-list} and
 \texttt{original-date}. Corresponding Django attributes contain
 underscores instead of dashes, as dashes are not allowed in Python
 identifiers.
 
-As mentioned before, all identifiers in the XML schema are lowercase,
-except for those that were borrowed from the TEI guidelines (which
-were transferred to our schema \emph{as is} to distinguish them from
-custom identifiers that were introduced specifically for the
-Sbr-Regesten). For the Django data model, we stuck to widely used
-Python naming conventions: \texttt{CamelCase} was used for class/model
-names, \texttt{snake\_case} for everything else.
+Identifiers in the XML schema are generally lowercase, except for
+those that were borrowed from the TEI guidelines, which were
+transferred to our schema \emph{as is} to distinguish them from
+identifiers for custom types that were introduced specifically for the
+Sbr-Regesten. For the Django data model, we stuck to widely used
+Python naming conventions: \texttt{CamelCase} was used for class and
+model names, \texttt{snake\_case} for everything else.
 
 Additionally, some identifiers had to be affixed going from the XML
-schema to the Django data model, due to clashes with names of Python
-functions / keywords. Examples include \texttt{print}, which was
+schema to the Django data model due to clashes with names of Python
+2.7 functions and keywords. Examples include \texttt{print}, which was
 renamed to \texttt{print\_info}, and \texttt{type}, which was renamed
-to \texttt{regest\_type} / \texttt{location\_type} /
-\texttt{landmark\_type} / \texttt{region\_type}.
+for individual models using the following pattern:
+\texttt{<model\_name>\_type}.
 
 \paragraph{Storing Information About High-Level Entities}
 
 The XML schema distinguishes between \emph{elements} and
 \emph{attributes} for storing information about high-level entities.
-Attributes are generally employed to represent names of entities (e.g.
-regest titles, names of index entries) and \emph{meta information},
-which may or may not be provided explicitly for a specific entity
-(e.g. regest author: explicit, type of an index entry: deduced). The
-Django data model, by contrast, makes no such distinction: It
-uniformly stores information about entities in model attributes, the
-majority of which are textual types.
+Attributes are generally employed to represent \emph{names of
+  entities} (examples include regest titles and names of index
+entries) and different kinds of \emph{meta information}, which may or
+may not be provided explicitly for a specific entity. For example,
+author information for individual regests is usually provided
+explicitly, while the type of any given index entry is deduced in the
+extraction process. The Django data model, by contrast, makes no such
+distinction: It uniformly stores information about entities in model
+attributes, the majority of which are textual types.
 
 \paragraph{Relationships Between Entities}
 
 In the XML schema, relationships between entities are modeled in two
-different ways: Entities that belong together logically \textbf{and}
-are close to each other in the original text are most often connected
-via (transitive) \emph{parent-child} relationships. On a conceptual
-level, for instance, each regest has at least one date associated with
-it (which is extracted from its title). In the XML version of the
-Sbr-Regesten, any \texttt{date} node is a direct child node of a
-\texttt{regest} node.\footnote{As an additional example for a
-  transitive case, consider the relationship between a regest and its
-  issuer (\emph{Aussteller}): \emph{issuer} is a child node of
-  \emph{content}, which in turn is a child node of \emph{regest}.}
+different ways: Entities that belong together logically and are close
+to each other in the original text are most often connected via
+(transitive) \emph{parent-child} relationships. On a conceptual level,
+for instance, every regest has one or more dates associated with it,
+each of which is extracted from its title. To make this relationship
+explicit, \texttt{date} nodes are nested into \texttt{regest} nodes as
+direct child nodes in the XML version of the Sbr-Regesten.\footnote{As
+  an additional example for a transitive case, consider the
+  relationship between a regest and its issuer (\emph{Aussteller}):
+  \texttt{<issuer>} is a child node of \texttt{<content>}, which in
+  turn is a child node of \texttt{<regest>}.}
 
 Connections between related entities that are further removed from
 each other structurally can not be modeled in the same way. For these
 cases, the XML schema uses explicit references to unique entity IDs to
-indicate links between specific entities. As an example, consider the
-\texttt{mentioned-in} lists associated with entities listed in the
-index: Along with the titles of the regests a given entity is
-mentioned in, they reference their IDs via the \texttt{regest}
-attribute of the \texttt{reg-ref} node.
-
-In Django, relationships between \emph{high-level} entities (i.e.
-those that are represented by a model class) are all modeled in the
-same way.
+indicate links between specific types of entities. As an example,
+consider the \texttt{mentioned-in} lists associated with entities
+listed in the index: Along with the titles of the regests a given
+entity is mentioned in, they reference their IDs via the
+\texttt{regest} attribute of the \texttt{reg-ref} node.
 
 In Django there is only one way to model relationships between
 high-level entities: To express that there is a connection between two
 distinct models, \textbf{one} of the two models needs to define an
-(appropriately named) attribute which ``points'' to the other model.
-The type of ``pointer'' that is appropriate for a given relationship
+appropriately named attribute which ``points'' to the other model. The
+type of ``pointer'' that is appropriate for a given relationship
 (\texttt{ForeignKey} vs. \texttt{OneToOneField} vs.
-\texttt{ManyToManyField}) and where/on which model the attribute
-representing it has to be defined depends on the direction and
-cardinality of the relationship: In some cases, the attribute had to
-be set on the \emph{component} model instead of the main one. The
+\texttt{ManyToManyField}) and where (i.e., on which model) the
+attribute representing it has to be defined depends on the direction
+and cardinality of the relationship: In some cases, the attribute had
+to be set on the \emph{component} model instead of the main one. The
 \texttt{RegestDate} model, for instance, defines a \texttt{regest}
 attribute (of type \texttt{ForeignKey} since it encodes a
 \emph{many-to-one} relationship), instead of the \texttt{Regest} model
 defining a \texttt{regest\_date} attribute like in the XML
-schema.\footnote{This does \textbf{not} mean that associated
-  \texttt{RegestDate} instances are not accessible from the
-  \texttt{Regest} model. For information about how to access related
-  objects from models that do not explicitly define ``relationship
-  attributes'' themselves, see the ``Related objects'' part of the
+schema.\footnote{This does not mean that associated
+  \texttt{RegestDate} instances are not accessible from instances of
+  the \texttt{Regest} model. For information about how to access
+  related objects from models that do not explicitly define
+  ``relationship attributes'' themselves, see the ``Related objects''
+  part of the
   \href{https://docs.djangoproject.com/en/1.4/topics/db/queries/}{Making
     queries} section in the official Django documentation.}
 
 \paragraph{Representing Structure vs. Content}
 
 The XML schema created for the Sbr-Regesten mixes structural
-information about the original text with mark-up used to identify
-semantic units / entities within the text. By contrast, the Django
+information about the original text with markup used to identify
+semantic units and entities within the text. By contrast, the Django
 data model was designed to serve as a starting point for a
 comprehensive knowledge base independent of a particular text, and
 therefore strongly emphasizes \emph{content}. However, because
 high-level entities (namely \texttt{Regest} and \texttt{IndexEntry})
-store their XML representations in an attribute (which for obvious
-reasons has no equivalent in the XML schema) called \texttt{xml\_repr},
-structural information about the original text \textbf{can} be derived
-from the database using not only relationships between different
-models, but also the values of this attribute.
+store their XML representations in an attribute called
+\texttt{xml\_repr}, which for obvious reasons has no equivalent in the
+XML schema, structural information about the original text
+\textbf{can} be derived from the database using not only relationships
+between different models, but also the values of this attribute.
 
 Another side effect of having to preserve and represent structure in
 addition to content is that the XML schema requires multiple levels of
 \emph{nesting} of elements in a lot of cases. Compared to that, the
-Django data model is a lot \emph{flatter}: Most pieces of information
-associated with a given entity is stored simply as text (as opposed to
-a more complex data structure).
+Django data model is a lot ``flatter'': Most pieces of information
+associated with a given entity are stored simply as text, as opposed
+to a more complex data structure.
 
 \subsubsection{Regesten-Specific Differences}
 \label{sec:reg-model}
 
 In addition to the general differences between the XML schema and the
-Django data model, there are some differences specific to the
-representation of the regesten:
+Django data model listed above, there are some differences specific to
+the representation of regests:
 
 \begin{itemize}
 \item In the XML schema, the \texttt{issuer} element is not associated
@@ -968,8 +972,8 @@ representation of the regesten:
   associating \texttt{Footnote} objects with whole regests.
 \item The \texttt{MetaInfo} model has no corresponding XML entity, and
   does not represent information contained in the original text. It is
-  meant to be used for storing (admin-assigned) comments and tags for
-  individual regests.
+  meant to be used for storing administrator-assigned comments and
+  tags for individual regests.
 \end{itemize}
 
 \subsubsection{Index-Specific Differences}
@@ -984,14 +988,15 @@ are of note:
   the Sbr-Regesten, the Django data model does not distinguish between
   \texttt{header} and \texttt{body} of an index entry.
 \item As can be seen in Figure \ref{fig:data-model}, the Django data
-  model defines two classes (\texttt{Concept} and \texttt{IndexEntry})
-  grouping features that are common to all types of concepts and index
-  entries. While XSD does support a limited form of inheritance via
-  the \texttt{<xs:extension>} tag for both simple and complex types,
-  this is restricted to adding attributes and \textbf{appending}
-  additional elements to sequences defined by complex types. Somewhat
-  unfortunately, however, elements common to headers of different
-  types of index entries \textbf{follow} those that are unique:
+  model defines two classes -- \texttt{Concept} and
+  \texttt{IndexEntry} -- grouping features that are common to all
+  types of concepts and index entries. While XSD does support a
+  limited form of inheritance via the \texttt{<xs:extension>} tag for
+  both simple and complex types, this is restricted to adding
+  attributes and \textbf{appending} additional elements to sequences
+  defined by complex types. Somewhat unfortunately, however, elements
+  common to headers of different types of index entries
+  \textbf{follow} those that are unique:
 
 \begin{verbatim}
   <xs:complexType name="landmark-header" mixed="true">
@@ -1039,5 +1044,5 @@ parts of the book. The reasoning behind this is that the database
 holding the information extracted from the Sbr-Regesten is not
 intended to be a static representation of one specific book. As
 mentioned in multiple places throughout this document, its main
-purpose is act as a knowledge base which can be constantly expanded
+purpose is to act as a knowledge base which can be constantly expanded
 with new information.
