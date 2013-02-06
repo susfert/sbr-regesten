@@ -135,7 +135,7 @@ def relconc_to_db(relConc, createElement=create_concept):
       pass'''
         
 
-def loc_to_db(itemsoup):
+def loc_to_db(itemsoup,ref_dict):
     '''Extracts a location and writes it into the database.'''
     header = itemsoup.find('location-header')
     placeName = header.placename
@@ -199,13 +199,14 @@ def loc_to_db(itemsoup):
 
     l.id = get_item_ID()
     l.xml_repr = itemsoup
+    #print(l)
     l.save()
     
+    # mentionings + related index entries
     ment_to_db(header, l)
+    ref_dict[l.id] = header.find('index-refs')
     
-    #if header.find('index-refs'):
-        #add_all(l.related_entries, header.find('index-refs'))
-    
+    # related concepts
     if itemsoup.find('concept-body'):
         add_all(l.related_concepts, relconc_to_db(itemsoup.find\
                ('concept-body').find('related-concepts')))
@@ -215,7 +216,7 @@ def loc_to_db(itemsoup):
   
 
 
-def land_to_db(itemsoup):
+def land_to_db(itemsoup,ref_dict):
     '''Extracts a landmark and writes it into the database.'''
     header = itemsoup.find('landmark-header')
      
@@ -229,8 +230,11 @@ def land_to_db(itemsoup):
     land.xml_repr = itemsoup
     land.save()
        
-    # mentioned_in + related 
+    # mentioned_in + related index entries
     ment_to_db(itemsoup.find('landmark-header'), land)
+    ref_dict[land.id] = header.find('index-refs')
+    
+    # related concepts
     if hasattr(itemsoup, 'concept-body'):
         add_all(land.related_concepts, relconc_to_db(itemsoup.find\
                 ('concept-body').find('related-concepts')))
@@ -239,7 +243,7 @@ def land_to_db(itemsoup):
     return land
     
  
-def pers_to_db(itemsoup):
+def pers_to_db(itemsoup,ref_dict):
     '''Extracts a person and writes it into the database.'''
     p = Person()
     #itemsoup.find('person-header')
@@ -261,8 +265,9 @@ def pers_to_db(itemsoup):
         p.xml_repr = itemsoup
         p.save()
             
-        # mentioned_in
+        # mentioned_in + related index entries
         ment_to_db(itemsoup.find('person-header'), p)
+        ref_dict[p.id] = header.find('index-refs')
         
         # related concepts
         if hasattr(itemsoup, 'concept-body'):
@@ -276,7 +281,7 @@ def pers_to_db(itemsoup):
 
 
 
-def persgr_to_db(itemsoup):
+def persgr_to_db(itemsoup,ref_dict):
     '''Extracts a persongroup and writes it into the database.'''
     header = itemsoup.find('persongroup-header')
     
@@ -286,8 +291,11 @@ def persgr_to_db(itemsoup):
     pg.xml_repr = itemsoup
     pg.save()
     
-    # mentioned_in + related-concepts
+    # mentioned_in + related index entries
     ment_to_db(itemsoup.find('persongroup-header'), pg)
+    ref_dict[pg.id] = header.find('index-refs')
+    
+    # related-concepts
     if itemsoup.find('listing-body'):
         add_all(pg.members, relconc_to_db(itemsoup.find('listing-body').members\
                , createElement=create_person))
@@ -297,7 +305,7 @@ def persgr_to_db(itemsoup):
 
 
 
-def fam_to_db(itemsoup):
+def fam_to_db(itemsoup, ref_dict):
     '''Extracts a family and writes it into the database.'''
     header = itemsoup.find('family-header')
     
@@ -308,8 +316,11 @@ def fam_to_db(itemsoup):
     f.xml_repr = itemsoup
     f.save()
     
-    # mentioned_in + related concepts
+    # mentioned_in + related index entries 
     ment_to_db(itemsoup.find('family_header'), f)
+    ref_dict[f.id] = header.find('index-refs')
+    
+    # related-concepts
     if itemsoup.find('listing-body'):
         add_all(f.members, relconc_to_db(itemsoup.find('listing-body').members\
                 , createElement=create_person))
@@ -317,7 +328,45 @@ def fam_to_db(itemsoup):
     print (f)
     return f
  
- 
+def items_to_db(itemList):
+    ref_dict = {}
+    for itemsoup in itemList:
+        type = itemsoup['type']
+
+        if type == 'location':
+            entry = loc_to_db(itemsoup,ref_dict)
+        
+        elif type == 'family':
+            entry = fam_to_db(itemsoup,ref_dict)
+          
+        elif type == 'person':
+            entry = pers_to_db(itemsoup,ref_dict)
+        
+        elif type == 'persongroup':
+            entry = persgr_to_db(itemsoup,ref_dict)
+        
+        elif type == 'landmark':
+            entry = land_to_db(itemsoup,ref_dict)
+    
+        else:
+            entry = ''
+            print ('unknown type!!')
+            break
+    return  ref_dict
+
+def isolate_id(id):
+    return int(id.split('_')[1])
+
+
+def solve_refs(ref_dict):
+    for item_id, refNode in ref_dict.items():
+        if refNode:
+            refList = [node['itemid'] for node in refNode.findAll('index-ref')]
+            objList = [IndexEntry.objects.get(id=isolate_id(ref)) for ref in refList]
+            obj = IndexEntry.objects.get(id=item_id)
+            add_all(obj.related_entries, objList)
+
+
 
 def index_to_db():
     '''
@@ -335,25 +384,5 @@ def index_to_db():
         global idConc
         idConc = len(itemList) + 1
         
-        for itemsoup in itemList:
-            type = itemsoup['type']
-
-            if type == 'location':
-                entry = loc_to_db(itemsoup)
-            
-            elif type == 'family':
-                entry = fam_to_db(itemsoup)
-              
-            elif type == 'person':
-                entry = pers_to_db(itemsoup)
-            
-            elif type == 'persongroup':
-                entry = persgr_to_db(itemsoup)
-            
-            elif type == 'landmark':
-                entry = land_to_db(itemsoup)
-        
-            else:
-                entry = ''
-                print ('unknown type!!')
-                break
+        ref_dict = items_to_db(itemList)
+        solve_refs(ref_dict)
