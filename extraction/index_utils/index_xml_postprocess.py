@@ -11,11 +11,10 @@ import re
 import sys
 from bs4 import BeautifulSoup, Tag, NavigableString
 
-sys.setrecursionlimit(10000)
 
 
 def getItemIndex(itemList, name):
-    ''' Returns item-id, only if the name is unique in the index. '''
+    ''' Find index item with a certain name (string). Return its id.'''
     matched = False
     for item in itemList:
         if unicode(re.split('/',item['value'])[0]).strip() == unicode(name):
@@ -29,7 +28,10 @@ def getItemIndex(itemList, name):
 
     
 def parseSiehe(inItem, itemList):
-    ''' Parses index-references. '''
+    '''
+    Parse references to other index entries (index-refs). Find the
+    single references in the index-refs tag, solve and tag them.
+    '''
     soup=BeautifulSoup()
     sieheNames = ''
     possLast = ''
@@ -78,15 +80,13 @@ def parseSiehe(inItem, itemList):
         return inItem
 
 
-# postprocesses the xml (Aufloesung von 'siehe'-Referenzen innerhalb des Indexes)
 def index_xml_postprocess():
     '''
-    Postprocesses the parsed xml index (index.xml). Solves the
-    regest-references in the item header.
+    Postprocess the XML index. Solve references to other index entries
+    in the item headers.
     '''
     print('Postprocessing index xml.')        
     with codecs.open ('index.xml', 'r', 'utf-8') as inFile:
-        #with codecs.open ('index_post.xml', 'w', 'utf-8') as outFile:
         with codecs.open ('sbr-regesten.xml', 'a', 'utf-8') as outFile:
             outFile.write('\n')
             inXml = inFile.read()

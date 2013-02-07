@@ -16,6 +16,7 @@ from regesten_webapp.models import Regest, RegestDate, Quote, ContentType
 
 
 def get_item_ID():
+    '''Get consecutive id for an index item'''
     global countIndex
     item_id = countIndex
     countIndex += 1
@@ -23,8 +24,8 @@ def get_item_ID():
 
 def ment_to_db(xmlNode, concept): # TODO
     '''
-    TODO: Extracts related regests and writes them into the database.
-    To be done when the regests are extracted.
+    TO BE IMPLEMENTED:
+    Extract related regests and writes them into the database.
     '''
     pass
     '''if hasattr(xmlNode, 'mentioned-in'):
@@ -46,12 +47,13 @@ def ment_to_db(xmlNode, concept): # TODO
 
 
 def add_all(obj, li):
+    '''Add a list of elements to an object.'''
     for elem in li:
           obj.add(elem)
 
 
 def if_exists(node):
-    ''' Checks if a node exists.'''
+    '''Check if a node exists.'''
     if node:
         return node.get_text().strip(') (')
     else:
@@ -59,7 +61,7 @@ def if_exists(node):
 
 
 def create_quote(xmlNode,objId):
-    '''Creates a quote.'''
+    '''Build a quote from XML. Write it into the database.'''
     q = Quote()
     q.content_type = ContentType.objects.get(app_label='regesten_webapp', model='concept')
     q.content = xmlNode.get_text()
@@ -69,7 +71,7 @@ def create_quote(xmlNode,objId):
 
 
 def create_person(xmlNode):
-    ''' Creates a name. '''
+    ''' Build a person from XML. Write it into the database.'''
     global idConc
     
     p = Person()
@@ -89,7 +91,7 @@ def create_person(xmlNode):
 
   
 def create_concept(xmlNode):
-    ''' Creates a concept. '''
+    ''' Build a concept. '''
     name = xmlNode.find('name')
     global idConc
     
@@ -114,7 +116,7 @@ def create_concept(xmlNode):
 
 
 def relconc_to_db(relConc, createElement=create_concept):
-    '''Extracts related-concepts and writes them into the database.'''
+    '''Extract related-concepts and write them into the database.'''
     clist = []
     if relConc:
         for conc in relConc:
@@ -136,7 +138,7 @@ def relconc_to_db(relConc, createElement=create_concept):
         
 
 def loc_to_db(itemsoup,ref_dict):
-    '''Extracts a location and writes it into the database.'''
+    '''Extract a location from XML and write it into the database.'''
     header = itemsoup.find('location-header')
     placeName = header.placename
     attrs = placeName.settlement.attrs
@@ -217,7 +219,7 @@ def loc_to_db(itemsoup,ref_dict):
 
 
 def land_to_db(itemsoup,ref_dict):
-    '''Extracts a landmark and writes it into the database.'''
+    '''Extract a landmark from XML and write it into the database.'''
     header = itemsoup.find('landmark-header')
      
     land = Landmark()
@@ -244,7 +246,7 @@ def land_to_db(itemsoup,ref_dict):
     
  
 def pers_to_db(itemsoup,ref_dict):
-    '''Extracts a person and writes it into the database.'''
+    '''Extract a person from XML and write it into the database.'''
     p = Person()
     #itemsoup.find('person-header')
     if hasattr(itemsoup, 'person-header'):
@@ -282,7 +284,9 @@ def pers_to_db(itemsoup,ref_dict):
 
 
 def persgr_to_db(itemsoup,ref_dict):
-    '''Extracts a persongroup and writes it into the database.'''
+    '''
+    Extract a persongroup from XML and write it into the database.
+    '''
     header = itemsoup.find('persongroup-header')
     
     pg = PersonGroup()
@@ -306,7 +310,7 @@ def persgr_to_db(itemsoup,ref_dict):
 
 
 def fam_to_db(itemsoup, ref_dict):
-    '''Extracts a family and writes it into the database.'''
+    '''Extract a family from XML and write it into the database.'''
     header = itemsoup.find('family-header')
     
     f = Family() 
@@ -327,8 +331,10 @@ def fam_to_db(itemsoup, ref_dict):
     
     print (f)
     return f
+
  
 def items_to_db(itemList):
+    '''Add a list of XML index items to the database.'''
     ref_dict = {}
     for itemsoup in itemList:
         type = itemsoup['type']
@@ -354,11 +360,16 @@ def items_to_db(itemList):
             break
     return  ref_dict
 
+
 def isolate_id(id):
+    '''Return the number in an id.'''
     return int(id.split('_')[1])
 
 
 def solve_refs(ref_dict):
+'''
+Extract references from the dictionary and add them to the database.
+'''
     for item_id, refNode in ref_dict.items():
         if refNode:
             refList = [node['itemid'] for node in refNode.findAll('index-ref')]
@@ -370,8 +381,8 @@ def solve_refs(ref_dict):
 
 def index_to_db():
     '''
-    Extracts the index items from the sbr-regesten.xml and writes them
-    into the database sbr-regesten.db
+    Extract index items from the XML file and write them into the
+    database sbr-regesten.db.
     '''
     print('Writing index into db..')
     

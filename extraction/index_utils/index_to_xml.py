@@ -21,7 +21,7 @@ locations = []
 landmarks = []
 unclassified = []
 families = []
-siehe = [] # to collect items that will be classified later through their reference with 'siehe'
+siehe = []
 
 person_id = 0
 
@@ -32,19 +32,12 @@ with codecs.open ('resources/forenames.txt', 'r', 'utf-8') as file:
         forenameList.append(forename.strip())
 
 
-with codecs.open('sbr-regesten.xml', 'r', 'utf-8') as f:
-    s = BeautifulSoup(f)
-    regSoup = s.regesten
-    regestenList=[]
-    if regSoup:
-        regestenList = regSoup.findAll('regest')
-
 
 ########################## 1. Preprocessing ########################
 
 def del_span_tags(htmlString):
     '''
-    Deletes all span-tags in an html string. 
+    Delete all span-tags in an HTML string. 
     <span style='color:windowtext'>Tentelingen</span> --> Tentelingen
     '''
     htmlString = re.sub('\</?span.*?\>', '', htmlString)
@@ -53,8 +46,9 @@ def del_span_tags(htmlString):
 
 def del_empty_tags(htmlString):
   '''
-  Deletes (unwraps) empty i-tags in an html string as
-  <i style='mso-bidi-font-style:normal'> </i>'
+  Unwrap i-tags containing only whitespaces, commas or hyphen in an
+  html string.
+  <i style='mso-bidi-font-style:normal'>-</i>' --> -
   '''
   htmlString = re.sub('(?u)(<i[^<>]*?>)([, \-]*)(</i>)', '\g<2>', htmlString)
   return htmlString
@@ -62,7 +56,8 @@ def del_empty_tags(htmlString):
 
 def join_b_tags(htmlString):
     '''
-    Joins all pairs of b-tags in an html string if there is only a comma or nothing in between.
+    Join all pairs of b-tags in an HTML string if there is only a
+    comma or nothing in between.
     <b>...</b>, <b>...</b> --> <b>..., ...</b>
     '''
     htmlString = re.sub('(?u)(</b>)([(:?<.*?>), ]*)(<b>)', '\g<2>', \
@@ -72,7 +67,8 @@ def join_b_tags(htmlString):
 
 def join_i_tags(htmlString):
     '''
-    Joins all pairs of i-tags in an html string if there is only a comma or nothing in between.
+    Join all pairs of i-tags in an HTML string if there is only a
+    comma or nothing in between.
     <i>...</i>, <i>...</i> --> <i>..., ...</i>
     '''
     htmlString = re.sub('(?u)(</i>)([(:?<.*?>), ]*)(<i>)', '\g<2>', \
@@ -82,10 +78,8 @@ def join_i_tags(htmlString):
 
 def exclude_comma(htmlString):
     ''''
-    TODO:
-    For i-tags ending with a comma, the comma is moved outside the tag./
-    Commata are moved outside a tag, if they are at the end of an i-tag.
-    <i>Cristyne,</i> -> <i>Cristyne</i>,
+    Move commas at the end of i-tags outside.
+    <i>Cristyne,</i> --> <i>Cristyne</i>,
     '''
     htmlString = re.sub('(?u)(, ?)(</i>)', '\g<2>\g<1>', htmlString)
     htmlString = re.sub('(?u)(<i[^<>]*>)((:? ?, ?)+)', '\g<2>\g<1>', \
@@ -94,7 +88,7 @@ def exclude_comma(htmlString):
 
 
 def preprocess(soup):
-    ''' Regularizes a BeautifulSoup html item.  '''
+    ''' Regularize a BeautifulSoup HTML item.  '''
     htmlString = unicode(soup)
     htmlString = del_span_tags(htmlString)
     htmlString = del_empty_tags(htmlString)
@@ -108,14 +102,14 @@ def preprocess(soup):
 ########################## 2. ItemExtractor ########################
 
 class ExtractorException(Exception):
-    '''Raised when html-input is irregular or unexpected.'''
+    '''Raised when HTML input is irregular or unexpected.'''
     def __init__(self, text):
         self.text = text
     def __str__(self):
         return self.text
 
 class IndexItem:
-    '''Wrapper for a html sequence corresponding to an index item.'''
+    '''Wrapper for an HTML sequence corresponding to an index item.'''
     def __init__(self, header, body):
         self.header = header
         self.body = body
@@ -129,38 +123,21 @@ class IndexItem:
 
 def get_regest_ID(reg_ref):
     '''
-    Searches the restesten part of the xml to match a given reg-ref to its corresponding regest, returning its id.
-    As the regesten part of the xml was not available during development, it's probably not fully working (not tested).
-    If no regest is found, the default value of regest_0 (the first regest) will be returned.
+    TO BE IMPLEMENTED
+    Return default value regest_99999
+    (Search the restesten to match a given reg-ref to its
+    corresponding regest, return the regest's id.)
     '''
-  
     defaultID = 'regest_99999'
-    idList = []
-    count = False
-    countR = 0
-    reg_ref=reg_ref.strip(' +')
-  
-    for regest in regestenList:
-        if countR > 10:
-            break
-        if count:
-            countR += 1
-        
-        if regest.date.get_text().startswith(reg_ref):
-            idList.append(regest['id'])
-            count = True
-            
-    if len(idList) == 1:
-        return idList[0]
-    else:
-        #print('keine eindeutige regestzuweisung moeglich:' + str(idList))
-        return defaultID 
+    return defaultID 
 
     
 def find_index_refs(text):
     '''
-    Finds, solves and tags references to other index entries (index-refs) at the end of a given string.
-    Returns the string without references and the soup tag
+    Find references to other index entries at the end of a given 
+    string. Tag them as index-refs. Do not solve the references.
+    Return the string without references and the BeautifulSoup-tag
+    index-refs.
     '''
     indexRefsTag = None
     sieheMatch = re.match('(.*?)(m?i?t? [Ss]iehe[^0-9\)\(]*$)', text)
@@ -174,16 +151,16 @@ def find_index_refs(text):
 
 def parse_mentionings(text):
     '''
-    Finds and tags references to regests (mentionings) in a given string.
-    Hof 1428-08-14 --> Hof
-                   --> <mentioned-in><reg-ref regest="regest_99999">1428-08-14</reg-ref></mentioned-in>
+    Find, solve and tag references to regests (mentionings) in a given
+    string. Return the string without references and the
+    BeautifulSoup-tag mentioned-in.
     '''
     soup = BeautifulSoup()
     mentioningsTag = None
     mentionings = []
     
-    ment = '((?:\[?\+\]? )?[01][0-9]{3}\-?\/?[01]?[0-9]?\-?[0-3]?'\
-          '[0-9]? ?\([a-f]?k?u?r?z? ??n?a?c?h?v?o?r?n?t?e?u?m?p?o?s?t?a?n?t?e?'\
+    ment = '((?:\[?\+\]? )?[01][0-9]{3}\-?\/?[01]?[0-9]?\-?[0-3]?[0-9]? ?'\
+          '\([a-f]?k?u?r?z? ??n?a?c?h?v?o?r?n?t?e?u?m?p?o?s?t?a?n?t?e?'\
           '\??\.?\) ?)( Anm\.)?|((?:\[?\+\]? )?[01][0-9]{3}\-?[01]?'\
           '[0-9]?\-?[0-3]?[0-9]?(\/[01][0-9])? ?\(?z?w?i?s?c?h?e?n?\)?)'
     
@@ -213,7 +190,8 @@ def parse_mentionings(text):
 
 def parse_addnames(parentTag, text):
     '''
-    Parses additional names (= strings written in italics in parenthesis) and adds them to a given parent tag.
+    Parse additional names (= strings written in italics in 
+    parenthesis) and add them to a given parent tag.
     '''
     altNMatch = re.match('(?u)(.*?\(\<i.*?\>)(.*?)\)(.*, .*)', text)
     r = None
@@ -241,16 +219,16 @@ def parse_addnames(parentTag, text):
 
 def parse_pers_name (nameTag, personName):
     '''
-    Parses a person name (string) with the tags forename, 
-    genName (generative name, such as II., senior, the first) and addNames (additional names).
-    Adds them to a given name tag.
-    Uses hardcoded lists for generative names and for additional name triggers.
+    Parse a person name (string) extracting surname, forename, addNames
+    (additional names) and genName (generational name, e.g. senior,
+    II., the first). Add them to a given name tag. Use hardcoded lists
+    for generational names and for additional name triggers.
     '''
     foreTag = soup.new_tag('forename')
     
-    genNameKeys = 'der .ltere|d\. .ltere|der J.ngere|der Erste|der Zweite|I\.'\
-                  '|II\.|der Dritte|III\.|IV\.|V\.|VI\.|VII\.|VIII\.|IX\.|X\.'\
-                  '|Junior|Jr|Senior|Sr|der Junge|der Alte'
+    genNameKeys = 'der .ltere|d\. .ltere|der J.ngere|der Erste|der Zweite'\
+                  '|I\.|II\.|der Dritte|III\.|IV\.|V\.|VI\.|VII\.|VIII\.|IX\.'\
+                  '|X\.|Junior|Jr|Senior|Sr|der Junge|der Alte'
     genNameMatch = re.search('(.{3,}?)(\[?' + genNameKeys + '\]?)(.*)', \
                             personName)
     addNameMatch = re.search('(.*?)' + '(gen\.|den man nennet|'\
@@ -288,24 +266,27 @@ def parse_pers_name (nameTag, personName):
 
 
 def equal_matchgroup(match,i,label):
-    '''Checks if the match group at position i has a certain label.'''
+    '''Check if the match group at position i has a certain label.'''
     try:
         return match.group(label) == match.group(i)
     except IndexError:
         return False
-    
+
+
 def get_match_label(match,i):
-    '''Returns the label of the i-th match group.'''
+    '''Return the label of the i-th match group.'''
     matchDict = match.groupdict()
     for groupName in matchDict.keys():
         if equal_matchgroup(match,i,groupName):
             return groupName
     return None
-        
+
+
 def annotate_groupnames(m, nameTag):
     '''
-    Tags the content of each group of a given match with its group name respectively.
-    Appends it to nameTag. Also returns the index, where the last part was tagged.
+    Tag the content of each match group with its group name. Append all
+    tags to a given nameTag. Return nameTag and the index after the
+    last match.
     '''
     for i in range(1,len(m.groups())+1):
         label = get_match_label(m,i)
@@ -320,7 +301,7 @@ def annotate_groupnames(m, nameTag):
     return nameTag, m.end(m.lastindex)
 
 def del_b_tag(header):
-    '''Deletes b-tags and their contents in a BeautifulSoup-item'''
+    '''Delete b-tags with their contents in a BeautifulSoup-item.'''
     hasNoB = BeautifulSoup(str(header))
     hasNoB.b.decompose()
     return hasNoB
@@ -331,11 +312,12 @@ def del_b_tag(header):
 
 def parse_place_name (placeNameTag, text, ref_point=True):
     '''
-    Parses a place name. Extracts and tags reference-points, districts, regions, coutries.
-    reference point = everything before the first district/region/coutry respectively,
-    if it is not information about an abandoned village (Wuestung).
-    Uses hardcoded lists of keys/triggers for districts, regions and countries.
-    Uses the first matching match for annotation.
+    Parse a place name. Extract and tag reference-points, districts,
+    regions, coutries. A reference point is everything before the first
+    district/region/coutry respectively, if it is not information about
+    an abandoned village (Wuestung). Use hardcoded lists of
+    keys/triggers for districts, regions and countries. Use the first
+    matching regex for tagging.
     '''   
     districtKeys = 'Gem|Stadtverband [^;,]+|Gde\. [^,;]+|[\w-]+-Kreis|'\
                    'Kr\. [^,;]+|[-\w]+kreis|Stadt [\w][\w]\.|Stadt [\w-]+|'\
@@ -353,7 +335,8 @@ def parse_place_name (placeNameTag, text, ref_point=True):
                               '[^\w]+W.stung.*?[^\w]+)(?=(?:' + district + \
                               '|' + region + '|' + country+'))', text) 
         if refPointMatch:
-            placeNameTag, index = annotate_groupnames(refPointMatch, placeNameTag)
+            placeNameTag, index = annotate_groupnames(refPointMatch,\
+                                                      placeNameTag)
             text=text[index:]
     else:
         m = re.match('(.*?)(?=(?:' + district + '|' + region + '|' + \
@@ -361,7 +344,6 @@ def parse_place_name (placeNameTag, text, ref_point=True):
         if m:
             placeNameTag.append(m.group(1))
             text=m.group(2)
-    
     
     distRegMatch = re.match('(?u)(?P<district>'+ district + ')(.*)'\
                             '(?P<region>' + region + ')(.*)', text)
@@ -401,7 +383,8 @@ def parse_place_name (placeNameTag, text, ref_point=True):
 
 def loc_header_to_XML(header):
     '''
-    Converts a preprocessed html index-item header into a xml location header.
+    Convert a preprocessed HTML index-item header into an XML location
+    header.
     '''
     headerTag = soup.new_tag('location-header')
     placeNameTag = soup.new_tag('placeName')
@@ -409,7 +392,7 @@ def loc_header_to_XML(header):
     settleTag = soup.new_tag('settlement')
     placeNameTag.append(settleTag)
  
-    # Abandoned villages (Wuestung)
+    # Abandoned villages
     avMatch = re.search('(Staerk, W.stungen Nr. [0-9]{1,2})', \
                            header.get_text())
     w = False
@@ -419,20 +402,12 @@ def loc_header_to_XML(header):
          settleTag['av-ref'] = avMatch.group(0)
     settleTag['abandoned-village'] = str(w).lower()
  
-    # Settlement name 
-    if header.b:               # for location-headers
+    # Settlement name + additional names
+    if header.b:
         name = header.b.get_text()
         hasNoB = del_b_tag(header)
         rest = unicode(hasNoB)
     
-    else:                       # for locations in family headers
-        liste = header.get_text().split(',', 1)
-        name = liste[0]
-        if len(liste) > 1:
-            rest = liste[1]
-        else:
-            rest= ''
-
     settleTag.append(name)
     
     placeNameTag, hasNoAddN = parse_addnames(placeNameTag, rest)
@@ -441,18 +416,19 @@ def loc_header_to_XML(header):
     else:
         text = BeautifulSoup(rest).get_text()
 
+    # Index-refs + mentionings
     text, indexRefsTag = find_index_refs(text)
     text, ment = parse_mentionings(text)
     
-    # SettlementType, RefPoint, District, Region, Country # TODO: \w*abtei einzige Regex!
+    # Settlement type, reference-point, district, region, country
     settlementKeys = 'Dorf|Stadt|Stadtteil|Burg|ehem. Burg|Hofgut|Hof|Vogtei'\
                  '|Ort|.rtlichkeit|Gemeinde|Kloster|Abtei|Schloss|Herrschaft'\
                  '|Gft\.|Kgr\.|Land|Kgr\.|Herzogtum|Hzgt\.|Grafschaft|Bistum'\
                  '|F.rstentum|Deutschordenskommende|Zisterzienserabtei|M.hle'\
                  '|Hochstift|Pfarrei|Erzstift|Erzbistum|Dekanat|Burgsiedlung'\
                  '|Domstift|Reichsland|Deutschordensballei|Wasserburg|Region'\
-                 '|Regierungssitz'
-    settlement = '(?:'+settlementKeys+')(?![\w])'
+                 '|Regierungssitz|Deutschordenshaus'
+    settlement = '(?:' + settlementKeys + ')(?![\w])'
     settleMatch = re.match('(?u)(.*?)('+ settlement +')(.*?)', text)
     
     if settleMatch:
@@ -474,11 +450,11 @@ def loc_header_to_XML(header):
     return name.rstrip(', '), headerTag
 
 
-####################### 3.1.2 Family Header #################################
+####################### 3.1.2 Family Header ##################################
 
 def fam_header_to_XML(header):
     '''
-    Converts a preprocessed html index-item header into a xml family header.
+    Convert a preprocessed HTML index-item header into an XML family header.
     '''
     headerTag = soup.new_tag('family-header')
 
@@ -492,8 +468,7 @@ def fam_header_to_XML(header):
     hasNoB = del_b_tag(header)
     
 
-    # Alternative names & locations
-    # both appear in parentesis, alternative names in italics, locations not)
+    # Alternative names
     famNameTag, hasNoAddN = parse_addnames(famNameTag, unicode(hasNoB))
     headerTag.append(famNameTag)
     
@@ -502,6 +477,7 @@ def fam_header_to_XML(header):
     else:
         rest = hasNoB.get_text()
 
+    # Location
     parMatch = re.match(r'([^\w]*?)\((.*[A-Za-z][a-z]{1,3}.*)(\), .*)', rest)
     if parMatch:
         headerTag.append(BeautifulSoup(parMatch.group(1)).get_text())
@@ -514,7 +490,7 @@ def fam_header_to_XML(header):
     else:
         t = BeautifulSoup(rest).get_text()
     
- 
+    # Index-refs + mentionings
     t, indexRefsTag = find_index_refs(t)
     rest, ment = parse_mentionings(t)
     
@@ -532,7 +508,8 @@ def fam_header_to_XML(header):
 
 def land_header_to_XML(header):
     '''
-    Converts a preprocessed html index-item header into a xml landmark header.
+    Convert a preprocessed HTML index-item header into an XML landmark
+    header.
     '''
     headerTag = soup.new_tag('landmark-header')
     geogTag = soup.new_tag('geogName')
@@ -544,7 +521,7 @@ def land_header_to_XML(header):
     geogTag.append(nameTag)
     nameTag.append(name)
     
-    # alternative names & mentionings
+    # Alternative names
     hasNoB = del_b_tag(header)
 
     geogTag, hasNoAddN = parse_addnames(geogTag, unicode(hasNoB))
@@ -556,10 +533,11 @@ def land_header_to_XML(header):
 
     headerTag.append(geogTag)
 
+    # Index-Refs + mentionings
     text, indexRefsTag = find_index_refs(t)
     t, ment = parse_mentionings(t)
 
-    
+    # Landmark type
     landKey = 'Fluss|Berg|gau[ ,]|Gau|Bach|Talschaft|Tal|Landschaft|Au'\
               '|Waldung|Wald|Gemeindewald'
     landMatch = re.match('(.*)('+landKey+')(.*)', t)
@@ -592,22 +570,21 @@ def land_header_to_XML(header):
 
 
 
-#################### 3.1.4 Persongroup Header ###############################
+#################### 3.1.4 Persongroup Header ################################
 
 def persgr_header_to_XML(header):
     '''
-    Converts a preprocessed html index-item header into a xml persongroup header.
-    Additionally returns the name of the item.
+    Convert a preprocessed HTML index-item header into an XML
+    persongroup header.
     '''
     headerTag = soup.new_tag('persongroup-header')
     
     text, indexRefsTag = find_index_refs(header.get_text())
     rest, ment = parse_mentionings(text)
     value = header.b.get_text()
-    name = rest
     grNameTag = soup.new_tag('group-name')
     headerTag.append(grNameTag)
-    grNameTag.append(name)
+    grNameTag.append(rest)
     
     if ment:
         headerTag.append(ment)
@@ -622,9 +599,10 @@ def persgr_header_to_XML(header):
     
 def pers_header_to_XML(header):
     '''
-    Converts a preprocessed html index-item header into a xml person header.
-    Additionally returns the name of the item.
-    Uses hardcoded lists for generational names (genNames, such as xxx) and role names (such as xxx) and extern list of forenames (forenameList).
+    Convert a preprocessed HTML index-item header into an XML person
+    header. Use hardcoded lists for genName (generational names, e.g.
+    senior, the first, junior) and roleName (e.g. duke, king) and
+    extern list of forenames (forenameList).
     '''
     headerTag = soup.new_tag('person-header')
     persTag = soup.new_tag('person')
@@ -639,10 +617,12 @@ def pers_header_to_XML(header):
     
     hasNoB = del_b_tag(header)
     
+    # Index-Refs + mentionings
     text, indexRefsTag = find_index_refs(header.get_text())
     text, ment = parse_mentionings(text)
     description, ment2 = parse_mentionings(hasNoB.get_text())
 
+    # Forename, surname, genName + roleName
     genNameKeys = 'der .ltere|d\. .ltere|der J.ngere|der Erste|der Zweite'\
                   '|II\.|der Dritte|III\.|IV\.|V\.|VI\.|VII\.|VIII\.|IX\.'\
                   '|Junior|Jr|Senior|Sr|der Junge|der Alte|d\.J\.|I\.|X\.'
@@ -652,7 +632,6 @@ def pers_header_to_XML(header):
     matched = False
     forenameKeys = '|'.join(forenameList)
     
-    # Fust von Diebach gen. Knebel
     surForeMatch = re.match('(?u)(?P<surname>[^, ]{3,}?)(, )(?P<forename>' +\
                             forenameKeys + ')([ von]*,? )' , text)
     foreMatch = re.match('(?u)(?P<forename>' + forenameKeys + ')(,)' , text)
@@ -681,6 +660,7 @@ def pers_header_to_XML(header):
 
     persTag.append(nameTag)
     
+    # description
     if description:
         descriptionTag = soup.new_tag('description')
         persTag.append(descriptionTag)
@@ -694,12 +674,12 @@ def pers_header_to_XML(header):
     return name.rstrip(', '), headerTag
 
 
-############################## 3.2 Bodies ###########################
+############################## 3.2 Bodies ####################################
 
 def parse_quotes (htmlitem):
     '''
-    Parses quotes in an html item. Converts all i-tags into quote-tags.
-    Deletes all other tags.
+    Parse quotes in an HTML item. Convert all i-tags into quote-tags.
+    Delete all other tags.
     '''
     quoteMatch_with_comma = re.match('(?u)(.*?)<i.*?>(.{5,}?),(.{5,}?)</i>'\
                                      '(.*)', htmlitem)
@@ -735,7 +715,8 @@ def parse_quotes (htmlitem):
 
 
 def build_conc_tag(text):
-    '''Builds a concept out of a given text.'''
+    '''Build a concept from a given string, containing name,
+       description and mentionings.'''
     soup=BeautifulSoup()
     concTag = soup.new_tag('concept')
     rest, ment = parse_mentionings(text)
@@ -751,23 +732,23 @@ def build_conc_tag(text):
     return (concTag)
 
 
-
-def relConcToXML(liste, prefix):
+def rel_conc_to_XML(liste, prefix):
     '''
-    Parses a list of concepts (strings).
-    Prefix is given and stored for indentation.
+    Convert a list of strings into a list of concepts, which are added
+    to a related-cocepts tag. Identify the current indentation level
+    with prefix.
     '''
     relConcTag = soup.new_tag('related-concepts')    
     concList = []
     concTag = None
     for concHTML in liste:
-        conc=parse_quotes(concHTML) # TODO: ist das ein html??
+        conc = parse_quotes(concHTML) # TODO: ist das ein html??
         intendMatch = re.match('( *?\-)(.*)', conc)
         if intendMatch:
             concList.append(intendMatch.group(2))
             continue
         elif concList:
-            innerRelConcTag = relConcToXML(concList, prefix + ' -')
+            innerRelConcTag = rel_conc_to_XML(concList, prefix + ' -')
             if concTag:
                 concTag.append(innerRelConcTag)
             else:
@@ -779,7 +760,7 @@ def relConcToXML(liste, prefix):
         relConcTag.append(concTag)
 
     if concList:
-            innerRelConcTag = relConcToXML(concList, prefix + ' -')
+            innerRelConcTag = rel_conc_to_XML(concList, prefix + ' -')
             if concTag:
                 concTag.append(innerRelConcTag)
             else:
@@ -791,16 +772,13 @@ def relConcToXML(liste, prefix):
 
 
 
-
-
-################# 3.2.1 ListingBody (FamilyBody, PersongroupBody) ###########
-
+################# 3.2.1 ListingBody (FamilyBody, PersongroupBody) ############
 
 def listing_body_to_XML(body):
     '''
-    Converts an html body into a xml body type listing-body.
-    Listing bodies have persons on the first level of indentation.
-    The rest of levels are parsed as concepts.
+    Convert a preprocessed HTML index-item body into an XML
+    listing-body. Listing bodies have persons on the first level of 
+    indentation. The remaining levels are parsed as concepts.
     '''
     listBodyTag = soup.new_tag('listing-body')
     membersTag = soup.new_tag('members')
@@ -820,7 +798,7 @@ def listing_body_to_XML(body):
             continue
             
         elif concList:
-            relConcTag = relConcToXML(concList, ' -')
+            relConcTag = rel_conc_to_XML(concList, ' -')
             if personTag:
                 personTag.append(relConcTag)
             concList = []
@@ -869,11 +847,13 @@ def listing_body_to_XML(body):
     return listBodyTag
 
 
-############## 3.2.2 RelatedConceptsBody (Location, Landmark, Person) #######
+############## 3.2.2 ConceptBody (Location, Landmark, Person) #######
 
-def relconc_body_to_XML(body):
+def conc_body_to_XML(body):
     '''
-    Converts an html body into a xml body type concept-body.
+    Convert a preprocessed HTML index-item body into an XML concept
+    body, consisting of concepts which recursively contain related
+    concepts.
     '''
     listBodyTag = soup.new_tag('concept-body')
     bodyList = str(body).split('<br>')
@@ -899,7 +879,7 @@ def relconc_body_to_XML(body):
             continue
             
         elif concList:
-            relConcTag = relConcToXML(concList, ' -')
+            relConcTag = rel_conc_to_XML(concList, ' -')
             conceptTag.append(relConcTag)
             concList = []
     
@@ -907,7 +887,7 @@ def relconc_body_to_XML(body):
         relTag.append(conceptTag)
  
     if concList:
-            relConcTag = relConcToXML(concList, ' -')
+            relConcTag = rel_conc_to_XML(concList, ' -')
             if conceptTag:
                 conceptTag.append(relConcTag)
             else:
@@ -922,7 +902,10 @@ def relconc_body_to_XML(body):
 ############################ 4.1 Familiy Parser    #####################
 
 def fam_to_XML(family, id):
-    ''' Converts an html index item into a completely annotated xml family item. '''
+    '''
+    Convert a preprocessed HTML index item into a completely annotated
+    XML family item.
+    '''
     itemTag = soup.new_tag('item')
     value, itemHeader = fam_header_to_XML(family.header)
     itemTag['id'] = 'item_'+str(id)
@@ -938,7 +921,10 @@ def fam_to_XML(family, id):
 ################## 4.2 PersongroupParser #############
 
 def persgr_to_XML(persongroup, id):
-    ''' Converts an html index item into a completely annotated xml persongroup item. '''
+    '''
+    Convert a preprocessed HTML index item into a completely annotated
+    XML persongroup item.
+    '''
     itemTag = soup.new_tag('item')
     value, itemHeader = persgr_header_to_XML(persongroup.header)
     itemTag['id'] = 'item_'+str(id)
@@ -954,14 +940,17 @@ def persgr_to_XML(persongroup, id):
 ################## 4.3 PersonParser #############
 
 def pers_to_XML(person, id):
-    ''' Converts an html index item into a completely annotated xml person item. '''
+    '''
+    Convert a preprocessed HTML index item into a completely annotated
+    XML person item.
+    '''
     itemTag = soup.new_tag('item')
     value, itemHeader = pers_header_to_XML(person.header)
     itemTag['id'] = 'item_'+str(id)
     itemTag['type'] = 'person'
     itemTag['value'] = value
     itemTag.append(itemHeader)
-    itemBody = relconc_body_to_XML(person.body)
+    itemBody = conc_body_to_XML(person.body)
     itemTag.append(itemBody)
     #print(value)
     return itemTag
@@ -969,15 +958,18 @@ def pers_to_XML(person, id):
     
 ################## 4.4 LocationParser #############
 
-def locToXML(location, id):
-    ''' Converts an html index item into a completely annotated xml location item. '''
+def loc_to_XML(location, id):
+    '''
+    Convert a preprocessed HTML index item into a completely annotated
+    XML location item.
+    '''
     itemTag = soup.new_tag('item')
     value, itemHeader = loc_header_to_XML(location.header)
     itemTag['id'] = 'item_'+str(id)
     itemTag['type'] = 'location'
     itemTag['value'] = value
     itemTag.append(itemHeader)
-    itemBody = relconc_body_to_XML(location.body)
+    itemBody = conc_body_to_XML(location.body)
     itemTag.append(itemBody)
     #print(value)
     return itemTag
@@ -985,15 +977,18 @@ def locToXML(location, id):
     
 ################## 4.5 LandmarkParser #############
 
-def landToXML(landmark, id):
-    ''' Converts an html index item into a completely annotated xml landmark item. '''
+def land_to_XML(landmark, id):
+    '''
+    Convert a preprocessed HTML index item into a completely annotated
+    XML landmark item.
+    '''
     itemTag = soup.new_tag('item')
     value, itemHeader = land_header_to_XML(landmark.header)
     itemTag.append(itemHeader)
     itemTag['id'] = 'item_'+str(id)
     itemTag['type'] = 'landmark'
     itemTag['value'] = value
-    itemBody = relconc_body_to_XML(landmark.body)
+    itemBody = conc_body_to_XML(landmark.body)
     itemTag.append(itemBody)
     #print(value)
     return itemTag
@@ -1001,6 +996,9 @@ def landToXML(landmark, id):
 ##########################################################
 
 def build_header_body(h, b, lineList):
+    '''
+    Merges refering lines into the header.
+    '''
     if len(lineList) > 0:
         firstLineText=BeautifulSoup(lineList[0]).get_text().strip()
         
@@ -1016,7 +1014,10 @@ def build_header_body(h, b, lineList):
 
 
 def extract_items():
-    '''TODO'''
+    '''
+    Locate the index in the HTML file. Split it up into enties realised
+    as IndexItems. Divede items into header and body.
+    '''
     text = ''
     t = ''
 
@@ -1033,7 +1034,6 @@ def extract_items():
     indexTag.append(indexInfoTag)
 
     items = []
-
     htmlItems = soup.findAll('p')
     
     foundIndex = False
@@ -1081,9 +1081,12 @@ def extract_items():
 
 def classify_and_parse(items):
     '''
-    Gets a list of (html) items, decides whether it is a location, family, person, landmark or persongroup and parses them respectively.
-    Appends items it classifies as "siehe" without parsing them. Has to be done seperately.
-    Returns a list of xml items and html-siehe-items.
+    Decide for each HTML item in a list if it is a location, family,
+    person, landmark or persongroup. Parse them accordingly. Append
+    items classified as "siehe" without parsing them. Return a list
+    of XML items and HTML-siehe-items. Hardcoded lists of keys for
+    families, locations, persons, persongroups and landmarks are 
+    used for classification.
     '''
 
     xmlItems = []
@@ -1098,11 +1101,11 @@ def classify_and_parse(items):
                              'Gemeinde |Ort |.rtlichkeit |Kloster|Schloss|'\
                              'Herrschaft|Gft\.|Kgr\.|Region|Gebiet|Abtei|'\
                              'Land |Kgr\.|Herzogtum|Hzgt\.|[Gg]rafschaft|'\
-                             'F.rstentum|Deutschordenskommende|RLP|Gde\.|'\
-                             'Bistum|Vogtei|Regierungssitz|Hochstift|'\
+                             'F.rstentum|Deutschordenskommende|RLP|M.hle|'\
+                             'Bistum|Vogtei|Regierungssitz|Hochstift|Gde\.|'\
                              'Pfarrei|W.stung|F\)|Erzstift|, Erzbistum|'\
-                             'Dekanat|Domstift|Reichsland|Deutschordensballei'\
-                             '|M.hle|Wallfahrt|Land |Reise|lothr. Amt|'\
+                             'Dekanat|Domstift|Reichsland|Wallfahrt|'\
+                             'Land |Reise|lothr. Amt|Deutschordensballei|'\
                              'Deutschordenshaus|[Ss]tadt (?!S)', header)
         
         grpMatch = re.search('Notare|, Grafen|, Markgrafen|[Hh]erz.ge|'\
@@ -1133,7 +1136,7 @@ def classify_and_parse(items):
 
         elif locMatch:
             pass
-            x = locToXML(item, id)
+            x = loc_to_XML(item, id)
             xmlItems.append(x)
             locations.append(item)
 
@@ -1148,7 +1151,7 @@ def classify_and_parse(items):
             persons.append(item)
 
         elif landMatch:
-            x = landToXML(item, id)
+            x = land_to_XML(item, id)
             xmlItems.append(x)
             landmarks.append(item)
 
@@ -1169,8 +1172,9 @@ def classify_and_parse(items):
 
 def postprocess_siehe(items):
     '''
-    Postprocesses a list of items. Solves references in the item headers to find out its type.
-    Tags them and add them to the complete list of xml items.
+    Postprocess a list of items. Solves references in the headers of
+    yet unresolved siehe-items to find out their type. Tag them and add
+    them to the complete list of xml items.
     '''
     xmlItemsComplete = []
     
@@ -1183,7 +1187,6 @@ def postprocess_siehe(items):
             sieheMatch = re.search('siehe (.*)',line)
             if sieheMatch:
                 n = sieheMatch.group(1).strip().split('/')[0]
-                #n = n
                 itemTag = soup.new_tag('item')
                 for i in items:
                     if not isinstance(i, IndexItem):
@@ -1191,7 +1194,8 @@ def postprocess_siehe(items):
                             type = i['type']
                             itemTag['type'] = type
                             itemTag['value'] = item.header.b.get_text()
-                            itemTag['id'] = 'item_' + str(item.header['tmp_id'])
+                            itemTag['id'] = 'item_' + \
+                                                  str(item.header['tmp_id'])
                             if not type:
                               print (value+': unknown type.')
                                 
@@ -1201,7 +1205,7 @@ def postprocess_siehe(items):
                               value, header = loc_header_to_XML(item.header)
                               header.placeName.settlement['type'] = settleType
                               itemTag.append(header)
-                              itemTag.append(relconc_body_to_XML(item.body))
+                              itemTag.append(conc_body_to_XML(item.body))
                                 
                             if type == 'family':
                               value, header = fam_header_to_XML(item.header)
@@ -1217,12 +1221,8 @@ def postprocess_siehe(items):
 
 def index_to_xml():
     '''
-    Main function. Finds the index in html/sbr-regesten.html, converts
-    it into xml and writes it into index.xml.
-    Hardcoded lists of triggers for families, alndmarks, persons, persongroups and landmarks are 
-    used to classify of whihc of the types an index entry is.
-    If the type is not specified in the html item header (e.g. 'Mengen siehe Bliesmengen'),
-    it contains a reference to another index-entry from which te type can be referred. Such cases are collected in the list siehe.
+    Main function. Find the index in the HTML file, convert it into XML
+    and write into index.xml.
     '''
     print('Index Extractor is working ..')
     
