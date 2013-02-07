@@ -22,28 +22,12 @@ def get_item_ID():
     countIndex += 1
     return item_id
 
-def ment_to_db(xmlNode, concept): # TODO
+def ment_to_db(xmlNode, concept):
     '''
     TO BE IMPLEMENTED:
     Extract related regests and writes them into the database.
     '''
     pass
-    '''if hasattr(xmlNode, 'mentioned-in'):
-      for reg_ref in xmlNode.find('mentioned-in'):
-        if isinstance(reg_ref, NavigableString):
-          continue
-        else:
-          titleList=RegestTitle.objects.filter\
-                    (title__startswith=reg_ref.get_text().strip())
-          if not len(titleList)==1:
-            #print('Keine eindeutige Zuweisung von Regest moeglich.')
-            continue
-          else:
-            print('Regest gefunden!')
-            regestList=Regest.objects.filter(title=titleList[0])
-            regest=regestList[0]
-            con=regest.content
-            concept.regestcontent_set.add(con)'''
 
 
 def add_all(obj, li):
@@ -133,10 +117,6 @@ def relconc_to_db(relConc, createElement=create_concept):
     return clist
 
 
-'''def indexrefs_to_db(indexrefs):
-      pass'''
-        
-
 def loc_to_db(itemsoup,ref_dict):
     '''Extract a location from XML and write it into the database.'''
     header = itemsoup.find('location-header')
@@ -147,7 +127,7 @@ def loc_to_db(itemsoup,ref_dict):
     l.additional_names = if_exists(placeName.addNames)
     l.name = itemsoup['value']
         
-    # Wuestungen
+    # Abandoned villages
     if 'type' in attrs:
         l.location_type = placeName.settlement['type']
     vill = placeName.settlement['abandoned-village']
@@ -158,7 +138,7 @@ def loc_to_db(itemsoup,ref_dict):
     if 'av-ref' in attrs:
         l.av_ref = placeName.settlement['av-ref']    
       
-    # Reference point & District
+    # Reference point + district
     ref_point = placeName.find('reference_point')
     if ref_point:
         ref_point = ref_point.get_text().strip(' ,;.')
@@ -169,7 +149,7 @@ def loc_to_db(itemsoup,ref_dict):
     if placeName.district:
         l.district = placeName.district.get_text().strip(' ,;.')
     
-    # region  
+    # Region  
     if placeName.region:
         regs = Region.objects.filter(name=placeName.region.get_text()\
                                     .strip(' ,;.'))
@@ -180,7 +160,7 @@ def loc_to_db(itemsoup,ref_dict):
                      .strip(' ,;.'), region_type=placeName.region['type'])
         l.region = region
 
-    # country
+    # Country
     if placeName.country:
         if placeName.country.get_text() == "F":
             l.country = "Frankreich"
@@ -201,14 +181,13 @@ def loc_to_db(itemsoup,ref_dict):
 
     l.id = get_item_ID()
     l.xml_repr = itemsoup
-    #print(l)
     l.save()
     
-    # mentionings + related index entries
+    # Mentionings + related index entries
     ment_to_db(header, l)
     ref_dict[l.id] = header.find('index-refs')
     
-    # related concepts
+    # Related concepts
     if itemsoup.find('concept-body'):
         add_all(l.related_concepts, relconc_to_db(itemsoup.find\
                ('concept-body').find('related-concepts')))
@@ -232,11 +211,11 @@ def land_to_db(itemsoup,ref_dict):
     land.xml_repr = itemsoup
     land.save()
        
-    # mentioned_in + related index entries
+    # Mentionings + related index entries
     ment_to_db(itemsoup.find('landmark-header'), land)
     ref_dict[land.id] = header.find('index-refs')
     
-    # related concepts
+    # Related concepts
     if hasattr(itemsoup, 'concept-body'):
         add_all(land.related_concepts, relconc_to_db(itemsoup.find\
                 ('concept-body').find('related-concepts')))
@@ -248,7 +227,6 @@ def land_to_db(itemsoup,ref_dict):
 def pers_to_db(itemsoup,ref_dict):
     '''Extract a person from XML and write it into the database.'''
     p = Person()
-    #itemsoup.find('person-header')
     if hasattr(itemsoup, 'person-header'):
         header = itemsoup.find('person-header')
         pers_name = header.person.persname
@@ -267,11 +245,11 @@ def pers_to_db(itemsoup,ref_dict):
         p.xml_repr = itemsoup
         p.save()
             
-        # mentioned_in + related index entries
+        # Mentionings + related index entries
         ment_to_db(itemsoup.find('person-header'), p)
         ref_dict[p.id] = header.find('index-refs')
         
-        # related concepts
+        # Related concepts
         if hasattr(itemsoup, 'concept-body'):
             add_all(p.related_concepts, relconc_to_db(itemsoup.find\
                    ('concept-body').find('related-concepts')))
@@ -295,11 +273,11 @@ def persgr_to_db(itemsoup,ref_dict):
     pg.xml_repr = itemsoup
     pg.save()
     
-    # mentioned_in + related index entries
+    # Mentionings + related index entries
     ment_to_db(itemsoup.find('persongroup-header'), pg)
     ref_dict[pg.id] = header.find('index-refs')
     
-    # related-concepts
+    # Related concepts
     if itemsoup.find('listing-body'):
         add_all(pg.members, relconc_to_db(itemsoup.find('listing-body').members\
                , createElement=create_person))
@@ -367,9 +345,9 @@ def isolate_id(id):
 
 
 def solve_refs(ref_dict):
-'''
-Extract references from the dictionary and add them to the database.
-'''
+    '''
+    Extract references from the dictionary and add them to the database.
+    '''
     for item_id, refNode in ref_dict.items():
         if refNode:
             refList = [node['itemid'] for node in refNode.findAll('index-ref')]
