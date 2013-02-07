@@ -7,3 +7,7 @@
 %%   von Sonderfällen / Ausnahmen; etc.)
 
 \emph{Author: Conrad Steffens} \\
+
+[To be replaced by the implementer of the regesten part.]
+
+The regesten part of the Sbr-Regesten contains the regest documents. The schema for the regests is defined in \texttt{sbr-regesten/regesten-schemas/sbr-regesten.xsd}, together with the schema for the other parts of the book. In order to extract the regesten part, the module \texttt{sbr-regesten/extraction/regest\_extractor} has to be implemented. This module extracts the regests from the HTML file, which is stored in \texttt{sbr-regesten/html/sbr-regesten.html}. It adds the extracted XML to the file \texttt{sbr-regesten/sbr-regesten.xml} and adds all regests to the database. There should be a postprocessing step, once the index is parsed. The regest-references in the index can be exploited in order to tag entities (as persons and locations) in the regests.
