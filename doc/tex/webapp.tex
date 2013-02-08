@@ -652,12 +652,35 @@ a new Django app, Django creates a single module for the tests
 associated with the app called \texttt{tests.py}. This module is
 located in the top-level directory of the app. However, as individual
 apps grow in size, it might become necessary to split up their tests
-into several modules to keep the overall architecture modular. Django
-provides support for this: If you create a directory called
-\texttt{tests} on the same level as the default \texttt{tests.py}
-module, you can put as many test modules in this directory as you
-like, and you can name them whatever you want, without the need for
-any additional setup.
+into several modules to keep the overall architecture modular. In
+order to accomplish this without confusing the default test runner you
+should follow these steps:
+
+\begin{enumerate}
+\item In the directory that holds the default \texttt{tests.py}
+  module, create a directory called \texttt{tests}.
+\item \texttt{cd} into this directory and turn it into a
+  \emph{package} by creating a file called \texttt{\_\_init\_\_.py}.
+\item Move the default \texttt{tests.py} module to the \texttt{tests}
+  directory and rename it according to the types of tests it
+  contains.\footnote{If you haven't added to or changed the default
+    test module, you could e.g. rename it to \texttt{model\_tests.py},
+    since at the time of this writing it only contains tests for the
+    model layer.}
+\item Add any number of additional test modules to the directory.
+\item As a last step, add a separate \texttt{import} statement for
+  each test module to the \texttt{\_\_init\_\_.py} module. For
+  instance, if \texttt{tests} contains three modules
+  \texttt{model\_tests.py}, \texttt{view\_tests.py},
+  \texttt{extraction\_tests.py}, the contents of
+  \texttt{\_\_init\_\_.py} will have to look like this:
+\begin{verbatim}
+from model_tests import *
+from view_tests import *
+from extraction_tests import *
+\end{verbatim}
+
+\end{enumerate}
 
 The current version of the Sbr-Regesten Web Application already
 includes tests for non-trivial methods of the model layer. They are
