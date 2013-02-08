@@ -1,7 +1,17 @@
 \section{Extraction Process: Overview}
 \label{sec:overview}
 
-The extraction process is based on an HTML version of the Sbr-Regesten. The latter was created using the \texttt{.doc} version of Sbr-regesten, obtained by the publishers. Microsoft Word 2010 was used to store it as \texttt{.html}. Compared to different open-source tools for convertion, it provided the best structural information for our purpose. The HTML file is stored in \texttt{sbr-regesten/html/sbr-regesten.hmtl}.\footnote{Due to minor inconsistencies in the HTML, the file was manually adapted at some places, see appendix xxx.}
+The extraction process is based on an HTML version of the
+Sbr-Regesten. The latter was created using the \texttt{.doc} version
+of Sbr-regesten, obtained from the publishers. Microsoft Word from the
+2010 edition of \href{http://office.microsoft.com/en-us/}{Microsoft
+  Office} was used to convert the document to \texttt{.html}. Compared
+to a range of other open-source tools available to us for conversion,
+its output provided the best structural information for our purpose.
+The HTML file is stored in
+\texttt{sbr-regesten/html/sbr-regesten.html}.\footnote{Due to minor
+  inconsistencies in the HTML, the file was manually adapted in some
+  places, see Appendix \ref{sec:html}.}
 
 In order to keep the architecture of the extraction process modular,
 individual chapters of the Sbr-Regesten were extracted using separate
@@ -13,15 +23,18 @@ For ease of use, the extraction process was integrated into the
 Sbr-Regesten Web Application as a \emph{management command}. This
 chapter focuses on where to find the extraction modules and how they
 are chained to form the overall extraction pipeline. For information
-on (re-)running the extraction process, consult chapter \ref{sec:run}.
+on (re-)running the extraction process, please consult chapter
+\ref{sec:run}.
 
 The order of extraction for the individual parts of the Sbr-Regesten
 follows the order of chapters in the original text. The first module
-is responsible for inserting the start tag of \emph{root element}
-(\texttt{<sbr-regesten>}) into the XML document; the last module to
-process the HTML version of the Sbr-Regesten inserts the corresponding
-end tag (\texttt{</sbr-regesten}). Book chapters and the modules
-responsible for extracting them are listed in the following table:
+is responsible for inserting the start tag of the \emph{root element}
+(\texttt{<sbr-regesten>}) into the output file, which is called
+\texttt{sbr-regesten.xml} and is located in the top-level directory of
+the project. The last module to process the HTML version of the
+Sbr-Regesten inserts the corresponding end tag
+(\texttt{</sbr-regesten>}). Book chapters and the modules responsible
+for extracting them are listed in the following table:
 
 \begin{figure}[h]
   \centering
@@ -45,12 +58,12 @@ responsible for extracting them are listed in the following table:
 \end{figure}
 
 The extraction modules are located in the
-\texttt{sbr-regesten/extraction} directory. Each one of them uses the
-HTML version of the Sbr-Regesten stored in
-\texttt{sbr-regesten/html/sbr-regesten.html} as input and implements a
-function called \texttt{extract\_<part-of-book>}. This function takes
-no arguments and serves as an entry point for extracting the chapter
-it is responsible for. The \texttt{extract.py} module located in
+\texttt{sbr-regesten/extraction} directory. As explained above, each
+one of them uses the HTML version of the Sbr-Regesten as input and
+implements a function called \texttt{extract\_<part-of-book>}. This
+function takes no arguments and serves as an entry point for
+extracting the chapter it is responsible for. The \texttt{extract.py}
+module located in
 
 \begin{verbatim}
 sbr-regesten/regesten_webapp/management/commands
@@ -59,8 +72,6 @@ sbr-regesten/regesten_webapp/management/commands
 chains the calls to the entry points in the appropriate order:
 
 \begin{verbatim}
-# Imports ...
-
 class Command(NoArgsCommand):
     help = 'Starts and directs the extraction process for the Sbr-Regesten'
 
