@@ -251,10 +251,10 @@ on their type.
 
 Irrespective its type, a header usually ends with the element
 \texttt{mentioned-in}, which might only be followed by
-\texttt{index-refs}. \texttt{Mentioned-in} is of type
+\texttt{index-refs}. \texttt{mentioned-in} is of type
 \texttt{mentionings} and contains a sequence of references to the
 regests (\texttt{reg-ref}). The attribute \texttt{regest} specifies
-the id from the regest it refers to. \texttt{Index-refs} contains a
+the id from the regest it refers to. \texttt{index-refs} contains a
 sequence of references to other index entries (\texttt{index-ref}).
 The attribute \texttt{itemid} contains the id from the index item it
 refers to.
@@ -278,13 +278,13 @@ comparison of the two. The Sbr-Regesten schema adopts TEI's
 \texttt{settlement} element, aside from \texttt{type}. It gets the
 additional attributes \texttt{abandoned-village} and \texttt{av-ref}
 to encode information about abandoned villages (\textit{Wüstungen}).
-\texttt{Abandoned-village} is an obligatory attribute, which denotes
+\texttt{abandoned-village} is an obligatory attribute, which denotes
 whether the settlement is an abandoned village. If that is the case,
 the optional attribute \texttt{av-ref} encodes a reference to the
 catalogue of Staerk\footnote{Dieter Staerk, Die Wüstungen des
   Saarlandes, Minerva-Verlag, Saarbrücken, 1974.}. Region types may be
 \texttt{Bundesland} (if located in Germany), \texttt{Departement}
-(France) or \texttt{Province} (Belgium). \texttt{Country} has no
+(France) or \texttt{Province} (Belgium). \texttt{country} has no
 attributes. The TEI guidelines define a \texttt{district} as “any kind
 of subdivision of a settlement, such as a parish, ward, or other
 administrative or geographic unit.”\footnote{TEI P5: Guidelines for
@@ -313,9 +313,9 @@ administrative or geographic unit.”\footnote{TEI P5: Guidelines for
 
 Additional to \texttt{placeName}, the index schema for locations
 introduces two elements: \texttt{addNames} and
-\texttt{reference-point}. \texttt{AddNames} contains a list of
+\texttt{reference-point}. \texttt{addNames} contains a list of
 additional names of the location, each of them tagged as
-\texttt{addName}. \texttt{Reference-point} includes further
+\texttt{addName}. \texttt{reference-point} includes further
 information that is not covered by \texttt{district, region} or
 \texttt{country}. It specifies closer where to find the location, e.g.
 \textit{Im Köllertal, bei St. Ingbert} (\textit{in the Köllertal, near
@@ -400,7 +400,7 @@ exactly the two elements \texttt{name} and \texttt{addNames}
 Figure~\ref{fig:person-header-xml} shows an example for a
 \texttt{person-header}. Person headers provide the element
 \texttt{person}. Person consists of \texttt{persName} and
-\texttt{description}. \texttt{PersName} is very close to TEI's
+\texttt{description}. \texttt{persName} is very close to TEI's
 \texttt{persName}. It contains (optional) \texttt{forename},
 \texttt{surname}, \texttt{genName} (generational name, such as
 \textit{Senior, the first, II.}, see TEI Guidelines) and
@@ -448,8 +448,8 @@ in the \texttt{description}.
 Figure~\ref{fig:family-header-xml} displays an example for a
 \texttt{family-header}. Family headers consist of the elements
 \texttt{family-name}, \texttt{location}, \texttt{mentioned-in} and
-\texttt{index-refs}. \texttt{Family-name} consists of name and
-\texttt{addNames} (additional names). \texttt{Location} is of type
+\texttt{index-refs}. \texttt{family-name} consists of name and
+\texttt{addNames} (additional names). \texttt{location} is of type
 \texttt{placeName}, which is the same type that
 \texttt{location-headers} have. See Section \ref{sec:location-header}
 \textit{location-header} for more details.
@@ -478,7 +478,7 @@ Figure~\ref{fig:family-header-xml} displays an example for a
 Figure~\ref{fig:persongroup-header-xml} shows an example for a
 \texttt{persongroup-header}. Persongroup headers consist of the
 elements \texttt{group-name}, \texttt{mentioned-in} and
-\texttt{index-refs}. \texttt{Group-name} contains the name of the
+\texttt{index-refs}. \texttt{group-name} contains the name of the
 persongroup.
 
 \begin{figure}[H]
@@ -493,7 +493,7 @@ persongroup.
 \end{figure}
 
 \subsubsection{Bodies}
-There are two different types of bodies: \texttt{Concept-body} and
+There are two different types of bodies: \texttt{concept-body} and
 \texttt{listing-body}.
 
 \paragraph{Concept-body}
@@ -502,7 +502,7 @@ A concept-body contains the element \texttt{related-concepts}.
 of \texttt{concepts} and \texttt{persons}\footnote{Note, that
   currently only concepts are extracted.}. A concept provides a
 \texttt{name}, a \texttt{description} and \texttt{mentioned-in}.
-\texttt{Name} contains the name of the concept and
+\texttt{name} contains the name of the concept and
 \texttt{description} any additional information provided.
 Additionally, a \texttt{concept} can recursively contain an element
 \texttt{related-concepts}. For the description of a \texttt{person},
@@ -548,7 +548,7 @@ see Section \ref{sec:person-header} \textit{Person-Header}.
 \paragraph{Listing-body}
 Figure~\ref{fig:listing-body-xml} illustrates an example for a
 \texttt{listing-body}. A listing-body consists of the element
-\texttt{members}. \texttt{Members} consists of a sequence of
+\texttt{members}. \texttt{members} consists of a sequence of
 \texttt{persons}, which have the type as the persons appearing in a
 \texttt{person-header} (see Section sec:person-header
 \textit{Person-Header}). Each \texttt{person} can have a
@@ -557,7 +557,7 @@ related concepts again, as in a concept-body. That means, that in a
 \texttt{persongroup} or \texttt{family}, the first layer displays
 members of that family or group. The concepts on deeper levels might
 also be family or group members but not obligatory. Therefore they are
-not modelled as members on their own, but as related-concepts of that
+not modeled as members on their own, but as related-concepts of that
 member.
 
 \begin{figure}[H]
@@ -619,15 +619,16 @@ construction. That complicates the index extraction.
 Figure~\ref{fig:index-extractor} shows the basic architecture of the
 module (\texttt{index\_extractor.py}), which is responsible for the
 index extraction. Note that it does not show any classes, but is aimed
-to illustrate the logical structure/workflow of
+to illustrate the logical structure/work-flow of
 \texttt{index\_extractor.py} to demonstrate its functionality. In
 short, the \texttt{index\_extractor} module finds the index in the
 HTML and extracts single index items. These are post-processed before
 yielding the final XML for the index entries and writing them form the
 XML file into the database.
 
-The \texttt{index\_extractor.py} module is divided into three modules
-(stored in in \texttt{sbr-regesten/\-extraction/\-index\_utils}):
+The \texttt{index\_extractor.py} module is divided into three modules,
+all of which are stored in the directory
+\texttt{sbr-regesten/extraction/index\_utils}:
 
 \begin{itemize}
 \item \texttt{index\_to\_xml.py} extracts the index from the HTML file
@@ -641,8 +642,8 @@ The \texttt{index\_extractor.py} module is divided into three modules
 The index extraction is implemented in two separate stages which
 convert the index into XML and store it in the database, respectively.
 This has two reasons: it structures the module and it allows a manual
-correction of the extracted XML before before the items are added to
-the database.
+correction of the extracted XML before the items are added to the
+database.
 
 \subsubsection{Extracting, Classifying and Parsing Index Items}
 The module \texttt{index\_to\_xml.py} uses the python package
@@ -838,7 +839,7 @@ the name, e.g. \textit{Dirminger Tal, Ensdorfer Au}.
 \paragraph{Person-Header-Parser}
 The function \texttt{pers\_header\_to\_XML} parses person headers. It
 builds a \texttt{<person-header>} \texttt{BeautifulSoup} tag and adds
-a \texttt{<person>} tag to it. The latter obtains a continious id with
+a \texttt{<person>} tag to it. The latter obtains a continuous id with
 the pattern \texttt{person\_[0-9]+}. A tag \texttt{<persName>} is
 added to the \texttt{person}. The \texttt{name} is extracted
 exploiting the \texttt{<b>} tags of the HTML. Thereafter, the HTML
@@ -937,7 +938,7 @@ the \texttt{<br>} tags. It created a \texttt{<concept-body>} tag,
 which contains \texttt{<related-concepts>} tag. Each non-indented HTML
 line is a \texttt{concept} and added to \texttt{<related-concepts>}.
 It is split into \texttt{name}, \texttt{description} and
-\texttt{mentionings}. \texttt{Mentionings} are extracted according to
+\texttt{mentionings}. \texttt{mentionings} are extracted according to
 paragraph \ref{sec:reg-refs} \textit{References to the regests}. The
 remaining string is split at the first comma. The first part of the
 string will be the \texttt{name} of the concept and the second its
@@ -1003,10 +1004,10 @@ for the index, extraction process and possible further uses. Depending
 on future demands, different extensions will have priority.
 Section~\ref{sec:git} describes how to obtain a copy of the source
 code. After modifying the Sbr-Regesten schema or the extraction
-process, an XML Schema Validator, as the
+process, an XML Schema \emph{Validator}, as the
 \href{http://corefiling.com/opensource/schemaValidate.html}
-{CoreFiling XML Schema Validator}, can be used to validate the XML
-output against the schema.
+{CoreFiling XML Schema Validator}, can (and should) be used to
+validate the XML output against the schema.
 
 \paragraph{References to the Regests}
 At the time of developing the index extraction, the regest part of the
@@ -1017,7 +1018,7 @@ and tagged with \texttt{reg-ref}. Each \texttt{<reg-ref>} is supposed
 to store the id of the regest it refers to in the attribute
 \texttt{regest}. This is not yet the case. The function
 \texttt{get\_regest\_ID} always returns the dummy id regest\_99999. We
-would recommend to reimplement the function \texttt{get\_regest\_ID}
+would recommend to re-implement the function \texttt{get\_regest\_ID}
 in
 
 \begin{verbatim}
@@ -1069,7 +1070,7 @@ appear in the header right after the mentionings. But such references
 can also appear in the bodies or in other parts of the headers, e.g.
 in location-headers before the district. The schema could be adapted
 to allow \texttt{reg-refs} there as well. They would have to be tagged
-by texttt{index\_to\_xml.py} and would then (automatically) be
+by \texttt{index\_to\_xml.py} and would then (automatically) be
 extracted by the existing the \texttt{parse\_siehe} function in
 \texttt{index\_xml\_postprocess}.
 
