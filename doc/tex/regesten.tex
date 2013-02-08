@@ -8,6 +8,28 @@
 
 \emph{Author: Conrad Steffens} \\
 
-[To be replaced by the implementer of the regesten part.]
+The ``Regesten'' part of the Sbr-Regesten contains the regest
+documents. The XML schema for regests is defined in
 
-The regesten part of the Sbr-Regesten contains the regest documents. The schema for the regests is defined in \texttt{sbr-regesten/regesten-schemas/sbr-regesten.xsd}, together with the schema for the other parts of the book. In order to extract the regesten part, the module \texttt{sbr-regesten/extraction/regest\_extractor} has to be implemented. This module extracts the regests from the HTML file, which is stored in \texttt{sbr-regesten/html/sbr-regesten.html}. It adds the extracted XML to the file \texttt{sbr-regesten/sbr-regesten.xml} and adds all regests to the database. There should be a postprocessing step, once the index is parsed. The regest-references in the index can be exploited in order to tag entities (as persons and locations) in the regests.
+\begin{verbatim}
+sbr-regesten/regesten-schemas/sbr-regesten.xsd
+\end{verbatim}
+
+together with the schema for the other parts of the book. As described
+in Chapter \ref{sec:overview}, the module
+
+\begin{verbatim}
+sbr-regesten/extraction/regest_extractor.py
+\end{verbatim}
+
+(which still needs to be implemented) takes care of extracting
+and annotating regests. It uses the HTML version of the Sbr-Regesten
+stored in \texttt{sbr-regesten.html} as input. The XML output it
+produces is added to \texttt{sbr-regesten.xml}, and a database entry
+is created for each individual regest.
+
+Additionally, a postprocessing step for tagging proper names of e.g.
+persons and locations should be implemented: Once the index has been
+parsed, regest references in the index can be exploited in order to
+detect entities mentioned in a given regest, and annotate them using
+the \texttt{<name>} tag.
