@@ -1,17 +1,9 @@
 \section{Extraction Process: Other Parts of the Book}
 \label{sec:other}
-%% Aufbau, XML-Schema und Extraktion beschreiben für:
-%% - Frontmatter
-%% - Inhaltsverzeichnis
-%% - Vorwort
-%% - Bibliographie
-%% - Abkürzungen
-%% - Initialen
-%% - Archivverzeichnis
 
-In terms of the complexity needed to represent (and extract) them, the
+In terms of the complexity needed to represent and extract them, the
 remaining parts of the Sbr-Regesten discussed in this chapter are a
-lot less involved than the regesten and the index.
+lot less involved than the ``Regesten'' and ``Index'' parts.
 
 \subsection{Front Matter}
 \label{sec:frontmatter}
@@ -38,13 +30,14 @@ relevant lines in the file. When the
 the contents of \texttt{html/sbr-regesten.html} and turns it into a
 \texttt{BeautifulSoup} instance. It then collects all relevant lines
 in a list. As a last step, the \texttt{extract\_frontmatter()}
-function takes care of writing the contents of the front matter to the
-XML output file.
+function takes care of inserting the start tag of the root element
+(\texttt{<sbr-regesten>}) into the XML output file and appends the
+contents of the front matter.
 
 \subsection{Table of Contents (TOC)}
 \label{sec:toc}
 
-The \emph{Table of Contents} lists the individual chapters of the
+The \emph{Table of Contents} lists individual chapters of the
 Sbr-Regesten.
 
 \paragraph{XML Schema}
@@ -90,40 +83,41 @@ in the bibliography section look like this:
 
 The parts of the XML schema for representing the bibliography section
 of the Sbr-Regesten are a bit more involved than those for
-representing the front matter and TOC sections: As a whole, the
+representing the front matter and TOC sections. As a whole, the
 section is wrapped using the \texttt{<listBibl>} tag as suggested by
 the TEI guidelines. The title of the bibliography section
-(\emph{Literaturverzeichnis}) is taken over from the original text
-\emph{as is}; the XML schema does not define a separate element for
-it. After the title, the bibliography section contains a small amount
-of free text. For the XML version, this text is wrapped with a tag
-called \texttt{listBibl-info}. Lastly, individual entries of the
-bibliography are annotated using the \texttt{bibl} tag whose name was
-borrowed from the TEI guidelines and which defines a single attribute
-called \texttt{biblidtype} for storing a unique ID for each entry in
-the bibliography.
+(\emph{Literaturverzeichnis}) is taken over from the original text as
+is; the XML schema does not define a separate element for it. After
+the title, the bibliography section contains a small amount of free
+text. In the XML output, this text is wrapped with a tag called
+\texttt{<listBibl-info>}. Lastly, individual entries of the
+bibliography are annotated using the \texttt{<bibl>} tag whose name
+was borrowed from the TEI guidelines and which defines a single
+attribute called \texttt{biblidtype} for storing a unique ID for each
+entry in the bibliography.
 
 \paragraph{Extraction}
 
 The bibliography is extracted by the module
 \texttt{bibliography\_extractor.py}. The module reads the entire HTML
-source and turns it into a BeautifulSoup instance. It splits it up
-into paragraphs exploiting the \texttt{<p>} tag in the HTML. Then, the
+source and turns it into a \texttt{BeautifulSoup} instance. It then
+proceeds to split the document up into paragraphs exploiting the
+\texttt{<p>} tag in the HTML. Then, the
 \texttt{bibliography\_extractor.py} creates a \texttt{<listBibl>} tag.
 In order to find the paragraphs relevant to the bibliography it
 searches for the keyword \emph{Literaturverzeichnis}. Once this is
 found, it starts extracting the bibliography. The first paragraph
 following the keyword \emph{Literaturverzeichnis} is tagged as
-\texttt{listBibl-info} and appended to it. Each of the following
+\texttt{<listBibl-info>} and appended to it. Each of the following
 non-empty paragraphs obtains a \texttt{<bibl>} tag with a continuous
 id as attribute and is again appended to the \texttt{<listBibl>} tag.
 The \texttt{bibliography\_extractor.py} stops when finding the keyword
 \emph{Abk}, which is the beginning of the next section of the book.
-The created BeautifulSoup instance is
+The created \texttt{BeautifulSoup} instance is
 \href{http://www.crummy.com/software/BeautifulSoup/bs4/doc/#pretty-printing}{prettified}
-and written into a temporary file. The latter is postprocessed for
-reason of indentation, before the bibliography is finally added to the
-\texttt{sbr-regesten.xml}.
+and written into a temporary file. The latter is post-processed for
+the purpose of indentation, before the bibliography is finally added
+to the \texttt{sbr-regesten.xml}.
 
 \subsection{Abbreviations}
 \label{sec:abbrevs}
@@ -153,20 +147,21 @@ wrapped using the \texttt{<list-info>} tag.\footnote{The name of this
   tag has been kept generic on purpose; it is reused in the list of
   initials described shortly.} Individual entries of the abbreviations
 section are represented by \texttt{<entry>} nodes. These nodes have
-two child elements each, one for tagging the abbreviation itself
-(\texttt{<abbr>}) and one for tagging its expansion (\texttt{expan}).
+two child elements each, one for tagging the abbreviation itself,
+called \texttt{abbr}, and one for tagging its expansion, called
+\texttt{expan}.
 
 \paragraph{Extraction}
 
 The \texttt{abbrev\_extractor.py} module uses the titles of the
-abbreviations section and the following section (\emph{Abkürzungen}
-and \emph{Siglen}, respectively) to identify relevant lines in the
-HTML source; any textual content between these two keywords is
-considered to belong to the abbreviations section. The extraction
-algorithm is similar to the algorithms used for extracting front
-matter and TOC sections: First, using the cues described above and
-ignoring empty lines, a list of relevant lines is accumulated from a
-\texttt{BeautifulSoup} instance representing the HTML source. Then,
+abbreviations section and the section which succeeds it
+(\emph{Abkürzungen} and \emph{Siglen}, respectively) to identify
+relevant lines in the HTML source; any textual content between these
+two keywords is considered to belong to the abbreviations section. The
+extraction algorithm is similar to the algorithms used for extracting
+front matter and TOC sections: First, using the cues described above
+and ignoring empty lines, a list of relevant lines is accumulated from
+a \texttt{BeautifulSoup} instance representing the HTML source. Then,
 abbreviations and their expansions are annotated with the
 corresponding tags and written to the XML output file one by one.
 
@@ -186,18 +181,19 @@ that are used throughout the book, along with their expansions:
 \paragraph{XML Schema}
 
 For wrapping the initials section as a whole, the XML schema defines
-an \texttt{<initials-list>} tag. The \emph{type} of this tag is the
-same as the one used for the abbreviations section. As a result, the
-inner structure of the \texttt{<initials-list>} node is identical to
-that of the \texttt{<abbrev-list>} node discussed in section
-\ref{sec:abbrevs}, and does not need to be discussed again here.
+an element called \texttt{initials-list}. The \emph{type} of this
+element is the same as the one used for the abbreviations section. As
+a result, the inner structure of the \texttt{<initials-list>} node in
+the XML output is identical to that of the \texttt{<abbrev-list>} node
+discussed in section \ref{sec:abbrevs}, and does not need to be
+discussed again here.
 
 \paragraph{Extraction}
 
 The \texttt{} module uses the title of the initials section
 (\emph{Siglen}) and the title of the first regest to detect content
 belonging to the initials section in the HTML source. Aside from some
-adjustments that had to be made due to the fact that the intials
+adjustments that had to be made due to the fact that the initials
 section lacks an info section, the algorithm for extracting and
 annotating initials and their expansions is virtually identical to the
 one used for the abbreviations section.
@@ -211,11 +207,11 @@ one used for the abbreviations section.
 \label{sec:future-work-other}
 
 Due to time constraints it was not possible to refactor the modules
-responsible for handling extraction of parts of the Sbr-Regesten
-discussed in this chapter. As a result, there is a fair amount of code
-duplication within and between the extraction modules. Since the
-individual modules contain fairly small amounts of code, this is not a
-critical issue, but if the extraction process is to be extended in the
-future, it would be desirable to
+responsible for extracting the parts of the Sbr-Regesten discussed in
+this chapter. As a result, there is a fair amount of code duplication
+within and between individual extractor modules. Since they contain
+fairly small amounts of code, this is not a critical issue, but if the
+extraction process is to be extended in the future, it would be
+desirable to
 \href{https://en.wikipedia.org/wiki/Don't_repeat_yourself}{DRY} out
 the existing code beforehand.
