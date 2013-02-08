@@ -126,8 +126,8 @@ Only one index entry is very unusual and does not fit in any of the proposed gro
 
 
 \subsection{XML Schema for the Index}
-
-One of the main contributions of the Sbr-regesten project was to create an XML schema for the Sbr-regesten. The schema can be found in the file \texttt{sbr-regesten.xsd}.
+\label{sec:index-schema}
+One of the main contributions of the Sbr-Regesten project was to create an XML schema for the Sbr-Regesten. The schema can be found in the file \texttt{sbr-regesten/regesten-schemas/sbr-regesten.xsd}.
 It was as far as it was applicable designed to comply with the TEI Guidelines \footnote{TEI P5: Guidelines for Electronic Text Encoding and Interchange by the TEI Consortium, Version 2.0.2, 2012}.This section describes the schema for the index.
 
 The index consists of an \texttt{index-info}, which contains general information about the index, followed by an unrestricted number of \texttt{items}. Each \texttt{item} represents an index entry and is either a location, a person, a landmark, a family or a persongroup. The schema covers each of the groups respectively.
@@ -147,24 +147,44 @@ Each index item requires the following attributes:
 %%\caption{\texttt{item} in TEI vs. \texttt{placeName} in the Sbr. Regesten schema.}
 %%\end{figure}
 
-An index \texttt{item} consists of an \texttt{item-header} and can also have an \texttt{item-body}. Both are abstract elements, which are substituted by the respective header and body types. This decision was made in order to have only one type of items with consecutive IDs, although the headers and bodies highly vary with depending on their type.
+An index \texttt{item} consists of an \texttt{item-header} and does usually also have an \texttt{item-body}. Both are abstract elements, which are substituted by the respective header and body types. This decision was made in order to have only one type of items with consecutive IDs, although the headers and bodies highly vary with depending on their type.
 
-
-The header might for all header types end with the elements \texttt{mentioned-in}, followed by \texttt{index-refs}. \texttt{Mentioned-in} is of type \texttt{mentionings} and contains a sequence of references to the regests. The attribute \texttt{regest} specifies the id from the regest it refers to. \texttt{Index-refs} contains  a sequence of references to other index entries. The attribute \texttt{itemid} contains the id from the index item it refers to. texttt{Index-refs} are allowed to contain free text to insert key words/indications to make evident to the reader, that these are references to index entries (mostly \textit{siehe}).
+***TODO***
+Irrespective its type, a header usually ends with the element \texttt{mentioned-in}, which might only be followed by \texttt{index-refs}. \texttt{Mentioned-in} is of type \texttt{mentionings} and contains a sequence of references to the regests. The attribute \texttt{regest} specifies the id from the regest it refers to. \texttt{Index-refs} contains  a sequence of references to other index entries. The attribute \texttt{itemid} contains the id from the index item it refers to. texttt{Index-refs} are allowed to contain free text to insert key words/indications to make evident to the reader, that these are references to index entries (mostly \textit{siehe}).
 The next sections will describe in more detail the elements, that items have depending on their type. They will also provide a marked-up example each header and body type.
 
 \subsubsection{Headers}
+\label{header-xml}
 
 \paragraph{Location-Header}
-Figure~\ref{fig:location-header-xml} and \ref{fig:location-wuest-xml} show examples for location headers. Location headers contain the element \texttt{placeName}, which corresponds mostly to TEI's \texttt{placeName}. See figure~\ref{fig:placeName}for an example for a comparision between both. The Sbr-regesten schema adopts TEI's \texttt{settlement}, \texttt{district}, \texttt{region} and \texttt{country}. It introduces two new attributes for the settlement element, aside from \texttt{type}. It gets the additional attributes \texttt{abandoned-village} and \texttt{av-ref} to encode information about abandoned villages (\texttt{Wüstungen}). \texttt{Abandoned-village} denotes if the settlement is an abandoned village. In that case \texttt{av-ref} encodes the reference to the catalogue of Staerk \footnote{Dieter Staerk, Die Wüstungen des Saarlandes, Minerva-Verlag, Saarbrücken, 1974.}. Region types may be \texttt{Bundesland} (if located in Germany), \texttt{Departement} (in France) or \texttt{Province} (Belgium). \texttt{Country} has no attribute. TEI defines a \texttt{district} as “any kind of subdivision of a settlement, such as a parish, ward, or other administrative or geographic unit.”\footnote{TEI P5: Guidelines for Electronic Text Encoding and Interchange by the TEI Consortium, Version 2.0.2, 2012} In contrast, in our index-locations a \texttt{district} is any administrative unit below a \texttt{region} (Kreis, Gemeinde, Stadtverband).
-Additional to the elements proposed by TEI, the index schema for locations has two more elements: \texttt{additional names} (which contains a list of additional names of the location) and \texttt{reference-point}, which contains further information not covered by\texttt{ district/region/country}. This information specifies where to find the location, e.g. \textit{Im Köllertal, bei St. Ingbert} (in the Köllertal, near St. Ingbert). All of the elements are optional (even settlement, as it also appears in the family headers, where \texttt{locations/placeNames} are given, without their names being explicitly specified.)   
+\label{sec:location-header}
+Figure~\ref{fig:location-header-xml} and \ref{fig:location-wuest-xml} show examples for location headers. Location headers contain the element \texttt{placeName}, which corresponds mostly to TEI's \texttt{placeName}. Figure~\ref{fig:placeName} shows an example for a comparison between both. The Sbr-Regesten schema adopts TEI's \texttt{settlement}, \texttt{district}, \texttt{region} and \texttt{country}. It introduces two new attributes for the \texttt{settlement} element, aside from \texttt{type}. It gets the additional attributes \texttt{abandoned-village} and \texttt{av-ref} to encode information about abandoned villages (\textit{Wüstungen}). \texttt{Abandoned-village} is an obligatory attribute, which denotes whether the settlement is an abandoned village. If that is the case, the optional attribute \texttt{av-ref} encodes a reference to the catalogue of Staerk\footnote{Dieter Staerk, Die Wüstungen des Saarlandes, Minerva-Verlag, Saarbrücken, 1974.}. Region types may be \texttt{Bundesland} (if located in Germany), \texttt{Departement} (France) or \texttt{Province} (Belgium). \texttt{Country} has no attributes. The TEI guidelines define a \texttt{district} as “any kind of subdivision of a settlement, such as a parish, ward, or other administrative or geographic unit.”\footnote{TEI P5: Guidelines for Electronic Text Encoding and Interchange by the TEI Consortium, Version 2.0.2, 2012} In contrast, in our index-locations a \texttt{district} is any administrative unit below a \texttt{region} (\textit{Kreis, Gemeinde, Stadtverband}).
+
+\begin{figure}[H]
+\centering
+\begin{verbatim}
+<placeName>
+    <settlement type="city">Rochester</settlement>,
+    <region type="state">New York</region>
+</placeName>
+
+<placeName>
+    <settlement type="Stadt" abandoned-village="false">Saarbrücken</settlement>,
+    <region type="Bundesland">SL</region>
+</placeName>
+\end{verbatim}
+\label{fig:placeName}
+\caption{\texttt{placeName} in TEI vs. \texttt{placeName} in the Sbr-Regesten schema}
+\end{figure}
+
+Additional to \texttt{placeName}, the index schema for locations introduces two elements: \texttt{addNames} and \texttt{reference-point}. \texttt{AddNames} contains a list of additional names of the location, each of them tagged as \texttt{addName}. \texttt{Reference-point} includes further information that is not covered by \texttt{district, region} or \texttt{country}. It specifies closer where to find the location, e.g. \textit{Im Köllertal, bei St. Ingbert} (\textit{in the Köllertal, near St. Ingbert}). All elementsin \texttt{placeName} are optional (even settlement, as \texttt{placeName} also occurs in family headers, where locations are given, without their names being explicitly specified.)   
 
 \begin{figure}[H]
 \centering
 \begin{verbatim}
 <location-header>
    <placeName>
-      <settlement type="Dorf" w="false">Frauenberg</settlement>
+      <settlement type="Dorf" abandoned-village="false">Frauenberg</settlement>
       <addNames> (
          <addName>Frauwenberg</addName>)
       </addNames>, Dorf (
@@ -182,7 +202,7 @@ Additional to the elements proposed by TEI, the index schema for locations has t
 </location-header>
 \end{verbatim}
 \label{fig:location-header-xml}
-\caption{Sample \texttt{location-header} xml.}
+\caption{Sample \texttt{location-header} XML}
 \end{figure}
 
 \begin{figure}[H]
@@ -190,7 +210,7 @@ Additional to the elements proposed by TEI, the index schema for locations has t
 \begin{verbatim}
 <location-header>
    <placeName>
-      <settlement type="Dorf" w="true" w-ref="Staerk, Wüstungen Nr. 19">
+      <settlement type="Dorf" abandoned-village="true" aV-ref="Staerk, Wüstungen Nr. 19">
          Arschofen</settlement>
       <ddNames> (
          <addName>Arßhoffen</addName>)
@@ -202,29 +222,12 @@ Additional to the elements proposed by TEI, the index schema for locations has t
 </location-header>
 \end{verbatim}
 \label{fig:location-wuest-xml}
-\caption{Sample \texttt{location-header} xml with \textit{Wüstung}.}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\begin{verbatim}
-<placeName>
-    <settlement type="city">Rochester</settlement>,
-    <region type="state">New York</region>
-</placeName>
-
-<placeName>
-    <settlement type="Stadt" w="false">Saarbrücken</settlement>,
-    <region type="Bundesland">SL</region>
-</placeName>
-\end{verbatim}
-\label{fig:placeName}
-\caption{\texttt{placeName} in TEI vs. \texttt{placeName} in the sbr-regesten schema.}
+\caption{Sample \texttt{location-header} XML of an abandoned village \textit{Wüstung}}
 \end{figure}
 
 
 \paragraph{Landmark-Header}
-Figure~\ref{fig:landmark-header-xml} shows an example for a \texttt{landmark-header}. Landmark-headers consist of the elements \texttt{geogName}, \texttt{mentioned-in} and \texttt{index-refs}. The element \texttt{geogName} is alluded to the TEI \texttt{geogName}, but contains exactly the two elements name and \texttt{addNames} (additional names).
+Figure~\ref{fig:landmark-header-xml} shows an example for a \texttt{landmark-header}. Landmark-headers consist of the elements \texttt{geogName}, \texttt{mentioned-in} and \texttt{index-refs}. The element \texttt{geogName} is alluded to the TEI \texttt{geogName}, but contains exactly the two elements \texttt{name} and \texttt{addNames} (additional names).
 
 \begin{figure}[H]
 \centering
@@ -239,12 +242,12 @@ Figure~\ref{fig:landmark-header-xml} shows an example for a \texttt{landmark-hea
 </landmark-header>
 \end{verbatim}
 \label{fig:landmark-header-xml}
-\caption{Sample for \texttt{landmark-header}.}
+\caption{Sample for \texttt{landmark-header}}
 \end{figure}
 
 \paragraph{Person-Header}
-Figure~\ref{fig:person-header-xml} shows an example for a person-header. Person headers provide the element \texttt{person}. Person consists of \texttt{persName} and \texttt{description}, where \texttt{persName} is very close to TEI's \texttt{persName}. It contains (optional) \texttt{forename}, \texttt{surname}, \texttt{genName} (generational name, such as Senior, the first, II., etc., see TEI) and \texttt{roleName} (name of the role/occupation? of the person: Fürst, Herzog, Papst, official title/rank/position, see TEI). The only addition to TEI in \texttt{persName} is \texttt{maidenname} (maiden name). Also here we do not have a single additional name (\texttt{addName}), but the element \texttt{addNames}, which contains a list of \texttt{addName} elements. It is also important to know that a \texttt{person} has not only an item id (as the other headers do), but also an id that refers to the person itself. This is due to the fact, that the \texttt{person} element is also used in the \texttt{listing-body}. A person therefore has two attributes: \texttt{id} and \texttt{itemid}.
-The other element of \texttt{person} is called \texttt{description}. It provides additional information about the person, such as occupation, relation to other persons (married to, son of, etc.). It is of type \texttt{content}, which means, that it can contain \texttt{quote} elements, if there is original text in the \texttt{description}.
+Figure~\ref{fig:person-header-xml} shows an example for a \texttt{person-header}. Person headers provide the element \texttt{person}. Person consists of \texttt{persName} and \texttt{description}.\texttt{PersName} is very close to TEI's \texttt{persName}. It contains (optional) \texttt{forename}, \texttt{surname}, \texttt{genName} (generational name, such as Senior, the first, II., etc., see TEI) and \texttt{roleName} (name of the role/occupation? of the person: Fürst, Herzog, Papst, official title/rank/position, see TEI). The only addition to TEI in \texttt{persName} is \texttt{maidenname} (maiden name). Also here we do not have a single additional name (\texttt{addName}), but the element \texttt{addNames}, which contains a list of \texttt{addName} elements. It is also important to know that a \texttt{person} has not only an item id (as the other headers do), but also an id that refers to the person itself. This is due to the fact, that the \texttt{person} element is also used in the \texttt{listing-body}. A person therefore has two attributes: \texttt{id} and \texttt{itemid}.
+The other element of \texttt{person}, \texttt{description}, provides additional information about the person, such as occupation, relation to other persons (\textit{married to, son of,} etc.). It is of type \texttt{content}, which means, that it can contain \texttt{quote} elements, if there is original text in the \texttt{description}.
 
 \begin{figure}[H]
 \centering
@@ -266,11 +269,11 @@ The other element of \texttt{person} is called \texttt{description}. It provides
 </person-header>
 \end{verbatim}
 \label{fig:person-header-xml}
-\caption{Sample for \texttt{person-header}.}
+\caption{Sample for \texttt{person-header}}
 \end{figure}
 
 \paragraph{Family-Header}
-Figure~\ref{fig:family-header-xml} shows an example for a \texttt{family-header}. Family headers consist of the elements \texttt{family-name}, \texttt{location}, \texttt{mentioned-in} and \texttt{index-refs}. \texttt{Family-name} consists of name and \texttt{addNames} (additional names). \texttt{Location} is of type \texttt{placeName}, which is the same type that \texttt{location-header}s have. See section \textit{location-header} for more details.
+Figure~\ref{fig:family-header-xml} displays an example for a \texttt{family-header}. Family headers consist of the elements \texttt{family-name}, \texttt{location}, \texttt{mentioned-in} and \texttt{index-refs}. \texttt{Family-name} consists of name and \texttt{addNames} (additional names). \texttt{Location} is of type \texttt{placeName}, which is the same type that \texttt{location-headers} have. See section \ref{sec:location-header}\texttt{location-header} for more details.
 
 \begin{figure}[H]
 \centering
@@ -289,12 +292,11 @@ Figure~\ref{fig:family-header-xml} shows an example for a \texttt{family-header}
 </family-header>
 \end{verbatim}
 \label{fig:family-header-xml}
-\caption{Sample for \texttt{family-header}.}
+\caption{Sample for \texttt{family-header}}
 \end{figure}
 
 \paragraph{Persongroup-Header}
-Figure~\ref{fig:persongroup-header-xml} shows an example for a \texttt{persongroup-header}. Persongroup headers consist of the elements \texttt{group-name}, \texttt{mentioned-in} and \texttt{index-refs}. \texttt{Group-name} is a string, containing the name of the persongroup.
-not TEI's \texttt{listperson}, because it would be the actual list, which in our case is in the body..
+Figure~\ref{fig:persongroup-header-xml} shows an example for a \texttt{persongroup-header}. Persongroup headers consist of the elements \texttt{group-name}, \texttt{mentioned-in} and \texttt{index-refs}. \texttt{Group-name} contains the name of the persongroup.
 
 \begin{figure}[H]
 \centering
@@ -304,22 +306,16 @@ not TEI's \texttt{listperson}, because it would be the actual list, which in our
 </persongroup-header>
 \end{verbatim}
 \label{fig:persongroup-header-xml}
-\caption{Sample for \texttt{persongroup-header}.}
+\caption{Sample for \texttt{persongroup-header}}
 \end{figure}
 
 \subsubsection{Bodies}
 There are two different types of bodies: \texttt{Concept-body} and \texttt{listing-body}.
 
 \paragraph{Concept-body}
-TODO: A concept-body contains related concepts. Each related concept consists of at least one concept or person (either only concepts or only persons)
-concept:
-name
-description
-mentioned-in
-related-concepts
-person
-see person-header-person
-We might also find other concepts in relation to the first lever member.
+TODO: A concept-body contains the element \texttt{related-concepts}. \texttt{related-concepts}, in turn, consists of an unrestricted number of either \texttt{concepts} or \texttt{persons}\footnote{Note, that we only extract concepts and no persons at this point.}. A concept provides a \texttt{name}, a \texttt{description} and \texttt{mentioned-in}. Additionally, it can recursively contain an element \texttt{related-concepts}. For a \texttt{person}, see section xxx.
+
+
 \begin{figure}[H]
 \centering
 \begin{verbatim}
@@ -354,11 +350,11 @@ We might also find other concepts in relation to the first lever member.
 </concept-body>
 \end{verbatim}
 \label{fig:concept-body-xml}
-\caption{Sample for \textit{concept-body}.}
+\caption{Sample for \texttt{concept-body}}
 \end{figure}
 
 \paragraph{Listing-body}
-Figure~\ref{fig:listing-body-xml} shows an example for a \texttt{listing-body}. A listing-body consist of the element \texttt{members}. \texttt{Members} consists of a list of persons (same type as the persons appearing in a person-header). Each person can have related concepts, which recursively can have related concepts again, as in a concept-body.
+Figure~\ref{fig:listing-body-xml} illustrates an example for a \texttt{listing-body}. A listing-body consists of the element \texttt{members}. \texttt{Members} consists of a sequence of \texttt{persons}, which have the type as the persons appearing in a \texttt{person-header}(see section xxx). Each \texttt{person} can have a \texttt{related-concepts} element, which recursively can contain related concepts again, as in a concept-body.
 That means, that in a \texttt{persongroup} or \texttt{family}, the first layer displays members of that family or group. The concepts on the levels beyond might also be family or group members but not obligatory. Therefore they are not modelled as members on their own, but as related-concepts of that member.
 
 \begin{figure}[H]
@@ -391,7 +387,6 @@ That means, that in a \texttt{persongroup} or \texttt{family}, the first layer d
         </persName>
         <description>, Amtmann zu Saargemünd </description>
         <mentioned-in>
-
            <reg-ref regest="regest_934">1519-03-23</reg-ref>
         </mentioned-in>
      </person>
@@ -399,51 +394,50 @@ That means, that in a \texttt{persongroup} or \texttt{family}, the first layer d
 </listing-body>
 \end{verbatim}
 \label{fig:listing-body-xml}
-\caption{Sample for \texttt{listing-body}.}
+\caption{Sample for \texttt{listing-body}}
 \end{figure}
 
 
 \subsection{Index Extraction}
-In order to convert the Sbr-Regesten into an XML, relevant pieces of information have to be extracted from the HTML and tagged according to the schema. Additionally, the regests and index entries are written into the database \texttt{sbr-regesten.db}.
+In order to convert the Sbr-Regesten index into an XML, relevant pieces of information have to be extracted from the HTML and tagged according to the schema. Additionally, the index entries are written into the database \texttt{sbr-regesten.db}. This chapter will describe in more detail how the XML for the index is extracted. Generally, the index suffers many inconsistencies due to its manual construction. That complicates the index extraction.
 
 
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.5]{img/index-extractor}
-  \caption{Simplified architecture of \texttt{index\_extractor.py}.}
+  \caption{Simplified architecture of \texttt{index\_extractor.py}}
   \label{fig:index-extractor}
 \end{figure}
 
-This chapter will describe in more detail how the XML for the index is extracted. 
-Figure~\ref{fig:index-extractor} shows the basic architecture of the process of index extraction (\texttt{index\_extractor}). Note it does not display any classes, but is aimed to illustrate the logical structure/workflow of the index\_extractor to demonstrate its functionality. In short, the \texttt{index\_extractor} module finds the index in the HTML and extracts single index items. These are later postprocessed, before yielding the final XML for the index entries and writing them form the XML file into the database.
+Figure~\ref{fig:index-extractor} shows the basic architecture of the module (\texttt{index\_extractor.py}), which is responsible for the index extraction. Note that it does not display any classes, but is aimed to illustrate the logical structure/workflow of \texttt{index\_extractor.py} to demonstrate its functionality. In short, the \texttt{index\_extractor} module finds the index in the HTML and extracts single index items. These are postprocessed before yielding the final XML for the index entries and writing them form the XML file into the database.
 
-The index\_extractor is divided into three modules (to be found in \texttt{extraction/index\_utils}):
+The \texttt{index\_extractor.py} module is divided into three modules (stored in in \texttt{sbr-regesten/\-extraction/\-index\_utils}):
 
 \begin{itemize}
-\item index\_to\_xml converts the HTML to an almost complete XML
-\item index\_xml\_postprocess postprocesses the XML, solving the references to the index entries
-\item index\_to\_db extracts the index-items from the XML and writes them into the database
+\item \texttt{index\_to\_xml.py} extracts the index from the HTML file and converts it into an almost complete XML
+\item \texttt{index\_xml\_postprocess.py} postprocesses the XML solving the references to other index entries
+\item \texttt{index\_to\_db.py} extracts the index items from the XML and writes them into the database
 \end{itemize}
 
-The separation of converting the index into XML and writing them into the database, has two reasons: it is easier structured and it is possible to manually correct the XML-file before adding the items into the database.
+The separation of converting the index into XML and writing them into the database, has two reasons: it structures the module and it allows a manual correction of the extracted XML before before the item are added into the database.
 
 \subsubsection{From the Index to the XML}
-The module \texttt{index\_to\_xml.py} uses the python package BeautifulSoup to process the HTML and convert it into XML. One problem that arose was that due to the maximum recursion limit the very deep structured index entry \textit{Saarbrücken, Burgsiedlung/Dorf/Stadt} could not be processed. Therefore the recursion limit had to be increased\footnote{This seems to be a common problem, when using BeautifulSoup. See \href{http://blog.pablohoffman.com/maximum-recursion-limit-in-python}{this blog-entry on maximum-recursion-limit-in-python}.}.
+The module \texttt{index\_to\_xml.py} uses the python package \href{http://www.crummy.com/software/BeautifulSoup/bs4/doc/} {BeautifulSoup} to process the HTML and convert it into XML. One problem that arose was that due to the maximum recursion limit the very deep structured index entry \textit{Saarbrücken, Burgsiedlung/Dorf/Stadt} could not be processed. Therefore the recursion limit had to be increased\footnote{This seems to be a common problem when using BeautifulSoup. See this  \href{http://blog.pablohoffman.com/maximum-recursion-limit-in-python}{blog entry on maximum-recursion-limit-in-python}.}.
 
-Figure~\ref{fig:index-to-xml} shows the call graph of the basic functions of \texttt{index\_to\_xml.py} (excluding the preprocessing steps and the solving of index entries form the "siehe" list).
+Figure~\ref{fig:index-to-xml} shows the call graph for the main function of \texttt{index\_to\_xml.py}. It is pruned excluding the preprocessing steps and the solving index item types via solving index references.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.35]{img/index-to-xml}
-  \caption{Basic call graph of \texttt{index\_to\_xml}}.
+  \includegraphics[scale=0.37]{img/index-to-xml}
+  \caption{Basic/Pruned call graph of \texttt{index\_to\_xml.py}}.
   \label{fig:index-to-xml}
 \end{figure}
 
 \paragraph{ItemExtractor}
-The ItemExtractor (function \texttt{extract\_items()}) reads the HTML source and converts it into a BeautifulSoup instance. The extraction of the single index items is very straightforward, as the HTML provides tags for paragraphs (\texttt{<p>}). Each index item is a paragraph. In order to find the beginning of the index, the paragraph starting with the keyword \textit{Index} is searched. Once it is found, the ItemExtractor tags the next non-empty paragraph as \texttt{<index-info>}. Each of the following non-empty paragraphs is recognized as index-item. It obtains an id and is preprocessed (irrelevant tags are deleted from the HTML and some irregularities are overcome). An instance of Index Item is created, which divides the HTML-paragraph into a header and body field. The ItemExtractor finishes processing the paragraphs when reading more than 10 empty paragraphs in a row. In that case we assume the index-section to be finished. It can not be solved via a key as for the beginning of the index or as in the extraction of the other parts of the books as the index is the last part of the book, only followed by the footnotes (in the HTML file). All extracted item objects are stored in a list and are in the next step given to the ItemClassifier.
+The ItemExtractor (implemented by the function \texttt{extract\_items}) reads the HTML source and converts it into a \texttt{BeautifulSoup} instance. The detection of the single index items is very straightforward, as the HTML provides tags for paragraphs (\texttt{<p>}). Each index item is a paragraph. In order to find the beginning of the index, the paragraph starting with the keyword \textit{Index} is searched. Once it is found, the ItemExtractor tags the next non-empty paragraph as \texttt{<index-info>}. Each of the following non-empty paragraphs is recognized as index \texttt{item}. It obtains an id and is preprocessed. The preprocessing step deletes tags that are irrelevant from the HTML and overcomes some irregularities. An instance of \texttt{Index Item} is created, which divides the HTML paragraph into a header and body. The ItemExtractor finishes processing the paragraphs when reading more than ten empty paragraphs in a row. In that case the index section is assumed to be finished. The stopping can not be solved via a keyword as for the beginning of the index and as in the extraction of the other parts of the books because the index is the last part of the book, only followed by the footnotes (in the HTML file). All extracted item objects are stored in a list and are in the next step given to the ItemClassifier.
 
 \paragraph{ItemClassifier}
-The ItemClassifier is implemented by the function \texttt{classify\_and\_parse}. It classifies the items and forwards them to the corresponding parsers, where they are parsed and returned. The ItemClassifier obtains the list of item objects and searches the header of each item for a set of names/keys (retrieved by bootstrapping, see figure~\ref{fig:regex} \footnote{Note, that the order of the keys and the matches are relevant, as some are more confident than others.}). In this way it decides for each item whether it belongs to the group \textit{location, landmark, person, family, persongroup} or \textit{siehe}. It forwards the item to the corresponding parser (\texttt{loc\_to\_XML(), land\_to\_XML, pers\_to\_XML, fam\_to\_XML} and \texttt{persgr\_to\_XML} respectively). The items stored in the \textit{siehe} list contain no direct information about the group they belong to. But they contain references to other index entries. Assuming that referring and referenced entry have the same type, they are forwarded to the corresponding parser after having solved the reference. Items that do not contain any of the keywords are stored in the list \textit{unclassified} and are not further processed. This is the case for the entry \textit{Saarbrücken, Gliederung} as this is a rather unusual entry (see~\ref{sec:other-index-entry}).
+The ItemClassifier is implemented by the function \texttt{classify\_and\_parse}. It classifies the items and forwards them to their corresponding parsers, where they are parsed and returned. The ItemClassifier obtains the list of index items and searches the header of each item for a set of keys and regular expressions. These were retrieved by a manual bootstrapping process and are displayed in figure~\ref{fig:regex} \footnote{Note, that the order of the keys and the matches are relevant, as some are more confident than others.}). According to the keys, the ItemClassifier decides for each item whether it belongs to the group \textit{location, landmark, person, family, persongroup} or \textit{siehe}. It forwards the item to the corresponding parser (\texttt{loc\_to\_XML, land\_to\_XML, pers\_to\_XML, fam\_to\_XML} or \texttt{persgr\_to\_XML} respectively). The items stored in the \textit{siehe} list contain no direct information about the group they belong to. But they contain references to other index entries. Assuming that referring and referenced entry have the same type, they are forwarded to the corresponding parser after having solved the reference. Items that do not contain any of the keywords are stored in the list \textit{unclassified} and are not further processed. This is the case for the entry \textit{Saarbrücken, Gliederung} as this is a rather unusual entry (see section~\ref{sec:other-index-entry}).
 
 \begin{figure}
 \centering
@@ -482,24 +476,27 @@ landMatch = re.search('Fluss|Berg|gau[ ,]|Gau|Bach|Tal|Landschaft|'\
 
 \end{verbatim}
 \label{fig:regex}
-\caption{xxx.}
+\caption{Regular expressions used to classify the index items}
 \end{figure}
 
 
 \paragraph{ItemParser}
-Once the item is classified it is passed to its corresponding ItemParser. There is an item parser for each of the five groups. It forwards the header to the specific header parser of its group and the body to one of the two body parsers. It then adds the parsed item to an itemList.
-Each of the headerParsers returns also the name of its entry. This is taken as \texttt{value} for the items. \texttt{id} TODO
-
-E.g. the location paser passes the location header to the locationHeaderParser, which returns an XML location-header and the name of the item. This one is taken as value attribute. The id obtained by the ItemExtractor is taken as id attribute and the type is added. In the case of location, location. The other four parsers proceed analogously.
+When an item is classified it is passed to its corresponding ItemParser. There is an ItemParser for each of the five groups. It forwards the header to the specific header parser of its group and the body to one of the two body parsers. It then adds the parsed item to an itemList. The HeaderParsers return also the name of the index entry, which is taken as \texttt{value} attribute of \texttt{item}. For example, the LocationParser passes the header to the Location-Header-Parser, which returns an XML \texttt{location-header} and the name of the item. This name is taken as \texttt{value} attribute. The id obtained by the ItemExtractor is taken as \texttt{id} attribute and the \texttt{type} (in this case \texttt{location}) is added. The body is passed to the Cocept-Body-Parser. The LandmarkParser, PersonParser, FamilyParser and PersongroupParser proceed analogously. 
 
 \paragraph{Location-Header-Parser}
-The parser for the location headers (\texttt{loc\_header\_to\_XML}) builds a \texttt{<location-header>}, placeName and settlement. The latter gets the attributes \texttt{abandoned-village} and \texttt{av-ref} It looks for the keyword \textit{W.stung} to decide whether it is an abandoned village and sets abandoned village to true/false. The regular expression \texttt{Staerk, W.stungen Nr. [0-9]{1,2}} is extracted and taken as value for \texttt{av-ref}. The name of the settlement (added to the settlement tag) is extracted from the HTML via the \texttt{<b>} tag. From the rest of the HTML, the additional names are parsed, exploiting existing parenthesis and \texttt{<i>} tags. From the rest of the HTML location-header, all HTML tags are deleted before the rest is processed. Then references to the regests and to other index entries are parsed by the respective parsing functions (see section~\ref{sec:reg-refs} and \ref{sec:index-refs}). The remaining string is searched for the type of the settlement (for the whole list see figure~\ref{location-list}). If one of the keywords is found it is taken as value for the attribute \texttt{type} of \texttt{settlement}. The rest of the string is parsed by the function \texttt{parse\_place\_name} (see section~\ref{sec:addNames}). Afterwards, the placeNameTag is added to the location-header, as well as the references to the regests and the references to the index. The header is now parsed.
+The parser for the location headers (\texttt{loc\_header\_to\_XML}) builds a \texttt{<location-header>}, which contains a \texttt{<placeName>}, which again includes a \texttt{<settlement>}. The latter gets the attributes \texttt{abandoned-village} and \texttt{av-ref}. The parser searches the header for the keyword \textit{W.stung} in order to decide whether the location is an abandoned village and assigns \texttt{abandoned village} the corresponding value (\texttt{true/false}). The regular expression 
+
+\begin{verbatim}
+Staerk, W.stungen Nr. [0-9]{1,2} 
+\end{verbatim}
+
+is used to extract the reference to Staerk's catalogue\footnote{Dieter Staerk, Die Wüstungen des Saarlandes, Minerva-Verlag, Saarbrücken, 1974.} \texttt{av-ref}. The name of the location is extracted from the HTML via the \texttt{<b>} tag and added to the \texttt{<settlement>} tag. The additional names are parsed by the AddNamesParser (see section xxx) exploiting existing parenthesis and \texttt{<i>} tags. From the rest of the HTML location-header, all HTML tags are deleted before the rest is processed. Then references to the regests and to other index entries are parsed by the respective parsing functions (see section~\ref{sec:reg-refs} and \ref{sec:index-refs}). The remaining string is searched for the type of the settlement (for the whole list see figure~\ref{location-list}). If one of the keywords is found it is taken as value for the attribute \texttt{type} of \texttt{settlement}. The rest of the string is parsed by the function \texttt{parse\_place\_name} (see section~\ref{sec:addNames}). Afterwards, the placeNameTag is added to the location-header, as well as the references to the regests and the references to the index. The header is now parsed.
 
 \paragraph{Landmark-Header-Parser}
-The Landmark-Header-Parser is implemented by the function \texttt{land\_to\_XML}. It builds a BeautifulSoup item \texttt{<landmark-header>} and adds a \texttt{<geogName>} tag to it. The landmark's name is extracted via the \texttt{<b>} tags in the HTML and added to a \texttt{<name>} tag, which is appended to the \texttt{geogName}. The remaining HTML is passed to the AddNameParser in order to extract additional names, possibly appearing in the beginning. The remaining part is flattened to a string, whose end is searched for index-refs and mentionings. The remaining middle part is thereafter searched for a set of keys for the type of landmark. See figure~\ref{fig:location-list}. If none of the keys is found in the rest string, the name of the landmark is searched. This is because the type is often not explicitly specified if it is already contained in the name, e.g. \textit{Dirminger Tal, Ensdorfer Au}.
+The Landmark-Header-Parser is implemented by the function \texttt{land\_to\_XML}. It builds a BeautifulSoup instance \texttt{<landmark-header>} and adds a \texttt{<geogName>} tag to it. The landmark's name is extracted via the \texttt{<b>} tags in the HTML and added to a \texttt{<name>} tag, which is appended to \texttt{geogName}. The remaining HTML is passed to the AddNameParser in order to extract additional names, possibly appearing in the beginning. The remaining part is flattened to a string, whose end is searched for index-refs and mentionings. The remaining middle part is thereafter searched for a set of keys for the type of landmark. See figure~\ref{fig:location-list}. If none of the keys is found in the rest string, the name of the landmark is searched. This is because the type is often not explicitly specified if it is already contained in the name, e.g. \textit{Dirminger Tal, Ensdorfer Au}.
 
 \paragraph{Person-Header-Parser}
-The person headers are parsed by the function \texttt{pers\_header\_to\_XML()}. It builds a \texttt{<person-header>} BeautifulSoup Tag and adds a \texttt{<person>} tag to it. The latter obtains a continious id with the pattern \texttt{person\_[0-9]+}. A tag \texttt{<persName>} is added to the \texttt{person}. The \texttt{name} is extracted exploiting the \texttt{<b>} tags of the HTML. Thereafter, the HTML tags are aborted and index-refs and mentionings are extracted from the end of the remaining string(see section~\ref{sec:index-refs} and \ref{sec:reg-refs}). The remaining middle part is then used to extract \texttt{forename, surname, genName and roleName}. A set of keywords (e.g. \textit{der Dritte, der Junge, Jr} for \texttt{genName} and \textit{Kaiser, Herzogin, Graf} for \texttt{roleName}). A list of forenames is provided by the file \texttt{resources/forenames.txt} which is imported at the beginning of \texttt{index\_to\_xml.py} and augmented during the extraction by the Listing-Body-Parser. A set of regular expressions describes possible combinations of these different names. The first matching rule is chosen and the item header tagged accordingly. The remaining part of the string is tagged as \texttt{<description>}. At the end the extracted index-refs and mentionings are added to the \texttt{<person-header>} tag.
+The person headers are parsed by the function \texttt{pers\_header\_to\_XML}. It builds a \texttt{<person-header>} BeautifulSoup Tag and adds a \texttt{<person>} tag to it. The latter obtains a continious id with the pattern \texttt{person\_[0-9]+}. A tag \texttt{<persName>} is added to the \texttt{person}. The \texttt{name} is extracted exploiting the \texttt{<b>} tags of the HTML. Thereafter, the HTML tags are aborted and index-refs and mentionings are extracted from the end of the remaining string(see section~\ref{sec:index-refs} and \ref{sec:reg-refs}). The remaining middle part is then used to extract \texttt{forename, surname, genName and roleName}. A set of keywords (e.g. \textit{der Dritte, der Junge, Jr} for \texttt{genName} and \textit{Kaiser, Herzogin, Graf} for \texttt{roleName}). A list of forenames is provided by the file \texttt{resources/forenames.txt} which is imported at the beginning of \texttt{index\_to\_xml.py} and augmented during the extraction by the Listing-Body-Parser. A set of regular expressions describes possible combinations of these different names. The first matching rule is chosen and the item header tagged accordingly. The remaining part of the string is tagged as \texttt{<description>}. At the end the extracted index-refs and mentionings are added to the \texttt{<person-header>} tag.
 
 \paragraph{Family-Header-Parser}
 The headers of family items are parsed by the function \texttt{fam\_header\_to\_XML}. A \texttt{<family-header>} tag is created and a tag \texttt{<family-name>} is appended to it. The latter contains the name of the family extracted from the HTML via the \texttt{<b>} tags. Afterwards, the \texttt{<b>} tag is deleted and the rest of the HTML is searched for additional names. The rest of the HTML that does not contain any additional names is converting into a tag-less string. If this contains an opening parenthesis before the next word, the content of these parenthesis are detected to be a location, which is parsed by the placeName Parser (see section~\ref{sec:addNames}), which also parses the corresponding part from the location headers. The part following the parenthesis (if there were such, elsewise, the whole remaining string) is searched for index-refs and mentionings.
@@ -524,6 +521,7 @@ The function \texttt{parse\_mentionings} recognizes the references to the regest
 \paragraph{Concept-Body-Parser}
 
 \paragraph{Listing-Body-Parser}
+ 
 
 
 \paragraph{Postprocessing}
@@ -539,7 +537,7 @@ The function \texttt{parse\_mentionings} recognizes the references to the regest
 
 \subsubsection{Future Work}
 
-This section presents possible next steps for expanding the index schema, the index extraction and possible further uses. Depending on the use or queries of the Sbr-regesten, different expansions will have priority. In order to manipulate the regesten, a copy of the source code is requiered. To obtain such, see section~\ref{sec:git}.
+This section presents possible next steps for expanding the index schema, the index extraction and possible further uses. Depending on the use or queries of the Sbr-Regesten, different expansions will have priority. In order to manipulate the regesten, a copy of the source code is requiered. To obtain such, see section~\ref{sec:git}.
 \paragraph{References to the Regests}
 At the time of developing the index extraction, the regest part of the book was not extracted or written into the database yet. Once this is the case, the first expansion of the current code would be to solve the references to the regests. The references are already recognised and tagged with reg-ref. Each reg-ref is supposed to store the id of the regest it refers to in the attribute regest. At the moment, this is not yet the case. The function \texttt{get\_regest\_ID} in \texttt{index\_to\_xml.py} returns the correct id only in cases where the date in the form "1532-11-24" is sufficient to disambiguate the regests. In other cases it returns the dummy id regest\_99999. We would recommand to reimplement the function \texttt{get\_regest\_ID} and solve the references directly searching the database, as the regests are added to the database before \texttt{index\_to\_xml.py} is called. To include the references also in the database, the function \texttt{ment\_to\_db} in \texttt{index\_to\_db.py} has to be implemented.
 
@@ -551,7 +549,7 @@ list of forenames as input, postprocess similar to siehe, manually increment lis
 The regests and the index do not provide only information about entities, but also about the relations they have. This becomes evident especially in the case of persons. The index already provides information such as "married with" or "son of". This information could be extracted to build networks of relations between persons.
 
 \paragraph{Quotes}
-The HTML provides information about which parts of the text are original text. Such sections are marked with italics (<i>). To mark original text the Sbr-regesten schema introduces the element 'Quotes'. This is mainly used in the regests. In the index quotes are only possible in the description part of the bodies. The tag <addNames> implicitly encodes this information as they extract text in italics. Otherwise this information gets lost during the process of extraction. But we can imagine the usefulness of conserving information about original text also in other parts of the index, we propose to expand the schema to allow quotes.
+The HTML provides information about which parts of the text are original text. Such sections are marked with italics (<i>). To mark original text the Sbr-Regesten schema introduces the element 'Quotes'. This is mainly used in the regests. In the index quotes are only possible in the description part of the bodies. The tag <addNames> implicitly encodes this information as they extract text in italics. Otherwise this information gets lost during the process of extraction. But we can imagine the usefulness of conserving information about original text also in other parts of the index, we propose to expand the schema to allow quotes.
 
 \paragraph{Expand References to the Index}
 TODO: References to the index are only found and solved if they appear in the header right after the mentionings. But in some cases such references occur in other places as well (often in the bodies or before the district). The schema could be adapted to allow \texttt{reg-refs} there as well. They would have to be marked by texttt{index\_to\_xml.py} and would then (automatically) be extracted by the existing the \texttt{parse\_siehe} function in \texttt{index\_xml\_postprocess}.
