@@ -173,8 +173,8 @@ Figure~\ref{fig:location-header-xml} and \ref{fig:location-wuest-xml} show examp
     <region type="Bundesland">SL</region>
 </placeName>
 \end{verbatim}
-\label{fig:placeName}
 \caption{\texttt{placeName} in TEI vs. \texttt{placeName} in the Sbr-Regesten schema}
+\label{fig:placeName}
 \end{figure}
 
 Additional to \texttt{placeName}, the index schema for locations introduces two elements: \texttt{addNames} and \texttt{reference-point}. \texttt{AddNames} contains a list of additional names of the location, each of them tagged as \texttt{addName}. \texttt{Reference-point} includes further information that is not covered by \texttt{district, region} or \texttt{country}. It specifies closer where to find the location, e.g. \textit{Im Köllertal, bei St. Ingbert} (\textit{in the Köllertal, near St. Ingbert}). All elementsin \texttt{placeName} are optional (even settlement, as \texttt{placeName} also occurs in family headers, where locations are given, without their names being explicitly specified.)   
@@ -201,8 +201,8 @@ Additional to \texttt{placeName}, the index schema for locations introduces two 
    </index-refs>
 </location-header>
 \end{verbatim}
-\label{fig:location-header-xml}
 \caption{Sample \texttt{location-header} XML}
+\label{fig:location-header-xml}
 \end{figure}
 
 \begin{figure}[H]
@@ -221,8 +221,8 @@ Additional to \texttt{placeName}, the index schema for locations introduces two 
    </placeName>
 </location-header>
 \end{verbatim}
-\label{fig:location-wuest-xml}
 \caption{Sample \texttt{location-header} XML of an abandoned village \textit{Wüstung}}
+\label{fig:location-wuest-xml}
 \end{figure}
 
 
@@ -241,8 +241,8 @@ Figure~\ref{fig:landmark-header-xml} shows an example for a \texttt{landmark-hea
    </geogName>, Fluss 
 </landmark-header>
 \end{verbatim}
-\label{fig:landmark-header-xml}
 \caption{Sample for \texttt{landmark-header}}
+\label{fig:landmark-header-xml}
 \end{figure}
 
 \paragraph{Person-Header}
@@ -268,8 +268,8 @@ The other element of \texttt{person}, \texttt{description}, provides additional 
    </mentioned-in>
 </person-header>
 \end{verbatim}
-\label{fig:person-header-xml}
 \caption{Sample for \texttt{person-header}}
+\label{fig:person-header-xml}
 \end{figure}
 
 \paragraph{Family-Header}
@@ -291,8 +291,8 @@ Figure~\ref{fig:family-header-xml} displays an example for a \texttt{family-head
   </location>), Familie von 
 </family-header>
 \end{verbatim}
-\label{fig:family-header-xml}
 \caption{Sample for \texttt{family-header}}
+\label{fig:family-header-xml}
 \end{figure}
 
 \paragraph{Persongroup-Header}
@@ -305,8 +305,8 @@ Figure~\ref{fig:persongroup-header-xml} shows an example for a \texttt{persongro
    <group-name>Notare </group-name>
 </persongroup-header>
 \end{verbatim}
-\label{fig:persongroup-header-xml}
 \caption{Sample for \texttt{persongroup-header}}
+\label{fig:persongroup-header-xml}
 \end{figure}
 
 \subsubsection{Bodies}
@@ -349,8 +349,8 @@ TODO: A concept-body contains the element \texttt{related-concepts}. \texttt{rel
    </related-concepts>
 </concept-body>
 \end{verbatim}
-\label{fig:concept-body-xml}
 \caption{Sample for \texttt{concept-body}}
+\label{fig:concept-body-xml}
 \end{figure}
 
 \paragraph{Listing-body}
@@ -393,8 +393,8 @@ That means, that in a \texttt{persongroup} or \texttt{family}, the first layer d
   </members>
 </listing-body>
 \end{verbatim}
-\label{fig:listing-body-xml}
 \caption{Sample for \texttt{listing-body}}
+\label{fig:listing-body-xml}
 \end{figure}
 
 
@@ -475,8 +475,8 @@ landMatch = re.search('Fluss|Berg|gau[ ,]|Gau|Bach|Tal|Landschaft|'\
                       header)
 
 \end{verbatim}
-\label{fig:regex}
 \caption{Regular expressions used to classify the index items}
+\label{fig:regex}
 \end{figure}
 
 
@@ -519,9 +519,11 @@ The function \texttt{parse\_mentionings} recognizes the references to the regest
 \texttt{parse\_addnames} obtains a flat HTML element and extracts additional names. Additional names are written in italics and in parenthesis. Therefore the parser looks for \texttt{<i>} tags surrounded by parenthesis. The string inside contains the additional names, which are separated by commas. Each is tagged with \texttt{<addName>} and added to a \texttt{<addNames>} tag.
 
 \paragraph{Concept-Body-Parser}
+\label{sec:conc-body-parser}
+The Concept-Body-Parser 
 
 \paragraph{Listing-Body-Parser}
- 
+
 
 
 \paragraph{Postprocessing}
@@ -538,6 +540,7 @@ The function \texttt{parse\_mentionings} recognizes the references to the regest
 \subsubsection{Future Work}
 
 This section presents possible next steps for expanding the index schema, the index extraction and possible further uses. Depending on the use or queries of the Sbr-Regesten, different expansions will have priority. In order to manipulate the regesten, a copy of the source code is requiered. To obtain such, see section~\ref{sec:git}.
+
 \paragraph{References to the Regests}
 At the time of developing the index extraction, the regest part of the book was not extracted or written into the database yet. Once this is the case, the first expansion of the current code would be to solve the references to the regests. The references are already recognised and tagged with reg-ref. Each reg-ref is supposed to store the id of the regest it refers to in the attribute regest. At the moment, this is not yet the case. The function \texttt{get\_regest\_ID} in \texttt{index\_to\_xml.py} returns the correct id only in cases where the date in the form "1532-11-24" is sufficient to disambiguate the regests. In other cases it returns the dummy id regest\_99999. We would recommand to reimplement the function \texttt{get\_regest\_ID} and solve the references directly searching the database, as the regests are added to the database before \texttt{index\_to\_xml.py} is called. To include the references also in the database, the function \texttt{ment\_to\_db} in \texttt{index\_to\_db.py} has to be implemented.
 
