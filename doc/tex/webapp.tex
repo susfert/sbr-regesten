@@ -506,6 +506,35 @@ should follow these steps:
   using the \texttt{clone} command above with the appropriate URL.
 \end{enumerate}
 
+\paragraph{A Note About the XML Schema}
+The XML schema for the Sbr-Regesten was developed using a separate Git
+repository called \emph{regesten-schemas}.\footnote{In case you are
+  not interested in the Sbr-Regesten Web Application and only want to
+  modify or extend the XML schema, you can \texttt{clone} the
+  regesten-schemas repository directly from the following URL:
+  \texttt{https://github.com/itsjeyd/regesten-schemas.git}} This
+repository is integrated into the main repository as a
+\emph{submodule}. When you clone the \texttt{sbr-regesten} repository
+using the \texttt{clone} command listed above, Git will not download
+any files associated with the submodule: Its folder
+(\texttt{sbr-regesten/regesten-schemas}) will be empty. To download
+the contents of the regesten-schemas repository to this folder, you
+need to run
+
+\begin{verbatim}
+$ git submodule init
+\end{verbatim}
+
+followed by
+
+\begin{verbatim}
+$ git submodule update
+\end{verbatim}
+
+For more information on Git submodules, refer to
+\href{http://git-scm.com/book/en/Git-Tools-Submodules}{this section}
+of the ``ProGit'' book listed below.
+
 \paragraph{Git Resources}
 There is a wealth of information about how to use Git available
 online, so it does not make sense to duplicate this information here.
