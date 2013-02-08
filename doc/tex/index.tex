@@ -421,7 +421,7 @@ The \texttt{index\_extractor.py} module is divided into three modules (stored in
 
 The index extraction is implemented in two separate stages which convert the index into XML and store it in the database, respectively. This has two reasons: it structures the module and it allows a manual correction of the extracted XML before before the items are added to the database.
 
-\subsubsection{From the Index to XML}
+\subsubsection{Extracting, classifying and parsing Index Items}
 The module \texttt{index\_to\_xml.py} uses the python package \href{http://www.crummy.com/software/BeautifulSoup/bs4/doc/} {BeautifulSoup} to process the HTML file and convert it into its XML representation. One problem that arose was that due to the maximum recursion limit the very deep structured index entry \textit{Saarbrücken, Burgsiedlung/Dorf/Stadt} could not be processed. Therefore the recursion limit had to be increased\footnote{This seems to be a common problem when using BeautifulSoup. See this  \href{http://blog.pablohoffman.com/maximum-recursion-limit-in-python}{blog entry on maximum-recursion-limit-in-python}.}.
 
 Figure~\ref{fig:index-to-xml} shows the call graph for the main function of \texttt{index\_to\_xml.py}. It is pruned excluding the preprocessing steps and the solving of underspecified index items (see section \ref{sec:classifier} \texttt{ItemClassifier}).
@@ -482,7 +482,11 @@ landMatch = re.search('Fluss|Berg|gau[ ,]|Gau|Bach|Tal|Landschaft|'\
 
 
 \paragraph{ItemParser}
-When an item is classified it is passed to its corresponding ItemParser. There is an ItemParser for each of the five groups. It forwards the header to the specific header parser of its group and the body to one of the two body parsers. It then adds the parsed item to an itemList. The HeaderParsers return also the name of the index entry, which is taken as \texttt{value} attribute of \texttt{item}. For example, the LocationParser passes the header to the Location-Header-Parser, which returns an XML \texttt{location-header} and the name of the item. This name is taken as \texttt{value} attribute. The id obtained by the ItemExtractor is taken as \texttt{id} attribute and the \texttt{type} (in this case \texttt{location}) is added. The body is passed to the Concept-Body-Parser. The LandmarkParser, PersonParser, FamilyParser and PersongroupParser proceed analogously. 
+When an item is classified it is passed to its corresponding ItemParser. There is an ItemParser for each of the five groups. It forwards the header to the specific header parser of its group and the body to one of the two body parsers. It then adds the parsed item to an itemList. The HeaderParsers return also the name of the index entry, which is taken as \texttt{value} attribute of \texttt{item}. For example, the LocationParser passes the header to the Location-Header-Parser, which returns an XML \texttt{location-header} and the name of the item. This name is taken as \texttt{value} attribute. The id obtained by the ItemExtractor is taken as \texttt{id} attribute and the \texttt{type} (in this case \texttt{location}) is added. The body is passed to the Concept-Body-Parser. The LandmarkParser, PersonParser, FamilyParser and PersongroupParser proceed analogously. The following two sections describe the parsers for the headers and the bodies.
+
+
+\subsubsection{Header Parsers}
+This section describes the five parser functions for the different item headers: \textit{Location-Header-Parser, Landmark-Header-Parser, Person-Header-Parser, Family-Header-Parser} and \textit{Persongroup-Header-Parser}. Functionalities that are used by several parsers are presented at the end of this section: references to the index, references to the regest and parsing of additional names.
 
 \paragraph{Location-Header-Parser}
 The parser for the location headers (\texttt{loc\_header\_to\_XML}) builds a \texttt{<location-header>}, which contains a \texttt{<placeName>}, which again includes a \texttt{<settlement>}. The latter gets the attributes \texttt{abandoned-village} and \texttt{av-ref}. The parser searches the header for the keyword \textit{W.stung} in order to decide whether the location is an abandoned village and assigns \texttt{abandoned village} the corresponding value (\texttt{true/false}). The regular expression 
@@ -519,6 +523,10 @@ The function \texttt{parse\_mentionings} recognizes the references to the regest
 \label{sec:addNames}
 \texttt{parse\_addnames} obtains a flat HTML element and extracts additional names. Additional names are written in italics and in parenthesis. Therefore the parser looks for \texttt{<i>} tags surrounded by parenthesis. The string inside contains the additional names, which are separated by commas. Each is tagged with \texttt{<addName>} and added to a \texttt{<addNames>} tag.
 
+
+\subsubsection{Body Parsers}
+This section describes the two parser functions for index bodies \textit{Concept-Body-Parser} and \textit{Listing-Body-Parser}.
+
 \paragraph{Concept-Body-Parser}
 \label{sec:conc-body-parser}
 The Concept-Body-Parser is implemented by the function \texttt{conc\_body\_to\_XML}. It splits the HTML item into lines, making use of the \texttt{<br>} tags. It created a \texttt{<concept-body>} tag, which contains \texttt{<related-concepts>} tag. Each non-indented HTML line is a \texttt{concept} and added to \texttt{<related-concepts>}. It is split into \texttt{name}, \texttt{description} and \texttt{mentionings}. \texttt{Mentionings} are extracted according to paragraph \ref{sec:reg-refs} \textit{References to the regests}. The remaining string is split at the first comma. The first part of the string will be the \texttt{name} of the concept and the second its \texttt{description}. The indented lines below a concept are added to a \texttt{related-concepts}. \texttt{related-concepts} again is split into concepts and processes recursively. \texttt{<name>}, \texttt{<description>}, \texttt{<mentionings>} and \texttt{<related-concepts>} are added to the \texttt{<concept>} tag.
@@ -527,11 +535,13 @@ The Concept-Body-Parser is implemented by the function \texttt{conc\_body\_to\_X
 The parser for listing bodies is implemented by the function \texttt{listing\_body\_to\_XML}. It builds a \texttt{<listing-body>} tag, which again contains a \texttt{<members>} tag. The Listing-Body-Parser splits the item HTML in lines exploiting the \texttt{<br>} tags. Each non-indented line is a person. A \texttt{<person>} tag is created which contains a \texttt{<persName>} tag. In almost all cases, the string of the person starts with its forename (especially in family-headers, where the surname is already given in the header). The Listing-Body-Parser therefore tags the first word in the person as \texttt{<forename>} and adds it to the \texttt{<persName>} tag. These forenames are additionally used to extend the forenames list (which is provided by \texttt{sbr-regesten/resources/forenames.txt} and used to find forenames in person headers). From the remaining string additional names (\texttt{addNames}) are parsed and added to \texttt{<persName>}. \texttt{<mentionings>} are extracted as described in section \ref{sec:reg-refs} \textit{References to regests}). The remaining part is tagged as \texttt{<description>}. The indented lines below a person-line are \texttt{related-concepts} of that person. The latter are parsed recursively using the same process as described in the paragraph above(\ref{sec:conc-body-parser}). \texttt{<persName>}, \texttt{<description>}, \texttt{<mentionings>} and \texttt{<related-concepts>} are added to the \texttt{<person>} tag.
 
 
+\subsubsection{Post-Processing}
+
 \paragraph{ItemPostprocessor}
 \label{sec:postproc}
 The post-processing step solves the references to other in index entries. This is only possible when the entire index is already parsed, as it searches all index items. The post-processing step is carreid out by the module \texttt{index\_xml\_postprocess.py}. It takes the temporary file \texttt{index.xml} as input, which was produced by the module \texttt{index\_to\_xml.py} and deletes it afterwards. It builds a \texttt{BeautifulSoup} instance out of the index XML, which is split into single index items. It detects the yet unsolved \texttt{<reg-refs>} tags and splits the contained string into the single references (using comma as separator). The references are solved by matching the string to the \texttt{value} of each index item. If the reference can be solved, a \texttt{<reg-ref>} tag is added to \texttt{<reg-refs>}. The id of the referred index item is stored in the attribute \texttt{regest}. Finally, the parsed index is added to \texttt{sbr-regesten/sbr-regesten.xml}.
 
-\subsubsection{From the Index XML to the Database}
+\subsubsection{Writing the Index into the Database}
 \texttt{index\_to\_db.py} takes the \texttt{sbr-regesten.xml} as input and processes the index items. It creates an entry in the database, extracts the tags from the item and adds the information to the fields defined in the model (see section~\ref{sec:data-model}).
 
 
