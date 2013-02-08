@@ -215,8 +215,13 @@ over these entries.
 \label{sec:index-schema}
 One of the main contributions of the Sbr-Regesten project was to
 create an XML schema for the Sbr-Regesten. The schema can be found in
-the file \texttt{sbr-regesten/regesten-schemas/sbr-regesten.xsd}. It
-was as far as it was applicable designed to comply with the
+the file
+
+\begin{verbatim}
+sbr-regesten/regesten-schemas/sbr-regesten.xsd
+\end{verbatim}
+
+It was as far as it was applicable designed to comply with the
 \href{http://www.tei-c.org/Guidelines/} {TEI
   Guidelines}\footnote{\href{http://www.tei-c.org/Guidelines/P5/index.xml}{TEI
     P5}: Guidelines for Electronic Text Encoding and Interchange by
@@ -815,8 +820,8 @@ as the references to the regests and the references to the index. The
 header is now parsed.
 
 \paragraph{Landmark-Header-Parser}
-The Landmark-Header-Parser is implemented by the function
-\texttt{land\_to\_XML}. It builds a \texttt{BeautifulSoup} instance
+The function \texttt{land\_to\_XML} implements the parser for landmark
+headers. It builds a \texttt{BeautifulSoup} instance
 \texttt{<landmark-header>} and adds a \texttt{<geogName>} tag to it.
 The landmark's name is extracted via the \texttt{<b>} tags in the HTML
 and added to a \texttt{<name>} tag, which is appended to
@@ -831,15 +836,14 @@ type is often not explicitly specified if it is already contained in
 the name, e.g. \textit{Dirminger Tal, Ensdorfer Au}.
 
 \paragraph{Person-Header-Parser}
-The person headers are parsed by the function
-\texttt{pers\_header\_to\_XML}. It builds a \texttt{<person-header>}
-\texttt{BeautifulSoup} tag and adds a \texttt{<person>} tag to it. The
-latter obtains a continious id with the pattern
-\texttt{person\_[0-9]+}. A tag \texttt{<persName>} is added to the
-\texttt{person}. The \texttt{name} is extracted exploiting the
-\texttt{<b>} tags of the HTML. Thereafter, the HTML tags are aborted
-and index-refs and mentionings are extracted from the end of the
-remaining string (see Section~\ref{sec:index-refs} and
+The function \texttt{pers\_header\_to\_XML} parses person headers. It
+builds a \texttt{<person-header>} \texttt{BeautifulSoup} tag and adds
+a \texttt{<person>} tag to it. The latter obtains a continious id with
+the pattern \texttt{person\_[0-9]+}. A tag \texttt{<persName>} is
+added to the \texttt{person}. The \texttt{name} is extracted
+exploiting the \texttt{<b>} tags of the HTML. Thereafter, the HTML
+tags are aborted and index-refs and mentionings are extracted from the
+end of the remaining string (see Section~\ref{sec:index-refs} and
 \ref{sec:reg-refs}). The remaining middle part is then used to extract
 \texttt{forename, surname, genName and roleName}. For that purpose, a
 set of keywords is exploited (e.g. \textit{der Dritte, der Junge, Jr}
@@ -855,20 +859,19 @@ the end the extracted index-refs and mentionings are added to the
 \texttt{<person-header>} tag.
 
 \paragraph{Family-Header-Parser}
-The headers of family items are parsed by the function
-\texttt{fam\_header\_to\_XML}. A \texttt{<family-header>} tag is
-created and a tag \texttt{<family-name>} is appended to it. The latter
-contains the name of the family extracted from the HTML via the
-\texttt{<b>} tags. Afterwards, the \texttt{<b>} tag is deleted and the
-rest of the HTML is searched for additional names. The rest of the
-HTML that does not contain any additional names is converted into a
-tag-less string. If this contains an opening parenthesis before the
-next word, the content of these parenthesis are detected to be a
-location, which is parsed by the placeName Parser (see
-Section~\ref{sec:addNames}), which also parses the corresponding part
-from the location headers. The part following the parenthesis (if
-there were such, elsewise, the whole remaining string) is searched for
-index-refs and mentionings.
+The function \texttt{fam\_header\_to\_XML} parses headers of family
+items. A \texttt{<family-header>} tag is created and a tag
+\texttt{<family-name>} is appended to it. The latter contains the name
+of the family extracted from the HTML via the \texttt{<b>} tags.
+Afterwards, the \texttt{<b>} tag is deleted and the rest of the HTML
+is searched for additional names. The rest of the HTML that does not
+contain any additional names is converted into a tag-less string. If
+this contains an opening parenthesis before the next word, the content
+of these parenthesis are detected to be a location, which is parsed by
+the placeName Parser (see Section~\ref{sec:addNames}), which also
+parses the corresponding part from the location headers. The part
+following the parenthesis (if there were such, elsewise, the whole
+remaining string) is searched for index-refs and mentionings.
 
 \paragraph{Persongroup-Header-Parser}
 The Parser for persongroup-headers is the least complex headerParser,
@@ -928,17 +931,16 @@ This section describes the two parser functions for index bodies
 
 \paragraph{Concept-Body-Parser}
 \label{sec:conc-body-parser}
-The Concept-Body-Parser is implemented by the function
-\texttt{conc\_body\_to\_XML}. It splits the HTML item into lines,
-making use of the \texttt{<br>} tags. It created a
-\texttt{<concept-body>} tag, which contains
-\texttt{<related-concepts>} tag. Each non-indented HTML line is a
-\texttt{concept} and added to \texttt{<related-concepts>}. It is split
-into \texttt{name}, \texttt{description} and \texttt{mentionings}.
-\texttt{Mentionings} are extracted according to paragraph
-\ref{sec:reg-refs} \textit{References to the regests}. The remaining
-string is split at the first comma. The first part of the string will
-be the \texttt{name} of the concept and the second its
+The function \texttt{conc\_body\_to\_XML} implements the
+Concept-Body-Parser. It splits the HTML item into lines, making use of
+the \texttt{<br>} tags. It created a \texttt{<concept-body>} tag,
+which contains \texttt{<related-concepts>} tag. Each non-indented HTML
+line is a \texttt{concept} and added to \texttt{<related-concepts>}.
+It is split into \texttt{name}, \texttt{description} and
+\texttt{mentionings}. \texttt{Mentionings} are extracted according to
+paragraph \ref{sec:reg-refs} \textit{References to the regests}. The
+remaining string is split at the first comma. The first part of the
+string will be the \texttt{name} of the concept and the second its
 \texttt{description}. The indented lines below a concept are added to
 a \texttt{related-concepts}. \texttt{related-concepts} again is split
 into concepts and processes recursively. \texttt{<name>},
@@ -946,23 +948,22 @@ into concepts and processes recursively. \texttt{<name>},
 \texttt{<related-concepts>} are added to the \texttt{<concept>} tag.
 
 \paragraph{Listing-Body-Parser}
-The parser for listing bodies is implemented by the function
-\texttt{listing\_body\_to\_XML}. It builds a \texttt{<listing-body>}
-tag, which again contains a \texttt{<members>} tag. The
-Listing-Body-Parser splits the item HTML in lines exploiting the
-\texttt{<br>} tags. Each non-indented line is a person. A
-\texttt{<person>} tag is created which contains a \texttt{<persName>}
-tag. In almost all cases, the string of the person starts with its
-forename (especially in family-headers, where the surname is already
-given in the header). The Listing-Body-Parser therefore tags the first
-word in the person as \texttt{<forename>} and adds it to the
-\texttt{<persName>} tag. These forenames are additionally used to
-extend the forenames list (which is provided by
-\texttt{sbr-regesten/resources/forenames.txt} and used to find
-forenames in person headers). From the remaining string additional
-names (\texttt{addNames}) are parsed and added to \texttt{<persName>}.
-\texttt{<mentionings>} are extracted as described in
-Section~\ref{sec:reg-refs} \textit{References to regests}). The
+The function \texttt{listing\_body\_to\_XML} implements the parser for
+listing bodies. It builds a \texttt{<listing-body>} tag, which again
+contains a \texttt{<members>} tag. The Listing-Body-Parser splits the
+item HTML in lines exploiting the \texttt{<br>} tags. Each
+non-indented line is a person. A \texttt{<person>} tag is created
+which contains a \texttt{<persName>} tag. In almost all cases, the
+string of the person starts with its forename (especially in
+family-headers, where the surname is already given in the header). The
+Listing-Body-Parser therefore tags the first word in the person as
+\texttt{<forename>} and adds it to the \texttt{<persName>} tag. These
+forenames are additionally used to extend the forenames list (which is
+provided by \texttt{sbr-regesten/resources/forenames.txt} and used to
+find forenames in person headers). From the remaining string
+additional names (\texttt{addNames}) are parsed and added to
+\texttt{<persName>}. \texttt{<mentionings>} are extracted as described
+in Section~\ref{sec:reg-refs} \textit{References to regests}). The
 remaining part is tagged as \texttt{<description>}. The indented lines
 below a person-line are \texttt{related-concepts} of that person. The
 latter are parsed recursively using the same process as described in
@@ -1032,18 +1033,23 @@ be implemented.
 
 \paragraph{Extracting Person Names}
 The user can provide a list of forenames, which is used to extract the
-names of \texttt{person} items. The forenames have to be stored in
-\texttt{sbr-regesten/resources/forenames.txt}. During the extraction
-of the index it uses this list to recognize forenames and expands it
-at the same time. Newly amended names are only considered from the
-point on they were added. This could be overcome by proceeding similar
-to the solving of references to other index items (see
-Section~\ref{sec:index-refs}). In the extraction step persons would be
-recognized and parsed as such. At the same time the list of forenames
-would be augmented. In the post-processing step all extracted
-forenames could be used to parse the names. Additionally, a similar
-process could be conceivable for surnames, role names and generative
-names.
+names of \texttt{person} items. The forenames have to be stored in the
+file
+
+\begin{verbatim}
+sbr-regesten/resources/forenames.txt
+\end{verbatim}
+
+During the extraction of the index it uses this list to recognize
+forenames and expands it at the same time. Newly amended names are
+only considered from the point on they were added. This could be
+overcome by proceeding similar to the solving of references to other
+index items (see Section~\ref{sec:index-refs}). In the extraction step
+persons would be recognized and parsed as such. At the same time the
+list of forenames would be augmented. In the post-processing step all
+extracted forenames could be used to parse the names. Additionally, a
+similar process could be conceivable for surnames, role names and
+generative names.
 
 \paragraph{Quotes}
 The HTML source provides information about which parts of the text are
