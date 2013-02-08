@@ -5,6 +5,7 @@ Author: Susanne Fertmann <s9sufert@stud.uni-saarland.de>
 """
 
 
+import os
 import codecs
 import string
 import re
@@ -110,7 +111,7 @@ def index_xml_postprocess():
                 outFile.write("\n")
                 
             outFile.write('\n </sbr-regesten>')
-    
+    os.remove('index.xml')
     print ('postprocessing done!')
     
 if __name__=='main':
