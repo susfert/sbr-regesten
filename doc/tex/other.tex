@@ -10,7 +10,7 @@ lot less involved than the ``Regesten'' and ``Index'' parts.
 
 The \emph{front matter} section of the Sbr-Regesten contains the full
 title of the book, some information about the authors/editors and the
-cover art, as well as some acknowledgments about financial support.
+cover art, as well as some acknowledgements about financial support.
 
 \paragraph{XML Schema}
 
@@ -102,16 +102,17 @@ The bibliography is extracted by the module
 \texttt{bibliography\_extractor.py}. The module reads the entire HTML
 source and turns it into a \texttt{BeautifulSoup} instance. It then
 proceeds to split the document up into paragraphs exploiting the
-\texttt{<p>} tag in the HTML. Then, the
+\texttt{<p>} tag in the HTML source. Then, the
 \texttt{bibliography\_extractor.py} creates a \texttt{<listBibl>} tag.
 In order to find the paragraphs relevant to the bibliography it
 searches for the keyword \emph{Literaturverzeichnis}. Once this is
 found, it starts extracting the bibliography. The first paragraph
 following the keyword \emph{Literaturverzeichnis} is tagged as
-\texttt{<listBibl-info>} and appended to it. Each of the following
-non-empty paragraphs obtains a \texttt{<bibl>} tag with a continuous
-id as attribute and is again appended to the \texttt{<listBibl>} tag.
-The \texttt{bibliography\_extractor.py} stops when finding the keyword
+\texttt{<listBibl-info>} and appended to \texttt{<listBibl>}. Each
+of the following non-empty paragraphs is tagged as \texttt{<bibl>}
+and also added to \texttt{<listBibl>}. A continuous ID is 
+assigned to each \texttt{<bibl>} and stored as attribute. The 
+\texttt{bibliography\_extractor.py} stops when finding the keyword
 \emph{Abk}, which is the beginning of the next section of the book.
 The created \texttt{BeautifulSoup} instance is
 \href{http://www.crummy.com/software/BeautifulSoup/bs4/doc/#pretty-printing}{prettified}
