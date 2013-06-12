@@ -161,8 +161,10 @@ def parse_mentionings(text):
     
     affix = ' \([a-f]?k?u?r?z? ?n?a?c?h?v?o?r?n?t?e?u?m?p?o?s?t?a?n?t?e?z?w?i?s?c?h?e?c?a?\.?n?n?o?c?h? ?V?a?t?e?r?\??\.?\)'
     
-    ment = '(?:\[?\+\]? )?[01][0-9]{3}\-?\/?[01]?[0-9]?\-?[0-3]?[0-9]?(\/[01][0-9])?('\
+    sing_ment = '(?:\[?\+\]? )?[01][0-9]{3}\-?\/?[01]?[0-9]?\-?[0-3]?[0-9]?(\/[01][0-9])?('\
           + affix +')*( Anm\.)?'
+    
+    ment = sing_ment + '( ?[-/] ?' + sing_ment + ')?'
     
     # 1525 (a) (ca.)
     # 1544-12-25 (nach) (a)
@@ -431,7 +433,8 @@ def loc_header_to_XML(header):
                  '|F.rstentum|Deutschordenskommende|Zisterzienserabtei|M.hle'\
                  '|Hochstift|Pfarrei|Erzstift|Erzbistum|Dekanat|Burgsiedlung'\
                  '|Domstift|Reichsland|Deutschordensballei|Wasserburg|Region'\
-                 '|Regierungssitz|Deutschordenshaus|Gebiet|Gde\.|Reichsstadt'
+                 '|Regierungssitz|Deutschordenshaus|Gebiet|Gde\.|Reichsstadt'\
+                 '|lothr\. Amt'
     settlement = '(?:' + settlementKeys + ')(?![\w])'
     settleMatch = re.match('(?u)(.*?)('+ settlement +')(.*?)', text)
     
@@ -809,6 +812,7 @@ def listing_body_to_XML(body):
     
         rest, ment = parse_mentionings(person.get_text())
         personAttrList = rest.split(',')
+        #re.split('[,\[]', rest)
         personName=personAttrList[0]
         personTag = soup.new_tag('person')
         global person_id
