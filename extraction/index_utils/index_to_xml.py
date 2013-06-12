@@ -429,7 +429,7 @@ def loc_header_to_XML(header):
                  '|Hochstift|Pfarrei|Erzstift|Erzbistum|Dekanat|Burgsiedlung'\
                  '|Domstift|Reichsland|Deutschordensballei|Wasserburg|Region'\
                  '|Regierungssitz|Deutschordenshaus|Gebiet|Gde\.|Reichsstadt'
-    settlement = '(?:' + settlementKeys + ')(/'+settlementKeys+'){0,3}(?![\w])'
+    settlement = '(?:' + settlementKeys + ')(?![\w])'
     settleMatch = re.match('(?u)(.*?)('+ settlement +')(.*?)', text)
     
     if settleMatch:
