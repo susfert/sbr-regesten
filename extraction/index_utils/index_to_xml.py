@@ -228,8 +228,8 @@ def parse_pers_name (nameTag, personName):
     
     genNameKeys = 'der .ltere|d\. .ltere|der J.ngere|der Erste|der Zweite'\
                   '|I\.|II\.|der Dritte|III\.|IV\.|V\.|VI\.|VII\.|VIII\.|IX\.'\
-                  '|X\.|Junior|Jr|Senior|Sr|der Junge|der Alte'
-    genNameMatch = re.search('(.{3,}?)(\[?' + genNameKeys + '\]?)(.*)', \
+                  'XI\.|X\.|Junior|Jr|Senior|Sr|der Junge|der Alte'
+    genNameMatch = re.search('(.{3,}?)( \[?)(' + genNameKeys + '\]?)(.*)', \
                             personName)
     addNameMatch = re.search('(.*?)' + '(gen\.|den man nennet|'\
                              'dem man sprichet)' + '(.+)', personName)
@@ -239,8 +239,9 @@ def parse_pers_name (nameTag, personName):
         if foreName.strip() != '':
             nameTag.append(foreTag)     
             foreTag.append(foreName) 
-        genName = genNameMatch.group(2)
-        restName = genNameMatch.group(3)
+        nameTag.append(genNameMatch.group(2))
+        genName = genNameMatch.group(3)
+        restName = genNameMatch.group(4)
         genNameTag = soup.new_tag('genName')
         nameTag.append(genNameTag)
         genNameTag.append(genName)     
@@ -323,7 +324,7 @@ def parse_place_name (placeNameTag, text, ref_point=True):
                    'Kr\. [^,;]+|[-\w]+kreis|Stadt [\w][\w]\.|Stadt [\w-]+|'\
                    'Kreis [^;,]+'
     regionKeys = 'Dep\.,? [A-Za-z-]+|SL|NRW|By|RLP|BW|Prov\..+|Hessen'
-    countryKeys = 'B|F|NL|CH|Lux|It|L|Spanien|T.rkei'
+    countryKeys = 'B|F|NL|CH|Lux|It|L|Spanien|T.rkei|Estland'
     
     district = '(?:' + districtKeys + ')(?:, (?:' + districtKeys + '))?'
     region = regionKeys
@@ -427,8 +428,8 @@ def loc_header_to_XML(header):
                  '|F.rstentum|Deutschordenskommende|Zisterzienserabtei|M.hle'\
                  '|Hochstift|Pfarrei|Erzstift|Erzbistum|Dekanat|Burgsiedlung'\
                  '|Domstift|Reichsland|Deutschordensballei|Wasserburg|Region'\
-                 '|Regierungssitz|Deutschordenshaus'
-    settlement = '(?:' + settlementKeys + ')(?![\w])'
+                 '|Regierungssitz|Deutschordenshaus|Gebiet|Gde\.|Reichsstadt'
+    settlement = '(?:' + settlementKeys + ')(/'+settlementKeys+'){0,3}(?![\w])'
     settleMatch = re.match('(?u)(.*?)('+ settlement +')(.*?)', text)
     
     if settleMatch:
