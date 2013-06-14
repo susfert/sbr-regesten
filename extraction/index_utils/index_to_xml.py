@@ -814,6 +814,21 @@ def listing_body_to_XML(body):
         personAttrList = rest.split(',')
         #re.split('[,\[]', rest)
         personName=personAttrList[0]
+        comma = True
+        if '(' in personName and not ')' in personName or '(' in personName and '1' in personName:
+            l = personName.split('(')
+            personName = l[0]
+            print('name: '+personName)
+            rest_string = '(' + '('.join(l[1:])
+            print('reststring: '+ rest_string)
+            copy = personAttrList
+            personAttrList = [personName]+[rest_string] + copy[1:]
+            print(str(personAttrList))
+            comma = False
+
+
+ #or '[' in personName:
+            
         personTag = soup.new_tag('person')
         global person_id
         personTag['id'] = 'person_'+str(person_id)
@@ -841,13 +856,16 @@ def listing_body_to_XML(body):
                 parse_pers_name(nameTag, possAddName)
                 personAttrList = personAttrList[1:]
         
-        for attr in personAttrList[1:]:
-            attrs = attrs + ',' + attr
+        attrs = ','.join(personAttrList[1:])
+        print('attrs: '+attrs)
 
         persInfoTag = soup.new_tag('description')
         if attrs:
             personTag.append(persInfoTag)
+            if comma:
+                persInfoTag.append(',')
             persInfoTag.append(attrs)
+            print(persInfoTag)
         
         if ment:
             personTag.append(ment)
