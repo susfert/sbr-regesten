@@ -60,7 +60,7 @@ def create_person(xmlNode):
     
     p = Person()
     pers_name = xmlNode.persname
-    p.name = pers_name.get_text()
+    p.name = pers_name.get_text().strip()
     p.additional_names = if_exists(pers_name.addNames)
     p.forename = if_exists(pers_name.forename)
     p.surname = if_exists(pers_name.surname)
@@ -80,7 +80,7 @@ def create_concept(xmlNode):
     global idConc
     
     c = Concept()
-    c.name = name.get_text()
+    c.name = name.get_text().strip()
     c.description = if_exists(xmlNode.description)
     c.id = idConc
     idConc += 1
